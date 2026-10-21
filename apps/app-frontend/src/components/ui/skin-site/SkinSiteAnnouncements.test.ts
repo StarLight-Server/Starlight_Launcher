@@ -28,6 +28,11 @@ const stubs: Record<string, string> = {
 }
 const hooks = registerHooks({
 	resolve(specifier, context, nextResolve) {
+		if (specifier === '@/helpers/remote-announcements')
+			return nextResolve(
+				new URL('../../../helpers/remote-announcements.ts', import.meta.url).href,
+				context,
+			)
 		if (specifier in stubs)
 			return {
 				url: `data:text/javascript,${encodeURIComponent(stubs[specifier])}`,
@@ -139,4 +144,21 @@ test('a failed announcement request can be retried', async (t) => {
 	await state.load()
 	assert.equal(state.failed, false)
 	assert.equal(state.announcements[0].id, 3)
+})
+
+test('the home announcement list retains entries beyond the five-item preview', async (t) => {
+	testSession.skinSiteStatus.value = 'signed-in'
+	testGlobal.skinSiteAnnouncementFetch = async () => ({
+		success: true,
+		payload: Array.from({ length: 7 }, (_, index) => ({
+			id: index + 1,
+			title: 'Announcement',
+			updateAt: index,
+			star: false,
+		})),
+	})
+	const state = mount(t)
+	await flush()
+	assert.equal(state.announcements.length, 7)
+	assert.equal(state.announcements[0].id, 7)
 })

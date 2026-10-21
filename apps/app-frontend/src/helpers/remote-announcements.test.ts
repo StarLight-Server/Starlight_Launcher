@@ -1,7 +1,24 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { mapBroadcastAnnouncements } from './remote-announcements.ts'
+import { mapBroadcastAnnouncements, parseAnnouncements } from './remote-announcements.ts'
+
+test('a broadcast with a long subtitle remains readable through the announcement center', () => {
+	const mapped = mapBroadcastAnnouncements([
+		{
+			id: 42,
+			title: 'A long announcement',
+			subtitle: '摘要'.repeat(200),
+			content: 'The complete announcement body remains available.',
+			updateAt: 1791640873710,
+			star: false,
+			importantLevel: 1,
+		},
+	])
+	const [announcement] = parseAnnouncements(mapped) ?? []
+	assert.equal(announcement?.id, '42')
+	assert.equal(announcement?.content, 'The complete announcement body remains available.')
+})
 
 test('maps a broadcast entry into a remote announcement', () => {
 	const result = mapBroadcastAnnouncements([

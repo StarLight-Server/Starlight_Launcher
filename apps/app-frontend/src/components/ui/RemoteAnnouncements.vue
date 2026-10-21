@@ -13,6 +13,11 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 
 import {
+	requestSkinSiteDownloadToken,
+	skinSiteStatus,
+	waitForSkinSiteSession,
+} from '@/composables/skin-site-session.ts'
+import {
 	announcementKey,
 	isAnnouncementActive,
 	mapBroadcastAnnouncements,
@@ -22,12 +27,6 @@ import {
 	type RemoteAnnouncement,
 	safeAnnouncementUrl,
 } from '@/helpers/remote-announcements'
-
-import {
-	requestSkinSiteDownloadToken,
-	skinSiteStatus,
-	waitForSkinSiteSession,
-} from '@/composables/skin-site-session.ts'
 
 const props = defineProps<{ ready: boolean; previewOnly?: boolean }>()
 const { formatMessage } = useVIntl()
@@ -69,7 +68,7 @@ const queuedThisSession = new Set<string>()
 const startupNotified = new Set<string>()
 let items: RemoteAnnouncement[] = []
 let pending: RemoteAnnouncement[] = []
-let cacheKey = 'starlight-remote-announcements-cache-v1'
+const cacheKey = 'starlight-remote-announcements-cache-v1'
 let cacheLoaded = false
 let disposed = false
 let interval: ReturnType<typeof setInterval> | undefined
@@ -110,9 +109,10 @@ function openCenter(item?: RemoteAnnouncement) {
 	}
 	void nextTick(() => modal.value?.show())
 }
-function handleOpenCenter() {
+function handleOpenCenter(event: Event) {
 	if (props.previewOnly) return
-	openCenter()
+	const requested = event instanceof CustomEvent ? event.detail?.announcement : undefined
+	openCenter(parseAnnouncements([requested])?.[0])
 }
 async function show(item: RemoteAnnouncement) {
 	if (
@@ -132,11 +132,14 @@ function selectAnnouncement(item: RemoteAnnouncement) {
 	selected.value = item
 	const key = announcementKey(item)
 	read.add(key)
+	if (startupNotice.value && announcementKey(startupNotice.value) === key)
+		startupNotice.value = null
 	pending = pending.filter((entry) => announcementKey(entry) !== key)
 	persist()
 	emitState()
 }
 function markAllRead() {
+	startupNotice.value = null
 	for (const item of items) {
 		read.add(announcementKey(item))
 	}

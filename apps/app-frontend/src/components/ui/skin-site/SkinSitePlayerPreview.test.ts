@@ -14,6 +14,7 @@ const session = {
 const testGlobal = globalThis as unknown as {
 	previewTestSession: typeof session
 	previewNormalize: (skin: { texture: string }) => Promise<string>
+	previewFetchImage: (url: string) => Promise<string>
 }
 testGlobal.previewTestSession = session
 const require = createRequire(import.meta.url)
@@ -22,7 +23,10 @@ const componentUrl = new URL('./SkinSitePlayerPreview.vue', import.meta.url).hre
 const stubs: Record<string, string> = {
 	'@modrinth/assets': 'export const RefreshCwIcon={}, SpinnerIcon={}, UserIcon={}',
 	'@modrinth/ui':
-		'export const commonMessages={retryButton:{defaultMessage:"Retry"}}; export const defineMessages=x=>x; export const useVIntl=()=>({formatMessage:x=>x.defaultMessage})',
+		'export const ButtonStyled={}; export const commonMessages={retryButton:{defaultMessage:"Retry"}}; export const defineMessages=x=>x; export const useVIntl=()=>({formatMessage:x=>x.defaultMessage})',
+	'vue-router': 'export const useRouter=()=>({push:async()=>{}})',
+	'@/helpers/skin-site-render':
+		'export const fetchImageAsDataUrl=url=>globalThis.previewFetchImage(url)',
 	'@modrinth/ui/src/components/skin/SkinPreviewRenderer.vue': 'export default {}',
 	'./SkinSiteSelectionRail.vue': 'export default {}',
 	'@/composables/skin-site-session':
@@ -77,9 +81,102 @@ function mountPreview(t: test.TestContext, card: unknown) {
 	app.provide('accountsCard', card)
 	const instance = app.mount({})
 	t.after(() => app.unmount())
-	return (instance.$ as unknown as { setupState: { texture: string; textureLoading: boolean } })
-		.setupState
+	return (
+		instance.$ as unknown as {
+			setupState: {
+				texture: string
+				textureLoading: boolean
+				textureFailed: boolean
+				capeTexture: string
+				retryTexture: () => Promise<void>
+			}
+		}
+	).setupState
 }
+
+test('a failed skin load is recoverable without changing the selected player', async (t) => {
+	const card = ref({
+		accounts: [{ profile: { id: 'first', name: 'First' }, account_type: 'microsoft' }],
+		defaultUser: 'first',
+		getAccountSkin: () => ({ texture: 'https://textures.test/skin.png', variant: 'CLASSIC' }),
+		getAccountAvatarUrl: () => undefined,
+	})
+	let available = false
+	testGlobal.previewNormalize = async () => {
+		if (!available) throw new Error('Network unavailable')
+		return 'data:image/png;base64,recovered-skin'
+	}
+	const state = mountPreview(t, card)
+	await flush()
+	assert.equal(state.textureFailed, true)
+	assert.equal(state.texture, '')
+	available = true
+	await state.retryTexture()
+	assert.equal(state.textureFailed, false)
+	assert.equal(state.texture, 'data:image/png;base64,recovered-skin')
+	assert.equal(card.value.defaultUser, 'first')
+})
+
+test('cape downloads follow the active player and discard a late previous cape', async (t) => {
+	const card = ref({
+		accounts: ['first', 'second'].map((id) => ({
+			profile: {
+				id,
+				name: id,
+				capes: [
+					{ id: 'inactive', state: 'INACTIVE', url: 'https://textures.test/inactive.png' },
+					{ id, state: 'ACTIVE', url: `https://textures.test/${id}-cape.png` },
+				],
+			},
+			account_type: 'microsoft',
+		})),
+		defaultUser: 'first',
+		getAccountSkin: () => ({ texture: 'https://textures.test/skin.png', variant: 'CLASSIC' }),
+		getAccountAvatarUrl: () => undefined,
+	})
+	testGlobal.previewNormalize = async () => 'data:image/png;base64,skin'
+	const requests: Array<{ url: string; finish: (texture: string) => void }> = []
+	testGlobal.previewFetchImage = (url) => new Promise((finish) => requests.push({ url, finish }))
+	const state = mountPreview(t, card)
+	await flush()
+	assert.equal(requests[0]?.url, 'https://textures.test/first-cape.png')
+	card.value.defaultUser = 'second'
+	await flush()
+	requests[1].finish('data:image/png;base64,second-cape')
+	await flush()
+	requests[0].finish('data:image/png;base64,first-cape')
+	await flush()
+	assert.equal(state.capeTexture, 'data:image/png;base64,second-cape')
+	assert.equal(state.texture, 'data:image/png;base64,skin')
+})
+
+test('changing only a cape keeps the current skin loaded', async (t) => {
+	const profile = {
+		id: 'first',
+		name: 'First',
+		capes: [{ id: 'cape', state: 'ACTIVE', url: 'https://textures.test/cape.png' }],
+	}
+	const card = ref({
+		accounts: [{ profile, account_type: 'microsoft' }],
+		defaultUser: 'first',
+		getAccountSkin: () => ({ texture: 'https://textures.test/skin.png', variant: 'CLASSIC' }),
+		getAccountAvatarUrl: () => undefined,
+	})
+	let normalizations = 0
+	testGlobal.previewNormalize = async () => {
+		normalizations++
+		return 'data:image/png;base64,skin'
+	}
+	testGlobal.previewFetchImage = async (url) =>
+		`data:image/png;base64,${url.endsWith('/new.png') ? 'new' : 'old'}`
+	const state = mountPreview(t, card)
+	await flush()
+	card.value.accounts[0].profile.capes[0].url = 'https://textures.test/new.png'
+	await flush()
+	assert.equal(state.capeTexture, 'data:image/png;base64,new')
+	assert.equal(state.texture, 'data:image/png;base64,skin')
+	assert.equal(normalizations, 1)
+})
 
 test('home normalizes official textures and ignores a late texture after switching players', async (t) => {
 	const accounts = [

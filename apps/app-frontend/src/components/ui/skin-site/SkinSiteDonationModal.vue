@@ -19,6 +19,7 @@ import {
 import { formatDonationAmount } from './donation-format'
 
 const { formatMessage } = useVIntl()
+const emit = defineEmits<{ summaryUpdated: [summary: SkinSitePublicDonationSummary] }>()
 const messages = defineMessages({
 	title: { id: 'app.skin-site.home.donation.title', defaultMessage: 'Donation thanks' },
 	total: { id: 'app.skin-site.home.donation.total', defaultMessage: 'Total raised' },
@@ -58,6 +59,7 @@ async function load(reset = false) {
 		if (!result.success) throw new Error(result.errorMessage)
 		items.value = [...items.value, ...result.payload.items]
 		summary.value = result.payload.summary
+		emit('summaryUpdated', result.payload.summary)
 		hasMore.value = result.payload.hasMore
 	} catch {
 		if (request === generation) failed.value = true

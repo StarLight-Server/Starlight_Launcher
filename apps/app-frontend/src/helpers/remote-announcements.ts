@@ -129,7 +129,8 @@ export function mapBroadcastAnnouncements(payload: unknown): RemoteAnnouncement[
 				: 0
 		const starred = item.star === true
 		const published = new Date(item.updateAt).toISOString()
-		const summary = typeof item.subtitle === 'string' && item.subtitle.trim() ? item.subtitle : null
+		const summary =
+			typeof item.subtitle === 'string' && item.subtitle.trim() ? item.subtitle.slice(0, 300) : null
 		items.push({
 			id,
 			title: item.title,

@@ -63,12 +63,21 @@ type State = {
 	load: (reset?: boolean) => Promise<void>
 	show: () => void
 }
-function mount(t: test.TestContext) {
-	const app = renderer.createApp(Donations)
+function mount(t: test.TestContext, props = {}) {
+	const app = renderer.createApp(Donations, props)
 	const instance = app.mount({})
 	t.after(() => app.unmount())
 	return (instance.$ as unknown as { setupState: State }).setupState
 }
+
+test('a loaded donation page updates the summary shown by its parent', async (t) => {
+	const updates: unknown[] = []
+	testGlobal.donationTestFetch = async () => page(1, false)
+	const state = mount(t, { onSummaryUpdated: (summary: unknown) => updates.push(summary) })
+	state.show()
+	await flush()
+	assert.deepEqual(updates, [{ totalAmount: '12.50', donorCount: 1 }])
+})
 const page = (id: number, hasMore = true) => ({
 	success: true,
 	payload: {

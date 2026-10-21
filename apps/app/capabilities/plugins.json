@@ -62,6 +62,12 @@
 					"url": "https://skin.starlight.cool/*"
 				},
 				{
+					"url": "https://textures.minecraft.net/texture/*"
+				},
+				{
+					"url": "http://textures.minecraft.net/texture/*"
+				},
+				{
 					"url": "http://localhost:8000/*"
 				},
 				{

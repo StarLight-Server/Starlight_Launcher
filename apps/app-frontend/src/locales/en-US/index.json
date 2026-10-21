@@ -13095,5 +13095,14 @@
   "app.skin-site.home.preview.loading": { "message": "Loading players…" },
   "app.skin-site.home.preview.failed": {
     "message": "Could not load skin-site players."
-  }
+  },
+  "app.skin-site.home.preview.skin-failed": { "message": "Could not load this skin." },
+  "app.skin-site.home.preview.cape-failed": { "message": "Could not load this cape." },
+  "app.skin-site.home.preview.manage": { "message": "Manage skin" },
+  "app.skin-site.home.preview.choose": { "message": "Select a player" },
+  "app.skin-site.home.preview.choose-hint": {
+    "message": "Choose a player on the left to preview their skin."
+  },
+  "app.skin-site.home.preview.skin-loading": { "message": "Loading skin…" },
+  "app.skin-site.home.announcements.view-all": { "message": "View all" }
 }

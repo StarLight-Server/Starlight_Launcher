@@ -13350,5 +13350,12 @@
   },
   "app.skin-site.home.preview.unavailable": { "message": "此玩家没有可预览的皮肤。" },
   "app.skin-site.home.preview.loading": { "message": "正在加载玩家…" },
-  "app.skin-site.home.preview.failed": { "message": "无法加载皮肤站玩家。" }
+  "app.skin-site.home.preview.failed": { "message": "无法加载皮肤站玩家。" },
+  "app.skin-site.home.preview.skin-failed": { "message": "无法加载此玩家的皮肤。" },
+  "app.skin-site.home.preview.cape-failed": { "message": "无法加载此玩家的披风。" },
+  "app.skin-site.home.preview.manage": { "message": "管理皮肤" },
+  "app.skin-site.home.preview.choose": { "message": "选择玩家" },
+  "app.skin-site.home.preview.choose-hint": { "message": "从左侧选择一个玩家，即可预览皮肤。" },
+  "app.skin-site.home.preview.skin-loading": { "message": "正在加载皮肤…" },
+  "app.skin-site.home.announcements.view-all": { "message": "查看全部" }
 }
