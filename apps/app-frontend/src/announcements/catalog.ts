@@ -33,6 +33,117 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.2',
+		version: '1.0.2',
+		publishedAt: '2026-10-25',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.2',
+			'zh-CN': 'Starlight Launcher 1.0.2',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'Native skin site: sign-in, registration, password reset, account settings, players, downloads, world map, wiki, bug tracker, player review, chat rooms, and announcements all run inside the launcher, with a full admin console for server operators.',
+					'zh-CN':
+						'皮肤站全面原生化：登录、注册、找回密码、账号设置、玩家管理、资源下载、世界地图、维基、问题追踪、玩家审核、聊天室与公告中心均在启动器内运行，并为服务器管理员提供完整管理台。',
+				},
+				{
+					'en-US':
+						'Cross-instance sync: share game options, resource packs, data packs, multiplayer servers, command history, and creative hotbars across instances, with per-option toggles and a fine-grained game-settings editor.',
+					'zh-CN':
+						'跨实例同步：在实例间共享游戏设置、资源包、数据包、多人游戏服务器、命令历史与创造模式物品栏，支持逐项开关与精细的游戏设置编辑器。',
+				},
+				{
+					'en-US':
+						'Crash analysis: JVM and launcher crash logs can be uploaded, shared, and explained by an AI assistant, with automatic mod-change snapshots for quick diagnosis.',
+					'zh-CN':
+						'崩溃分析：支持上传与分享 JVM 崩溃和启动器日志，AI 助手自动解释崩溃原因，并自动对比崩溃前的模组变更以便快速定位。',
+				},
+				{
+					'en-US':
+						'Keyboard shortcuts: navigate and scroll the launcher with rebindable shortcuts configured in Settings.',
+					'zh-CN': '键盘快捷键：可在设置中自定义启用并重排导航与快速滚动快捷键。',
+				},
+				{
+					'en-US':
+						'Instance groups: drag instances into groups in the library, with the grouping saved and synced.',
+					'zh-CN': '实例分组：在资源库中拖拽实例进行分组，分组结果保存并同步。',
+				},
+				{
+					'en-US':
+						'Customize the Minecraft window title, and reorder both the skin site navigation tabs and the instance page tabs in Settings.',
+					'zh-CN':
+						'支持自定义 Minecraft 窗口标题；皮肤站导航标签与实例页面标签顺序均可在设置中调整。',
+				},
+				{
+					'en-US':
+						'Announcement center: launcher release notes and community announcements are browsable in-app.',
+					'zh-CN': '公告中心：可在启动器内浏览版本更新日志与社区公告。',
+				},
+				{
+					'en-US':
+						'Anniversary easter egg on October 4th, with extra hidden triggers to discover.',
+					'zh-CN': '每年 10 月 4 日的周年庆彩蛋，另藏有其他触发方式等你发现。',
+				},
+			],
+			changed: [
+				{
+					'en-US':
+						'The skin site no longer runs in an embedded web page; all views are native launcher interfaces.',
+					'zh-CN': '皮肤站不再依赖内嵌网页，全部界面改为启动器原生实现。',
+				},
+				{
+					'en-US':
+						'Modpack downloads are served from a dedicated download domain.',
+					'zh-CN': '整合包下载改由独立下载域名提供。',
+				},
+				{
+					'en-US':
+						'The launcher repository was renamed to Starlight_Launcher.',
+					'zh-CN': '启动器仓库更名为 Starlight_Launcher。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'Security fixes backported from upstream: modpack path traversal patches now protect installs from unsafe paths.',
+					'zh-CN':
+						'合入上游安全修复：整合包路径穿越补丁现已保护安装过程免受不安全路径影响。',
+				},
+				{
+					'en-US':
+						'Fixed live logs falling behind and crash-log uploads failing; LogShare collection was switched to a lightweight collector.',
+					'zh-CN':
+						'修复实时日志积压与崩溃日志上传失败；LogShare 采集改用轻量日志收集器。',
+				},
+				{
+					'en-US':
+						'Fixed the announcement center crashing, wiki and profile pages going blank, garbled skin previews after switching players, instance groups not refreshing, and the server map being blocked by the content security policy.',
+					'zh-CN':
+						'修复公告中心崩溃、维基与个人资料页面空白、切换玩家后皮肤预览错乱、实例分组不刷新，以及服务器地图被内容安全策略拦截的问题。',
+				},
+				{
+					'en-US':
+						'Fixed false "content updated" prompts after automatic sync, and cross-instance sync tables missing on upgrade.',
+					'zh-CN': '修复自动同步后误报内容更新，以及升级后跨实例同步数据表缺失的问题。',
+				},
+				{
+					'en-US':
+						'Fixed online-player prompts not rendering MOTD colors, backups failing for instances with external game directories, and the captcha image being cropped.',
+					'zh-CN':
+						'修复在线玩家提示不渲染 MOTD 颜色、外部游戏目录实例备份失败，以及验证码图片被裁切的问题。',
+				},
+				{
+					'en-US':
+						'Fixed Linux installs defaulting the game directory incorrectly, onboarding steps not scrolling to the target, and the update channel defaulting incorrectly for fresh installs.',
+					'zh-CN':
+						'修复 Linux 安装时游戏目录默认值错误、引导步骤不自动滚动到目标，以及全新安装更新渠道默认值错误的问题。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-1.0.2-beta16',
 		version: '1.0.2-beta16',
 		publishedAt: '2026-10-25',
