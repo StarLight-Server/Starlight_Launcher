@@ -33,6 +33,24 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.2-beta16',
+		version: '1.0.2-beta16',
+		publishedAt: '2026-10-25',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.2-beta16',
+			'zh-CN': 'Starlight Launcher 1.0.2-beta16',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'The order of the skin site navigation tabs can now be customized in Settings, under Home & navigation.',
+					'zh-CN': '新增皮肤站导航标签顺序自定义，可在设置的「主页与导航」中调整。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-1.0.2-beta15',
 		version: '1.0.2-beta15',
 		publishedAt: '2026-10-24',
