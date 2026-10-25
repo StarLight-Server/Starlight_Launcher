@@ -1442,6 +1442,12 @@
   "app.appearance-settings.sidebar-instance-count.description": {
     "message": "侧边栏中显示的最大实例数量。设为 0 则显示全部。"
   },
+  "app.appearance-settings.instance-tab-order.description": {
+    "message": "调整实例页面中「内容、文件、截图、世界、日志」标签的显示顺序。"
+  },
+  "app.appearance-settings.instance-tab-order.title": {
+    "message": "实例页面标签顺序"
+  },
   "app.appearance-settings.sidebar-instance-count.title": {
     "message": "侧边栏实例数量限制"
   },
@@ -12112,6 +12118,12 @@
   },
   "app.settings.logs.open-folder": {
     "message": "打开日志文件夹"
+  },
+  "app.settings.order-list.move-down": {
+    "message": "将{name}下移"
+  },
+  "app.settings.order-list.move-up": {
+    "message": "将{name}上移"
   },
   "app.settings.logs.export.modal.title": {
     "message": "导出日志"

@@ -179,6 +179,7 @@ export type AppSettings = {
 	home_widgets: HomeDashboardConfig | null
 	terracotta_public_nodes: string[]
 	skin_site_nav_order: string[]
+	instance_tab_order: string[]
 
 	onboarded: boolean
 	onboarding_version: number
@@ -250,6 +251,7 @@ function normalizeDownloadSettings(settings: AppSettings & LegacyMirrorSettings)
 	settings.ignore_ssl_errors ??= false
 	settings.terracotta_public_nodes ??= ['wss://center.node.1tmc.top']
 	settings.skin_site_nav_order ??= []
+	settings.instance_tab_order ??= []
 	settings.feature_flags ??= { ...DEFAULT_FEATURE_FLAGS }
 	for (const [key, value] of Object.entries(DEFAULT_FEATURE_FLAGS)) {
 		settings.feature_flags[key as FeatureFlag] ??= value

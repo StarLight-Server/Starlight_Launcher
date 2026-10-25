@@ -386,6 +386,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import type { Component as ComponentType } from 'vue'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -423,6 +424,7 @@ import {
 import { getDisplayInstanceIcon } from '@/helpers/instance-icons'
 import { isInstanceLaunching } from '@/helpers/instance-launch-state'
 import { get_by_instance_id } from '@/helpers/process'
+import { get as getSettings } from '@/helpers/settings.ts'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
 import { refreshWorlds, type ServerStatus } from '@/helpers/worlds'
@@ -683,37 +685,56 @@ const hideInstanceTabs = computed(() =>
 	displayedInstanceRoute.value.matched.some((record) => record.meta.hideInstanceTabs === true),
 )
 const isStudioMode = computed(() => displayedInstanceRoute.value.name === 'FileStudio')
-const tabs = computed(() => [
-	{
-		label: formatMessage(messages.contentTab),
-		href: `${basePath.value}`,
-		icon: BoxesIcon,
-		onboardingId: 'instance-tab-content',
-	},
-	{
-		label: formatMessage(messages.filesTab),
-		href: `${basePath.value}/files`,
-		icon: FolderOpenIcon,
-		onboardingId: 'instance-tab-files',
-	},
-	{
-		label: formatMessage(messages.screenshotsTab),
-		href: `${basePath.value}/screenshots`,
-		icon: ImageIcon,
-	},
-	{
-		label: formatMessage(messages.worldsTab),
-		href: `${basePath.value}/worlds`,
-		icon: GlobeIcon,
-		onboardingId: 'instance-tab-worlds',
-	},
-	{
-		label: formatMessage(messages.logsTab),
-		href: `${basePath.value}/logs`,
-		icon: TerminalSquareIcon,
-		onboardingId: 'instance-tab-logs',
-	},
-])
+
+const defaultInstanceTabs = ['content', 'files', 'screenshots', 'worlds', 'logs'] as const
+type InstanceTabId = (typeof defaultInstanceTabs)[number]
+
+const instanceTabOrder = ref<InstanceTabId[]>([])
+void getSettings().then((settings) => {
+	const known = settings.instance_tab_order.filter((id): id is InstanceTabId =>
+		(defaultInstanceTabs as readonly string[]).includes(id),
+	)
+	const missing = defaultInstanceTabs.filter((id) => !known.includes(id))
+	instanceTabOrder.value = [...known, ...missing]
+})
+
+const tabs = computed(() => {
+	const tabById: Record<
+		InstanceTabId,
+		{ label: string; href: string; icon: ComponentType; onboardingId?: string }
+	> = {
+		content: {
+			label: formatMessage(messages.contentTab),
+			href: `${basePath.value}`,
+			icon: BoxesIcon,
+			onboardingId: 'instance-tab-content',
+		},
+		files: {
+			label: formatMessage(messages.filesTab),
+			href: `${basePath.value}/files`,
+			icon: FolderOpenIcon,
+			onboardingId: 'instance-tab-files',
+		},
+		screenshots: {
+			label: formatMessage(messages.screenshotsTab),
+			href: `${basePath.value}/screenshots`,
+			icon: ImageIcon,
+		},
+		worlds: {
+			label: formatMessage(messages.worldsTab),
+			href: `${basePath.value}/worlds`,
+			icon: GlobeIcon,
+			onboardingId: 'instance-tab-worlds',
+		},
+		logs: {
+			label: formatMessage(messages.logsTab),
+			href: `${basePath.value}/logs`,
+			icon: TerminalSquareIcon,
+			onboardingId: 'instance-tab-logs',
+		},
+	}
+	return instanceTabOrder.value.map((id) => ({ id, ...tabById[id] }))
+})
 
 function updateBreadcrumbs() {
 	if (instance.value) {

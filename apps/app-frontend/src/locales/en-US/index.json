@@ -569,6 +569,12 @@
   "app.appearance-settings.home-layout.title": {
     "message": "Home layout"
   },
+  "app.appearance-settings.instance-tab-order.description": {
+    "message": "Change the order of the content, files, screenshots, worlds, and logs tabs."
+  },
+  "app.appearance-settings.instance-tab-order.title": {
+    "message": "Instance page tab order"
+  },
   "app.appearance-settings.lightweight-mode.description": {
     "message": "Closes the launcher webview after Minecraft starts to reduce memory use. Restore it from the system tray."
   },
@@ -610,12 +616,6 @@
   },
   "app.appearance-settings.skin-site-nav-order.description": {
     "message": "Change the order of the navigation tabs shown on the skin site home page."
-  },
-  "app.appearance-settings.skin-site-nav-order.move-down": {
-    "message": "Move {name} down"
-  },
-  "app.appearance-settings.skin-site-nav-order.move-up": {
-    "message": "Move {name} up"
   },
   "app.appearance-settings.skin-site-nav-order.title": {
     "message": "Skin site navigation order"
@@ -8215,6 +8215,12 @@
   },
   "app.settings.logs.open-folder": {
     "message": "Open logs folder"
+  },
+  "app.settings.order-list.move-down": {
+    "message": "Move {name} down"
+  },
+  "app.settings.order-list.move-up": {
+    "message": "Move {name} up"
   },
   "app.settings.resources.add-minecraft-directory": {
     "message": "Add .minecraft directory"

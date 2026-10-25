@@ -164,6 +164,8 @@ pub struct Settings {
     pub terracotta_public_nodes: Vec<String>,
     #[serde(default)]
     pub skin_site_nav_order: Vec<String>,
+    #[serde(default)]
+    pub instance_tab_order: Vec<String>,
 
     #[serde(skip, default)]
     pub personalized_ads: bool,
@@ -347,6 +349,15 @@ impl Settings {
             .as_deref()
             .and_then(|value| serde_json::from_str(value).ok())
             .unwrap_or_default();
+        let instance_tab_order: Vec<String> =
+            sqlx::query_scalar::<_, Option<String>>(
+                "SELECT instance_tab_order FROM settings WHERE id = 0",
+            )
+            .fetch_one(exec)
+            .await?
+            .as_deref()
+            .and_then(|value| serde_json::from_str(value).ok())
+            .unwrap_or_default();
         let custom_window_title_enabled: bool = sqlx::query_scalar(
             "SELECT custom_window_title_enabled FROM settings WHERE id = 0",
         )
@@ -418,6 +429,7 @@ impl Settings {
                 .unwrap_or_else(default_terracotta_public_nodes),
             developer_mode: res.developer_mode == 1,
             skin_site_nav_order,
+            instance_tab_order,
             personalized_ads: res.personalized_ads == 1,
             onboarded: res.onboarded == 1,
             onboarding_version: res.onboarding_version as usize,
@@ -739,6 +751,10 @@ impl Settings {
             .bind(serde_json::to_string(&self.skin_site_nav_order)?)
             .execute(exec)
             .await?;
+        sqlx::query("UPDATE settings SET instance_tab_order = ? WHERE id = 0")
+            .bind(serde_json::to_string(&self.instance_tab_order)?)
+            .execute(exec)
+            .await?;
         Ok(())
     }
 
@@ -869,6 +885,7 @@ impl Settings {
             3 => {
                 // skin_site_nav_order defaults to empty (uses built-in order)
                 self.skin_site_nav_order = vec![];
+                self.instance_tab_order = vec![];
                 self.version = 4;
             }
             version => {

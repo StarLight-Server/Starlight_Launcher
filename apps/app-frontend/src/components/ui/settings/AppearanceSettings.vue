@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import {
 	BookIcon,
+	BoxesIcon,
 	BugIcon,
 	CheckIcon,
-	ChevronDownIcon,
-	ChevronUpIcon,
 	DownloadIcon,
+	FolderOpenIcon,
+	GlobeIcon,
 	ImageIcon,
 	LayoutTemplateIcon,
 	MapIcon,
 	MinimizeIcon,
 	ShieldCheckIcon,
+	TerminalSquareIcon,
 	TrashIcon,
 	UploadIcon,
 	UserIcon,
@@ -62,6 +64,7 @@ import {
 	parseCustomAccentColor,
 } from '@/store/theme.ts'
 
+import SettingsOrderList from './SettingsOrderList.vue'
 import SettingsRow from './SettingsRow.vue'
 import SettingsSection from './SettingsSection.vue'
 
@@ -392,14 +395,19 @@ const messages = defineMessages({
 		id: 'app.appearance-settings.skin-site-nav-order.description',
 		defaultMessage: 'Change the order of the navigation tabs shown on the skin site home page.',
 	},
-	skinSiteNavMoveUp: {
-		id: 'app.appearance-settings.skin-site-nav-order.move-up',
-		defaultMessage: 'Move {name} up',
+	instanceTabOrderTitle: {
+		id: 'app.appearance-settings.instance-tab-order.title',
+		defaultMessage: 'Instance page tab order',
 	},
-	skinSiteNavMoveDown: {
-		id: 'app.appearance-settings.skin-site-nav-order.move-down',
-		defaultMessage: 'Move {name} down',
+	instanceTabOrderDescription: {
+		id: 'app.appearance-settings.instance-tab-order.description',
+		defaultMessage: 'Change the order of the content, files, screenshots, worlds, and logs tabs.',
 	},
+	instanceTabContent: { id: 'app.instance.tabs.content', defaultMessage: 'Content' },
+	instanceTabFiles: { id: 'app.instance.tabs.files', defaultMessage: 'Files' },
+	instanceTabWorlds: { id: 'app.instance.tabs.worlds', defaultMessage: 'Worlds' },
+	instanceTabScreenshots: { id: 'app.instance.tabs.screenshots', defaultMessage: 'Screenshots' },
+	instanceTabLogs: { id: 'app.instance.tabs.logs', defaultMessage: 'Logs' },
 	fontsTitle: { id: 'app.appearance-settings.fonts.title', defaultMessage: 'Fonts' },
 	fontsDescription: {
 		id: 'app.appearance-settings.fonts.description',
@@ -496,15 +504,17 @@ const skinSiteNavOrder = ref<SkinSiteNavDestination[]>(
 	normalizeSkinSiteNavOrder(settings.value.skin_site_nav_order),
 )
 
-function moveSkinSiteNavItem(id: SkinSiteNavDestination, offset: number) {
-	const index = skinSiteNavOrder.value.indexOf(id)
-	const target = index + offset
-	if (index === -1 || target < 0 || target >= skinSiteNavOrder.value.length) return
-	const order = [...skinSiteNavOrder.value]
-	order.splice(target, 0, ...order.splice(index, 1))
-	skinSiteNavOrder.value = order
-	settings.value.skin_site_nav_order = order
-}
+const instanceTabItems: {
+	id: string
+	icon: Component
+	label: MessageDescriptor
+}[] = [
+	{ id: 'content', icon: BoxesIcon, label: messages.instanceTabContent },
+	{ id: 'files', icon: FolderOpenIcon, label: messages.instanceTabFiles },
+	{ id: 'screenshots', icon: ImageIcon, label: messages.instanceTabScreenshots },
+	{ id: 'worlds', icon: GlobeIcon, label: messages.instanceTabWorlds },
+	{ id: 'logs', icon: TerminalSquareIcon, label: messages.instanceTabLogs },
+]
 
 const customBackgroundPreview = computed(() =>
 	settings.value.custom_background_path
@@ -1247,55 +1257,33 @@ watch(
 					{{ formatMessage(messages.skinSiteNavOrderDescription) }}
 				</template>
 				<template #control>
-					<div class="flex w-full flex-col gap-1">
-						<div
-							v-for="(item, index) in skinSiteNavOrder"
-							:key="item"
-							class="flex items-center gap-3 rounded-lg border border-solid border-surface-4 bg-surface-3 p-3"
-						>
-							<component
-								:is="defaultSkinSiteNavItems.find((entry) => entry.id === item)?.icon"
-								class="size-4 shrink-0"
-							/>
-							<span class="flex-1 truncate text-sm font-semibold text-contrast">
-								{{
-									formatMessage(defaultSkinSiteNavItems.find((entry) => entry.id === item)!.label)
-								}}
-							</span>
-							<div class="flex shrink-0 items-center gap-1">
-								<button
-									type="button"
-									class="flex size-7 items-center justify-center rounded-md text-secondary transition-colors hover:bg-surface-4 hover:text-contrast disabled:cursor-not-allowed disabled:opacity-40"
-									:disabled="index === 0"
-									:aria-label="
-										formatMessage(messages.skinSiteNavMoveUp, {
-											name: formatMessage(
-												defaultSkinSiteNavItems.find((entry) => entry.id === item)!.label,
-											),
-										})
-									"
-									@click="moveSkinSiteNavItem(item, -1)"
-								>
-									<ChevronUpIcon />
-								</button>
-								<button
-									type="button"
-									class="flex size-7 items-center justify-center rounded-md text-secondary transition-colors hover:bg-surface-4 hover:text-contrast disabled:cursor-not-allowed disabled:opacity-40"
-									:disabled="index === skinSiteNavOrder.length - 1"
-									:aria-label="
-										formatMessage(messages.skinSiteNavMoveDown, {
-											name: formatMessage(
-												defaultSkinSiteNavItems.find((entry) => entry.id === item)!.label,
-											),
-										})
-									"
-									@click="moveSkinSiteNavItem(item, 1)"
-								>
-									<ChevronDownIcon />
-								</button>
-							</div>
-						</div>
-					</div>
+					<SettingsOrderList
+						:items="defaultSkinSiteNavItems"
+						:model-value="skinSiteNavOrder"
+						@update:model-value="
+							(order) => {
+								skinSiteNavOrder = order as SkinSiteNavDestination[]
+								settings.skin_site_nav_order = order
+							}
+						"
+					/>
+				</template>
+			</SettingsRow>
+			<SettingsRow stacked>
+				<template #label>
+					<span id="settings-target-appearance-instance-tab-order" tabindex="-1">
+						{{ formatMessage(messages.instanceTabOrderTitle) }}
+					</span>
+				</template>
+				<template #description>
+					{{ formatMessage(messages.instanceTabOrderDescription) }}
+				</template>
+				<template #control>
+					<SettingsOrderList
+						:items="instanceTabItems"
+						:model-value="settings.instance_tab_order"
+						@update:model-value="(order) => (settings.instance_tab_order = order)"
+					/>
 				</template>
 			</SettingsRow>
 		</SettingsSection>
