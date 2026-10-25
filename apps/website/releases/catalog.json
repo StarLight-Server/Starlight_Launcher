@@ -1,6 +1,609 @@
 {
-  "updated_at": "2026-10-03T07:08:29.010Z",
+  "updated_at": "2026-10-25T06:32:38.047Z",
   "announcements": [
+    {
+      "id": "launcher-1.0.2",
+      "version": "1.0.2",
+      "publishedAt": "2026-10-25",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2",
+        "zh-CN": "Starlight Launcher 1.0.2"
+      },
+      "changes": {
+        "added": [
+          {
+            "en-US": "Native skin site: sign-in, registration, password reset, account settings, players, downloads, world map, wiki, bug tracker, player review, chat rooms, and announcements all run inside the launcher, with a full admin console for server operators.",
+            "zh-CN": "皮肤站全面原生化：登录、注册、找回密码、账号设置、玩家管理、资源下载、世界地图、维基、问题追踪、玩家审核、聊天室与公告中心均在启动器内运行，并为服务器管理员提供完整管理台。"
+          },
+          {
+            "en-US": "Cross-instance sync: share game options, resource packs, data packs, multiplayer servers, command history, and creative hotbars across instances, with per-option toggles and a fine-grained game-settings editor.",
+            "zh-CN": "跨实例同步：在实例间共享游戏设置、资源包、数据包、多人游戏服务器、命令历史与创造模式物品栏，支持逐项开关与精细的游戏设置编辑器。"
+          },
+          {
+            "en-US": "Crash analysis: JVM and launcher crash logs can be uploaded, shared, and explained by an AI assistant, with automatic mod-change snapshots for quick diagnosis.",
+            "zh-CN": "崩溃分析：支持上传与分享 JVM 崩溃和启动器日志，AI 助手自动解释崩溃原因，并自动对比崩溃前的模组变更以便快速定位。"
+          },
+          {
+            "en-US": "Keyboard shortcuts: navigate and scroll the launcher with rebindable shortcuts configured in Settings.",
+            "zh-CN": "键盘快捷键：可在设置中自定义启用并重排导航与快速滚动快捷键。"
+          },
+          {
+            "en-US": "Instance groups: drag instances into groups in the library, with the grouping saved and synced.",
+            "zh-CN": "实例分组：在资源库中拖拽实例进行分组，分组结果保存并同步。"
+          },
+          {
+            "en-US": "Customize the Minecraft window title, and reorder both the skin site navigation tabs and the instance page tabs in Settings.",
+            "zh-CN": "支持自定义 Minecraft 窗口标题；皮肤站导航标签与实例页面标签顺序均可在设置中调整。"
+          },
+          {
+            "en-US": "Announcement center: launcher release notes and community announcements are browsable in-app.",
+            "zh-CN": "公告中心：可在启动器内浏览版本更新日志与社区公告。"
+          },
+          {
+            "en-US": "Anniversary easter egg on October 4th, with extra hidden triggers to discover.",
+            "zh-CN": "每年 10 月 4 日的周年庆彩蛋，另藏有其他触发方式等你发现。"
+          }
+        ],
+        "changed": [
+          {
+            "en-US": "The skin site no longer runs in an embedded web page; all views are native launcher interfaces.",
+            "zh-CN": "皮肤站不再依赖内嵌网页，全部界面改为启动器原生实现。"
+          },
+          {
+            "en-US": "Modpack downloads are served from a dedicated download domain.",
+            "zh-CN": "整合包下载改由独立下载域名提供。"
+          },
+          {
+            "en-US": "The launcher repository was renamed to Starlight_Launcher.",
+            "zh-CN": "启动器仓库更名为 Starlight_Launcher。"
+          }
+        ],
+        "fixed": [
+          {
+            "en-US": "Security fixes backported from upstream: modpack path traversal patches now protect installs from unsafe paths.",
+            "zh-CN": "合入上游安全修复：整合包路径穿越补丁现已保护安装过程免受不安全路径影响。"
+          },
+          {
+            "en-US": "Fixed live logs falling behind and crash-log uploads failing; LogShare collection was switched to a lightweight collector.",
+            "zh-CN": "修复实时日志积压与崩溃日志上传失败；LogShare 采集改用轻量日志收集器。"
+          },
+          {
+            "en-US": "Fixed the announcement center crashing, wiki and profile pages going blank, garbled skin previews after switching players, instance groups not refreshing, and the server map being blocked by the content security policy.",
+            "zh-CN": "修复公告中心崩溃、维基与个人资料页面空白、切换玩家后皮肤预览错乱、实例分组不刷新，以及服务器地图被内容安全策略拦截的问题。"
+          },
+          {
+            "en-US": "Fixed false \"content updated\" prompts after automatic sync, and cross-instance sync tables missing on upgrade.",
+            "zh-CN": "修复自动同步后误报内容更新，以及升级后跨实例同步数据表缺失的问题。"
+          },
+          {
+            "en-US": "Fixed online-player prompts not rendering MOTD colors, backups failing for instances with external game directories, and the captcha image being cropped.",
+            "zh-CN": "修复在线玩家提示不渲染 MOTD 颜色、外部游戏目录实例备份失败，以及验证码图片被裁切的问题。"
+          },
+          {
+            "en-US": "Fixed Linux installs defaulting the game directory incorrectly, onboarding steps not scrolling to the target, and the update channel defaulting incorrectly for fresh installs.",
+            "zh-CN": "修复 Linux 安装时游戏目录默认值错误、引导步骤不自动滚动到目标，以及全新安装更新渠道默认值错误的问题。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta16",
+      "version": "1.0.2-beta16",
+      "publishedAt": "2026-10-25",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta16",
+        "zh-CN": "Starlight Launcher 1.0.2-beta16"
+      },
+      "changes": {
+        "added": [
+          {
+            "en-US": "The order of the skin site navigation tabs can now be customized in Settings, under Home & navigation.",
+            "zh-CN": "新增皮肤站导航标签顺序自定义，可在设置的「主页与导航」中调整。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta15",
+      "version": "1.0.2-beta15",
+      "publishedAt": "2026-10-24",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta15",
+        "zh-CN": "Starlight Launcher 1.0.2-beta15"
+      },
+      "changes": {
+        "fixed": [
+          {
+            "en-US": "Fixed the announcement center failing to open and blank pages in the wiki and profile views caused by it.",
+            "zh-CN": "修复公告中心无法打开，以及由此导致的维基与个人资料页面空白。"
+          },
+          {
+            "en-US": "Fixed the skin preview showing garbled textures after switching between players.",
+            "zh-CN": "修复切换玩家后皮肤预览出现纹理错乱的问题。"
+          },
+          {
+            "en-US": "Fixed instance group changes only showing up after refreshing the page.",
+            "zh-CN": "修复实例分组修改后需要刷新页面才能生效的问题。"
+          },
+          {
+            "en-US": "Fixed server maps not loading because the map iframe was blocked by the content security policy.",
+            "zh-CN": "修复服务器地图因 iframe 被内容安全策略拦截而无法显示的问题。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta14",
+      "version": "1.0.2-beta14",
+      "publishedAt": "2026-10-23",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta14",
+        "zh-CN": "Starlight Launcher 1.0.2-beta14"
+      },
+      "changes": {
+        "added": [
+          {
+            "en-US": "Skin-site players can now be created, renamed and deleted, and one can be marked as the default account.",
+            "zh-CN": "皮肤站玩家支持新建、重命名与删除，并可设置默认角色。"
+          },
+          {
+            "en-US": "The wiki gained search, recent changes and category browsing, plus page watching and title moves.",
+            "zh-CN": "维基支持搜索、最近更新与分类浏览，页面可关注并修改标题。"
+          },
+          {
+            "en-US": "Wiki pages now support reading revision history, diffing versions and reverting to an older revision.",
+            "zh-CN": "维基页面支持查看历史修订、版本对比与撤销到指定版本。"
+          },
+          {
+            "en-US": "Announcements now display the images attached on the skin site.",
+            "zh-CN": "公告中心可显示皮肤站公告附带的图片。"
+          },
+          {
+            "en-US": "Bug reports now render their attached screenshots instead of file hashes.",
+            "zh-CN": "问题追踪的附件图片改为直接展示，不再显示文件哈希。"
+          }
+        ],
+        "changed": [
+          {
+            "en-US": "The downloads page shows a sign-in prompt instead of an error when signed out.",
+            "zh-CN": "未登录时资源下载页改为提示登录，不再弹出错误。"
+          }
+        ],
+        "fixed": [
+          {
+            "en-US": "Fixed the downloads page reporting a sign-in error even when already signed in.",
+            "zh-CN": "修复资源下载页在已登录状态下仍提示未登录的问题。"
+          },
+          {
+            "en-US": "Fixed the admin panel missing user permission groups, showing UUIDs instead of names for announcement authors, and showing option IDs in review answers.",
+            "zh-CN": "修复管理面板不显示用户权限组、公告发布人显示为 UUID、审核作答显示选项 ID 的问题。"
+          },
+          {
+            "en-US": "Fixed the wiki opening a blank page and internal links not navigating correctly.",
+            "zh-CN": "修复维基首次打开为空白、内部链接跳转异常的问题。"
+          },
+          {
+            "en-US": "Skin-site player login errors now surface the server-provided reason.",
+            "zh-CN": "皮肤站玩家登录失败时改为显示服务端给出的具体原因。"
+          },
+          {
+            "en-US": "Fixed server maps being blocked by CSP and font commands missing permission.",
+            "zh-CN": "修复服务器地图被 CSP 拦截、字体命令缺少权限的问题。"
+          },
+          {
+            "en-US": "Backups now support instances that use an external game directory.",
+            "zh-CN": "备份支持使用外部游戏目录的实例。"
+          },
+          {
+            "en-US": "The online-player tooltip now renders MOTD colour codes.",
+            "zh-CN": "在线玩家提示可渲染 MOTD 颜色代码。"
+          },
+          {
+            "en-US": "Fixed captcha images being cropped and missing the rotation hint.",
+            "zh-CN": "修复验证码图片被裁切、缺少旋转提示的问题。"
+          },
+          {
+            "en-US": "The skin-site player list now retries automatically and shows an error state after failures.",
+            "zh-CN": "皮肤站玩家列表加载失败后自动重试，并显示错误状态。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta13",
+      "version": "1.0.2-beta13",
+      "publishedAt": "2026-10-21",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta13",
+        "zh-CN": "Starlight Launcher 1.0.2-beta13"
+      },
+      "changes": {
+        "changed": [
+          {
+            "en-US": "The redesigned home page brings together the 3D skin preview, skin site and Microsoft player selection, announcements, donation acknowledgements and a compact navigation toolbar.",
+            "zh-CN": "新版首页集中展示 3D 皮肤预览、皮肤站与微软玩家切换、公告、捐赠鸣谢及底部功能工具栏。"
+          }
+        ],
+        "fixed": [
+          {
+            "en-US": "The home page keeps the current 3D skin preview stable when accounts or avatars refresh in the background, avoiding unnecessary texture reloads and model flicker.",
+            "zh-CN": "后台刷新账号或头像时保持当前 3D 皮肤预览稳定，避免无关刷新导致纹理重新加载和模型闪烁。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta12",
+      "version": "1.0.2-beta12",
+      "publishedAt": "2026-10-21",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta12",
+        "zh-CN": "Starlight Launcher 1.0.2-beta12"
+      },
+      "changes": {
+        "fixed": [
+          {
+            "en-US": "Fixed automatic updates ignoring server rollbacks to an earlier launcher version.",
+            "zh-CN": "修复启动器忽略服务端旧版本回滚的问题，回滚后可自动下载并在退出或重启时安装。"
+          },
+          {
+            "en-US": "Fixed outdated update checks and downloads overriding a newly selected update version.",
+            "zh-CN": "修复旧的更新检查或下载结果覆盖新目标版本的问题。"
+          }
+        ]
+      },
+      "notes": {
+        "en-US": "Install this version once to enable automatic rollback support for subsequent updates.",
+        "zh-CN": "需要先安装一次此版本，之后才能自动跟随服务端回滚。"
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta11",
+      "version": "1.0.2-beta11",
+      "publishedAt": "2026-10-20",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta11",
+        "zh-CN": "Starlight Launcher 1.0.2-beta11"
+      },
+      "changes": {
+        "fixed": [
+          {
+            "en-US": "Filled missing Chinese translations across skin site sign-in, announcements, verification, registration, account settings, downloads and maps, and localized remaining user and Wiki labels.",
+            "zh-CN": "补齐皮肤站登录、公告、验证、注册、账号设置、下载和地图等界面的中文翻译，并修复用户信息与维基权限选项中的英文标签。"
+          },
+          {
+            "en-US": "Renew the saved skin site JWT on launcher startup before loading the user and announcements. Fixed overlapping refresh, sign-in and sign-out requests that could leave the account in an incorrect state.",
+            "zh-CN": "启动启动器时先刷新已保存的皮肤站 JWT，再加载用户与公告；修复刷新、登录和退出请求交错时可能导致的账号状态异常。"
+          },
+          {
+            "en-US": "Announcements now reload after sign-in, show a sign-in hint when signed out, and offer a retry action after a loading failure.",
+            "zh-CN": "公告在登录后自动重新加载，未登录时显示登录提示，加载失败时可直接重试。"
+          }
+        ],
+        "changed": [
+          {
+            "en-US": "Skin site release publishing now uses chunked uploads and reports synchronization failures explicitly. Localization checks also scan message IDs used in source to catch missing catalog entries.",
+            "zh-CN": "皮肤站自动发布改用分片上传，同步失败会明确报错；国际化检查新增源码词条扫描，防止再次遗漏语言包内容。"
+          }
+        ]
+      },
+      "notes": {
+        "en-US": "If the previously saved JWT has already expired, sign in again once to restore the session.",
+        "zh-CN": "如果此前保存的 JWT 已经过期，需要重新登录一次以恢复会话。"
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta10",
+      "version": "1.0.2-beta10",
+      "publishedAt": "2026-10-20",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta10",
+        "zh-CN": "Starlight Launcher 1.0.2-beta10"
+      },
+      "changes": {
+        "security": [
+          {
+            "en-US": "Backported the upstream Axolotl modpack path traversal fix to prevent malicious modpacks from writing files outside the intended installation directory.",
+            "zh-CN": "合入上游 Axolotl 整合包路径穿越安全补丁，阻止恶意整合包向安装目录之外写入文件。"
+          },
+          {
+            "en-US": "Strengthened path validation for Modrinth and CurseForge modpacks, server installations, cached files and modpack uninstall cleanup, including unsafe Windows path aliases.",
+            "zh-CN": "加强 Modrinth 与 CurseForge 整合包、服务端安装、缓存文件及整合包卸载清理的路径校验，拦截不安全的 Windows 路径别名。"
+          }
+        ]
+      },
+      "notes": {
+        "en-US": "Users of earlier versions should update promptly, especially before installing modpacks from untrusted sources.",
+        "zh-CN": "建议旧版本用户尽快更新，尤其是在安装来源不明的整合包之前。"
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta9",
+      "version": "1.0.2-beta9",
+      "publishedAt": "2026-10-19",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta9",
+        "zh-CN": "Starlight Launcher 1.0.2-beta9"
+      },
+      "changes": {
+        "added": [
+          {
+            "en-US": "Finished the skin site admin console: system overview, announcements, user and player management, review paper editor, mod upload with batch operations, chat room management with real-time voice, servers, audit log, resource downloads, donations and launcher releases.",
+            "zh-CN": "补全皮肤站管理台：系统概览、公告、用户与玩家管理、审核试卷编辑器、Mod 上传与批量操作、聊天室房间管理与实时语音、服务器、审计日志、资源下载、捐赠与启动器版本管理。"
+          },
+          {
+            "en-US": "Added Wiki management to the admin console, including a MediaWiki migration center that imports pages from an existing wiki and lets you review, publish or roll back the result.",
+            "zh-CN": "管理台新增维基管理，包含 MediaWiki 迁移中心：可从现有 Wiki 导入页面，并对结果进行审核、发布或回滚。"
+          },
+          {
+            "en-US": "Added a read-only Wiki reader in the launcher: render pages, follow links between entries, and keep a back stack while browsing.",
+            "zh-CN": "启动器新增维基阅读页：渲染词条正文、跟随词条链接跳转，并在浏览时保留返回栈。"
+          }
+        ],
+        "changed": [
+          {
+            "en-US": "Releases are now published to the skin site automatically when a tag is pushed, so the download page stays in sync without a manual upload.",
+            "zh-CN": "推送 tag 发版时会自动把版本同步到皮肤站，下载页无需再手动上传即可保持同步。"
+          },
+          {
+            "en-US": "Server management pages are only shown to web administrators.",
+            "zh-CN": "服务器管理页仅对网页管理员展示。"
+          }
+        ],
+        "fixed": [
+          {
+            "en-US": "Fixed the Chinese and English text on the skin site home navigation cards.",
+            "zh-CN": "修复皮肤站主页导航卡片的中英文案。"
+          },
+          {
+            "en-US": "Renamed the public download and map endpoints to resolve a duplicate export.",
+            "zh-CN": "重命名公开下载与地图接口，解决导出冲突。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta8",
+      "version": "1.0.2-beta8",
+      "publishedAt": "2026-10-18",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta8",
+        "zh-CN": "Starlight Launcher 1.0.2-beta8"
+      },
+      "changes": {
+        "added": [
+          {
+            "en-US": "The skin site is now fully native inside the launcher: sign-in, registration, password reset, account settings, players, downloads, world map and player review all run through the launcher UI instead of an embedded web page.",
+            "zh-CN": "皮肤站全面改为启动器原生界面：登录、注册、找回密码、账号设置、角色管理、资源下载、服务器地图与玩家审核均不再依赖内嵌网页。"
+          },
+          {
+            "en-US": "Added a bug tracker: browse and filter issues, read details and comments, post replies, create new issues and follow notifications.",
+            "zh-CN": "新增问题追踪：可浏览与筛选问题、查看详情与评论、发表回复、提交新问题并接收通知。"
+          },
+          {
+            "en-US": "Added an admin console with a permission gate: system overview, announcements, users, players, player review and launcher releases.",
+            "zh-CN": "新增管理控制台（带权限校验）：系统概览、公告管理、用户管理、玩家管理、玩家审核与启动器版本管理。"
+          }
+        ],
+        "changed": [
+          {
+            "en-US": "Hosted modpack downloads now go through the dedicated download server, keeping large downloads off the main API host.",
+            "zh-CN": "整合包下载改为走独立的下载服务器，避免大文件下载挤占主 API 服务。"
+          }
+        ],
+        "fixed": [
+          {
+            "en-US": "LogShare now collects logs with a lightweight reader, fixing crash log uploads that previously failed.",
+            "zh-CN": "LogShare 改用轻量日志收集，修复崩溃日志上传失败的问题。"
+          },
+          {
+            "en-US": "The onboarding tour now scrolls each step into view when the step changes.",
+            "zh-CN": "引导教程在切换步骤时自动滚动到目标元素。"
+          },
+          {
+            "en-US": "Fixed a type mismatch while collecting crash context credentials.",
+            "zh-CN": "修复崩溃上下文凭据收集中的类型不匹配问题。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta7",
+      "version": "1.0.2-beta7",
+      "publishedAt": "2026-10-17",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta7",
+        "zh-CN": "Starlight Launcher 1.0.2-beta7"
+      },
+      "changes": {
+        "fixed": [
+          {
+            "en-US": "Fixed real-time log backlog that could stall the console under heavy output.",
+            "zh-CN": "修复实时日志积压导致控制台卡顿的问题。"
+          },
+          {
+            "en-US": "The update channel now defaults to the build type: installing a Beta build starts on the Beta channel instead of Release.",
+            "zh-CN": "更新通道默认值改为跟随安装包版本：安装 Beta 版后默认使用 Beta 通道，不再回落为 Release。"
+          },
+          {
+            "en-US": "On Linux, the default game directory for StarLight instances no longer points at the system install path (e.g. /usr/bin); it falls back to the home directory.",
+            "zh-CN": "Linux 上 StarLight 实例的默认游戏目录不再指向系统安装路径（如 /usr/bin），改为回退到用户主目录。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta6",
+      "version": "1.0.2-beta6",
+      "publishedAt": "2026-10-11",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta6",
+        "zh-CN": "Starlight Launcher 1.0.2-beta6"
+      },
+      "changes": {
+        "added": [
+          {
+            "en-US": "Added keyboard shortcut settings: enable and rebind navigation and quick-scrolling shortcuts.",
+            "zh-CN": "新增键盘快捷键设置：可启用并自定义导航与快速滚动快捷键。"
+          },
+          {
+            "en-US": "Added crash log sharing and AI analysis: share crash diagnostics to LogShare for a structured summary and optional AI analysis, with a rebuilt crash window that browses log files and streams the analysis.",
+            "zh-CN": "新增崩溃日志分享与 AI 分析：可将崩溃诊断分享到 LogShare 获取结构化摘要与 AI 分析；崩溃窗口重做为双栏布局，可浏览日志文件并流式查看分析结果。"
+          },
+          {
+            "en-US": "Crash logs now also collect JVM crash reports (hs_err_pid*.log) and launcher logs.",
+            "zh-CN": "崩溃日志现在也会收集 JVM 崩溃报告（hs_err_pid*.log）与启动器日志。"
+          },
+          {
+            "en-US": "Added a launcher log export entry.",
+            "zh-CN": "新增启动器日志导出入口。"
+          },
+          {
+            "en-US": "Instance groups can now be reordered by dragging.",
+            "zh-CN": "实例分组支持拖拽重排。"
+          }
+        ],
+        "changed": [
+          {
+            "en-US": "Synced the latest supported AI chat model list from LobeHub.",
+            "zh-CN": "同步 LobeHub 最新的 AI 聊天模型列表。"
+          }
+        ],
+        "fixed": [
+          {
+            "en-US": "Fixed remote announcements not refreshing.",
+            "zh-CN": "修复远端公告不刷新的问题。"
+          },
+          {
+            "en-US": "Completed the Chinese translations for the armor preview feature.",
+            "zh-CN": "补齐盔甲预览功能的中文翻译。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta5",
+      "version": "1.0.2-beta5",
+      "publishedAt": "2026-10-11",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta5",
+        "zh-CN": "Starlight Launcher 1.0.2-beta5"
+      },
+      "changes": {
+        "added": [
+          {
+            "en-US": "Added a remote announcements center: a bell in the top bar opens a panel listing launcher announcements fetched from the Starlight skin site.",
+            "zh-CN": "新增远程公告中心：顶栏的铃铛可打开公告面板，展示从 Starlight 皮肤站拉取的启动器公告。"
+          },
+          {
+            "en-US": "Added a custom Minecraft window title option: set a global toggle and default title, and let each instance override it. The game window is renamed on Windows.",
+            "zh-CN": "新增自定义 Minecraft 窗口标题：可设置全局开关与默认标题，并允许各实例单独覆盖；Windows 下会重命名游戏窗口。"
+          }
+        ],
+        "fixed": [
+          {
+            "en-US": "Completed the Chinese translations for the armor preview feature.",
+            "zh-CN": "补齐盔甲预览功能的中文翻译。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta4",
+      "version": "1.0.2-beta4",
+      "publishedAt": "2026-10-08",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta4",
+        "zh-CN": "Starlight Launcher 1.0.2-beta4"
+      },
+      "changes": {
+        "added": [
+          {
+            "en-US": "Added armor and armor-trim rendering to the skin preview, letting you try on armor pieces and trim patterns directly in the skin editor.",
+            "zh-CN": "皮肤预览新增盔甲与盔甲纹饰渲染，可在皮肤编辑器内直接试穿各部位盔甲并调整纹饰图案。"
+          },
+          {
+            "en-US": "Armor preview selections in the skin editor are now saved locally, so they persist across sessions.",
+            "zh-CN": "皮肤编辑器中的盔甲预览选择现在会保存在本地，跨会话保留。"
+          }
+        ],
+        "changed": [
+          {
+            "en-US": "Improved download scheduling to reduce concurrency automatically when tasks are waiting for capacity, making large Minecraft installations more reliable on constrained connections.",
+            "zh-CN": "优化下载任务调度：任务因容量不足排队时会自动降低并发，提升大型 Minecraft 版本在受限网络环境下的安装稳定性。"
+          }
+        ],
+        "fixed": [
+          {
+            "en-US": "Fixed downloads timing out while waiting for internal connection capacity, which could cause Minecraft installations to fail even when the network was available.",
+            "zh-CN": "修复下载任务等待内部连接容量时过早超时，导致网络正常的情况下 Minecraft 安装仍可能失败的问题。"
+          },
+          {
+            "en-US": "Fixed instance group changes not saving for some instances.",
+            "zh-CN": "修复部分实例的分组修改无法保存的问题。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta3",
+      "version": "1.0.2-beta3",
+      "publishedAt": "2026-10-04",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta3",
+        "zh-CN": "Starlight Launcher 1.0.2-beta3"
+      },
+      "changes": {
+        "fixed": [
+          {
+            "en-US": "Fixed the anniversary celebration banner not showing above the window title bar, and made the banner background semi-transparent so the content behind it stays visible.",
+            "zh-CN": "修复周年庆庆祝横幅被窗口标题栏遮挡、无法显示的问题，并将横幅背景改为半透明，避免遮住下方内容。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta2",
+      "version": "1.0.2-beta2",
+      "publishedAt": "2026-10-04",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta2",
+        "zh-CN": "Starlight Launcher 1.0.2-beta2"
+      },
+      "changes": {
+        "fixed": [
+          {
+            "en-US": "Fixed the launcher failing to start with \"no such table: synced_pack_catalog\": the cross-instance sync migration was missing the synced_pack_catalog and synced_pack_instances tables.",
+            "zh-CN": "修复启动器因 \"no such table: synced_pack_catalog\" 无法启动的问题：跨实例同步迁移遗漏了 synced_pack_catalog 与 synced_pack_instances 两张表。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta1",
+      "version": "1.0.2-beta1",
+      "publishedAt": "2026-10-04",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta1",
+        "zh-CN": "Starlight Launcher 1.0.2-beta1"
+      },
+      "changes": {
+        "added": [
+          {
+            "en-US": "Cross-instance sync: share game options, resource packs, data packs, multiplayer servers, command history, and creative hotbars across instances, with per-option toggles and a fine-grained game-settings editor.",
+            "zh-CN": "跨实例同步：可跨实例共享游戏选项、资源包、数据包、多人服务器、命令历史与创造模式快捷栏，支持逐项开关与精细的游戏设置编辑器。"
+          },
+          {
+            "en-US": "Starlight turns 12! On October 4th every year the launcher now shows a celebration banner and falling confetti. The anniversary number is computed from 2014.",
+            "zh-CN": "Starlight 十二周年！每年 10 月 4 日，启动器会显示庆祝横幅与飘落的彩带、蛋糕，周年数按 2014 年起算。"
+          },
+          {
+            "en-US": "Added a developer feature flag to preview the anniversary celebration at any time.",
+            "zh-CN": "新增开发者功能开关，可随时预览周年庆效果。"
+          }
+        ]
+      }
+    },
     {
       "id": "launcher-1.0.1",
       "version": "1.0.1",
