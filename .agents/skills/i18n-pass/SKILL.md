@@ -18,7 +18,28 @@ Refer to the standard: @standards/frontend/INTERNATIONALIZATION.md
    - `<template>`: inner text, `alt`, `placeholder`, `aria-label`, button labels, tooltip text.
    - `<script>`: string literals passed to user-visible UI (notification messages, dropdown labels, error messages).
    - Skip: dynamic expressions, HTML tag names, CSS classes, internal identifiers, log messages.
-5. **Define messages** with `defineMessages` — use descriptive, stable `id`s based on the component's domain (e.g. `project.settings.title`).
-6. **Replace strings in templates** with `formatMessage()` calls, or `<IntlFormatted>` for strings containing links or markup.
+5. **Define messages** with `defineMessage`/`defineMessages` — use descriptive, stable `id`s based on the component's domain (e.g. `project.settings.title`).
+   ```ts
+   const messages = defineMessages({
+       projectSettingsTitle: { id: 'project.settings.title', defaultMessage: 'Project Settings' },
+   })
+   ```
+6. **Replace strings in templates** with `formatMessage()` calls (via `useVIntl()`), or `<IntlFormatted>` for strings containing links or markup.
+   ```vue
+   <button>{{ formatMessage(messages.projectSettingsTitle) }}</button>
+   <IntlFormatted :message-id="messages.tosLabel">
+       <template #terms-link="{ children }">
+           <NuxtLink to="/terms"><component :is="() => children" /></NuxtLink>
+       </template>
+   </IntlFormatted>
+   ```
 7. **Handle ICU edge cases** — add a space before `}}` if an ICU placeholder ends at a Vue template delimiter boundary.
 8. **Verify** no hard-coded English strings remain in the changed templates. Do not alter logic, layout, or reactivity.
+
+## Imports
+
+All i18n utilities come from `@modrinth/ui`:
+- `defineMessage` / `defineMessages` — message definitions
+- `useVIntl` — composable providing `formatMessage`
+- `IntlFormatted` — component for rich-text messages
+- `normalizeChildren` — helper for complex rich-text slot children
