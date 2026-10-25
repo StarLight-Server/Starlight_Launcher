@@ -539,9 +539,6 @@
   "app.update-popup.body.download-complete": {
     "message": "Скачивание версии Starlight Launcher {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
   },
-  "app.update-popup.body.linux": {
-    "message": "Доступна версия Starlight Launcher {version}. Обновите приложение через менеджер пакетов, чтобы получить последние улучшения и исправления!"
-  },
   "app.update-popup.body.metered": {
     "message": "Версия Starlight Launcher {version} доступна для скачивания! Используется сеть с лимитным тарифным планом, поэтому скачивание не началось автоматически."
   },
@@ -910,9 +907,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Выберите профиль"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Войти в Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Управляется сборкой"

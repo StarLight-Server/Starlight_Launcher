@@ -338,9 +338,6 @@
   "content.filter.updates": {
     "defaultMessage": "Обновления"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Предупреждения"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "Найти проекты"
   },

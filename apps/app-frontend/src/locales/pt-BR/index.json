@@ -548,9 +548,6 @@
   "app.update-popup.body.download-complete": {
     "message": "O Starlight Launcher v{version} já foi instalado. Recarregue para atualizar agora ou ela será feita automaticamente ao fechar o Starlight Launcher."
   },
-  "app.update-popup.body.linux": {
-    "message": "O Starlight Launcher v{version} está disponível. Use o gerenciador de pacotes para atualizar para obter novos recursos e correções!"
-  },
   "app.update-popup.body.metered": {
     "message": "O Starlight Launcher v{version} já está disponível! Já que sua rede é limitada, não a instalamos automaticamente."
   },
@@ -922,9 +919,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Selecionar conta"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Inicie sessão no Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Fornecido pela instância"

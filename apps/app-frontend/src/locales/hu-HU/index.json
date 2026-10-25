@@ -443,9 +443,6 @@
   "app.update-popup.body.download-complete": {
     "message": "A Starlight Launcher v{version} letöltése befejeződött. Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás a bezárásakor automatikusan frissül."
   },
-  "app.update-popup.body.linux": {
-    "message": "A Starlight Launcher v{version} elérhető. Használd a csomagkezelőt a legújabb funkciók és javítások frissítéséhez!"
-  },
   "app.update-popup.body.metered": {
     "message": "A Starlight Launcher v{version} már elérhető! Mivel mérhető hálózaton vagy, nem töltöttük le automatikusan."
   },
@@ -814,9 +811,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Fiók kiválasztása"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Bejelentkezés a Minecraftba"
   },
   "search.filter.locked.instance": {
     "message": "Pédány által megadva"

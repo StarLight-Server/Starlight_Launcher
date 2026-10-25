@@ -329,9 +329,6 @@
   "content.filter.updates": {
     "defaultMessage": "Güncellemeler"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Uyarı"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "İçerik ara"
   },

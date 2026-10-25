@@ -356,9 +356,6 @@
   "content.filter.updates": {
     "defaultMessage": "Cần cập nhật"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Cảnh báo"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "Thêm mod"
   },

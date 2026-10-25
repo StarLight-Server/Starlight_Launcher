@@ -207,9 +207,9 @@
 <script setup lang="ts">
 import {
 	BellIcon,
-	NewspaperIcon,
 	DownloadIcon,
 	DropdownIcon,
+	NewspaperIcon,
 	OnlineIndicatorIcon,
 	StarIcon,
 	StopCircleIcon,
@@ -238,12 +238,12 @@ import { useNetworkStatus } from '@/composables/useNetworkStatus'
 import { loading_listener, process_listener } from '@/helpers/events'
 import { get_many as getInstances } from '@/helpers/instance'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
-import type { LoadingBar } from '@/helpers/state'
-import { progress_bars_list } from '@/helpers/state'
 import {
 	OPEN_REMOTE_ANNOUNCEMENT_CENTER_EVENT,
 	REMOTE_ANNOUNCEMENTS_UPDATED_EVENT,
 } from '@/helpers/remote-announcements'
+import type { LoadingBar } from '@/helpers/state'
+import { progress_bars_list } from '@/helpers/state'
 import type { GameInstance } from '@/helpers/types'
 import { downloadBarTypes, injectDownloadManager } from '@/providers/download-manager'
 

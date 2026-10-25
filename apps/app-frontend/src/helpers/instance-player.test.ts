@@ -2,6 +2,9 @@ import assert from 'node:assert/strict'
 import { registerHooks } from 'node:module'
 import test from 'node:test'
 
+import { useNetworkStatus } from '../composables/useNetworkStatus.ts'
+import type { InstancePlayer } from './instance-player.ts'
+
 const hooks = registerHooks({
 	resolve(specifier, context, nextResolve) {
 		if (specifier === '@tauri-apps/plugin-http') {
@@ -19,14 +22,12 @@ const hooks = registerHooks({
 const { initSkinSiteSession, resetSkinSiteSession, setSkinSiteFrame } =
 	await import('../composables/skin-site-session.ts')
 hooks.deregister()
-import { useNetworkStatus } from '../composables/useNetworkStatus.ts'
 const {
 	onInstancePlayerChanged,
 	prepareInstancePlayer,
 	registerInstancePlayerPicker,
 	saveInstancePlayer,
 } = await import('./instance-player.ts')
-import type { InstancePlayer } from './instance-player.ts'
 
 test('instance player selection persists independently from the globally selected account', async () => {
 	const previousNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator')

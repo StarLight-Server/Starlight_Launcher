@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+
 import { createModalTransition } from './modal-transition.ts'
 
 test('fast reopen invalidates the previous closing animation', () => {

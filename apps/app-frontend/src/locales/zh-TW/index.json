@@ -1,67 +1,184 @@
 {
-  "app.hosted-mods.title": { "message": "正在更新伺服器 Mod" },
-  "app.hosted-mods.description": { "message": "所有更新安裝完成後將繼續啟動遊戲。" },
-  "app.hosted-mods.complete": { "message": "下載完成" },
-  "app.hosted-mods.downloads": { "message": "查看下載" },
-  "app.hosted-mods.close": { "message": "關閉" },
-  "app.hosted-packs.progress.retry": { "message": "返回實例重試" },
-  "app.hosted-packs.progress.preparing": { "message": "正在準備整合包安裝…" },
-  "app.hosted-packs.progress.downloads": { "message": "查看下載" },
-  "app.hosted-packs.open-instance": { "message": "開啟已安裝實例" },
-  "app.hosted-packs.retry-install": { "message": "重試安裝" },
-  "app.hosted-packs.auto-installing": { "message": "正在下載並安裝伺服器整合包…" },
-  "app.hosted-packs.auto-description": { "message": "從StarLight伺服器取得整合包並自動安裝，可一鍵遊玩StarLight伺服器" },
-  "app.hosted-packs.auto-install": { "message": "安裝 StarLight 官方整合包" },
-  "app.hosted-install.game-dir.header": { "message": "選擇遊戲目錄" },
-  "app.hosted-install.game-dir.description": { "message": "StarLight 實例的遊戲資料（mods、存檔、設定、資源包）會存放在外部遊戲目錄中。請選擇一個根目錄，整合包會在其中另外建立一個子資料夾。" },
-  "app.hosted-install.game-dir.label": { "message": "遊戲目錄根路徑" },
-  "app.hosted-install.game-dir.browse": { "message": "瀏覽" },
-  "app.hosted-install.game-dir.no-selection": { "message": "尚未選擇資料夾" },
-  "app.hosted-install.game-dir.reset-default": { "message": "使用預設位置" },
-  "app.hosted-install.game-dir.preview": { "message": "遊戲檔案將安裝到：{path}" },
-  "app.hosted-install.game-dir.confirm": { "message": "安裝" },
-  "app.onboarding.instance-mode.title": { "message": "選擇實例類型" },
-  "app.onboarding.instance-mode.description": { "message": "StarLight 實例自動安裝管理員指定的整合包和版本，每次啟動先檢查並完成更新，需要登入 StarLight 帳號。本地實例可自行選擇版本和整合包，適合第三方伺服器與單人遊玩。" },
-  "app.instance-mode.title": { "message": "實例類型" },
-  "app.instance-mode.starlight": { "message": "StarLight 實例" },
-  "app.instance-mode.local": { "message": "本機實例" },
-  "app.instance-mode.starlight-description": { "message": "遊玩 StarLight 伺服器必選。自動安裝伺服器指定的整合包、遊戲版本和載入器。每次啟動需要登入 StarLight，檢查並完成更新後再進入遊戲。" },
-  "app.instance-mode.local-description": { "message": "不會同步 StarLight 伺服器的變更。略過同步檢查，啟動更快，可自行選擇整合包安裝，更適合第三方伺服器與本機個人遊玩。" },
-  "app.instance-mode.saving": { "message": "正在套用實例類型，並視需要安裝伺服器整合包…" },
-  "app.instance-mode.loading": { "message": "正在讀取實例類型…" },
-  "app.instance-mode.retry": { "message": "重試" },
-  "app.instance-mode.local-packs-title": { "message": "本機整合包" },
-  "app.instance-mode.local-packs": { "message": "可以自行選擇整合包並安裝為本機實例。切換為本機後保留現有遊戲檔案和存檔，之後不再同步 StarLight 的變更。" },
-  "app.instance-mode.browse": { "message": "瀏覽整合包" },
-  "app.instance-mode.import": { "message": "匯入為本機實例" },
-  "app.hosted-packs.management": {"message": "內容管理"},
-  "app.hosted-packs.mods": {"message": "管理 Mod"},
-  "app.hosted-packs.packs": {"message": "管理整合包"},
-  "app.hosted-packs.title": { "message": "伺服器管理的整合包" },
-  "app.hosted-packs.description": { "message": "整合包和版本由管理員指定。每次啟動都會檢查伺服器更新，有變更時先下載並安裝，再啟動遊戲。需要有效的 StarLight 登入狀態和網路連線。" },
-  "app.hosted-packs.refresh": {"message": "重新整理"},
-  "app.hosted-packs.loading": {"message": "正在取得已發布整合包…"},
-  "app.hosted-packs.bound": {"message": "已安裝：{name} · {version}"},
-  "app.hosted-packs.syncing": {"message": "正在比對檔案並同步變動…"},
-  "app.hosted-packs.complete": {"message": "已同步至 {version}，變更 {count} 個檔案，下載 {size} MiB。"},
-  "app.hosted-packs.preserved": {"message": "保留了 {count} 個本機修改或個人檔案"},
-  "app.hosted-packs.empty": {"message": "尚無審核通過的整合包。"},
-  "app.hosted-packs.update": {"message": "立即同步"},
-  "app.hosted-packs.install": { "message": "重試自動安裝" },
-  "app.home.luck.title": { "message": "每日幸運指數" },
-  "app.home.luck.get": { "message": "一鍵獲取" },
-  "app.home.luck.login-to-get": { "message": "登入後獲取" },
-  "app.home.luck.loading": { "message": "正在詢問小精靈..." },
-  "app.home.luck.error": { "message": "小精靈暫時沒有回應，請稍後重試。" },
-  "app.home.luck.out-of": { "message": "滿分 100" },
-  "minecraft-account.skin-site.signed-in": { "message": "已登入 StarLight皮膚站" },
-  "minecraft-account.skin-site.checking": { "message": "正在驗證皮膚站登入狀態…" },
+  "app.hosted-mods.title": {
+    "message": "正在更新伺服器 Mod"
+  },
+  "app.hosted-mods.description": {
+    "message": "所有更新安裝完成後將繼續啟動遊戲。"
+  },
+  "app.hosted-mods.complete": {
+    "message": "下載完成"
+  },
+  "app.hosted-mods.downloads": {
+    "message": "查看下載"
+  },
+  "app.hosted-mods.close": {
+    "message": "關閉"
+  },
+  "app.hosted-packs.progress.preparing": {
+    "message": "正在準備整合包安裝…"
+  },
+  "app.hosted-packs.progress.downloads": {
+    "message": "查看下載"
+  },
+  "app.hosted-packs.open-instance": {
+    "message": "開啟已安裝實例"
+  },
+  "app.hosted-packs.retry-install": {
+    "message": "重試安裝"
+  },
+  "app.hosted-packs.auto-installing": {
+    "message": "正在下載並安裝伺服器整合包…"
+  },
+  "app.hosted-packs.auto-description": {
+    "message": "從StarLight伺服器取得整合包並自動安裝，可一鍵遊玩StarLight伺服器"
+  },
+  "app.hosted-packs.auto-install": {
+    "message": "安裝 StarLight 官方整合包"
+  },
+  "app.hosted-install.game-dir.header": {
+    "message": "選擇遊戲目錄"
+  },
+  "app.hosted-install.game-dir.description": {
+    "message": "StarLight 實例的遊戲資料（mods、存檔、設定、資源包）會存放在外部遊戲目錄中。請選擇一個根目錄，整合包會在其中另外建立一個子資料夾。"
+  },
+  "app.hosted-install.game-dir.label": {
+    "message": "遊戲目錄根路徑"
+  },
+  "app.hosted-install.game-dir.browse": {
+    "message": "瀏覽"
+  },
+  "app.hosted-install.game-dir.no-selection": {
+    "message": "尚未選擇資料夾"
+  },
+  "app.hosted-install.game-dir.reset-default": {
+    "message": "使用預設位置"
+  },
+  "app.hosted-install.game-dir.preview": {
+    "message": "遊戲檔案將安裝到：{path}"
+  },
+  "app.hosted-install.game-dir.confirm": {
+    "message": "安裝"
+  },
+  "app.onboarding.instance-mode.title": {
+    "message": "選擇實例類型"
+  },
+  "app.onboarding.instance-mode.description": {
+    "message": "StarLight 實例自動安裝管理員指定的整合包和版本，每次啟動先檢查並完成更新，需要登入 StarLight 帳號。本地實例可自行選擇版本和整合包，適合第三方伺服器與單人遊玩。"
+  },
+  "app.instance-mode.title": {
+    "message": "實例類型"
+  },
+  "app.instance-mode.starlight": {
+    "message": "StarLight 實例"
+  },
+  "app.instance-mode.local": {
+    "message": "本機實例"
+  },
+  "app.instance-mode.starlight-description": {
+    "message": "遊玩 StarLight 伺服器必選。自動安裝伺服器指定的整合包、遊戲版本和載入器。每次啟動需要登入 StarLight，檢查並完成更新後再進入遊戲。"
+  },
+  "app.instance-mode.local-description": {
+    "message": "不會同步 StarLight 伺服器的變更。略過同步檢查，啟動更快，可自行選擇整合包安裝，更適合第三方伺服器與本機個人遊玩。"
+  },
+  "app.instance-mode.saving": {
+    "message": "正在套用實例類型，並視需要安裝伺服器整合包…"
+  },
+  "app.instance-mode.loading": {
+    "message": "正在讀取實例類型…"
+  },
+  "app.instance-mode.retry": {
+    "message": "重試"
+  },
+  "app.instance-mode.local-packs-title": {
+    "message": "本機整合包"
+  },
+  "app.instance-mode.local-packs": {
+    "message": "可以自行選擇整合包並安裝為本機實例。切換為本機後保留現有遊戲檔案和存檔，之後不再同步 StarLight 的變更。"
+  },
+  "app.instance-mode.browse": {
+    "message": "瀏覽整合包"
+  },
+  "app.instance-mode.import": {
+    "message": "匯入為本機實例"
+  },
+  "app.hosted-packs.management": {
+    "message": "內容管理"
+  },
+  "app.hosted-packs.mods": {
+    "message": "管理 Mod"
+  },
+  "app.hosted-packs.packs": {
+    "message": "管理整合包"
+  },
+  "app.hosted-packs.title": {
+    "message": "伺服器管理的整合包"
+  },
+  "app.hosted-packs.description": {
+    "message": "整合包和版本由管理員指定。每次啟動都會檢查伺服器更新，有變更時先下載並安裝，再啟動遊戲。需要有效的 StarLight 登入狀態和網路連線。"
+  },
+  "app.hosted-packs.refresh": {
+    "message": "重新整理"
+  },
+  "app.hosted-packs.loading": {
+    "message": "正在取得已發布整合包…"
+  },
+  "app.hosted-packs.bound": {
+    "message": "已安裝：{name} · {version}"
+  },
+  "app.hosted-packs.syncing": {
+    "message": "正在比對檔案並同步變動…"
+  },
+  "app.hosted-packs.complete": {
+    "message": "已同步至 {version}，變更 {count} 個檔案，下載 {size} MiB。"
+  },
+  "app.hosted-packs.preserved": {
+    "message": "保留了 {count} 個本機修改或個人檔案"
+  },
+  "app.hosted-packs.empty": {
+    "message": "尚無審核通過的整合包。"
+  },
+  "app.hosted-packs.update": {
+    "message": "立即同步"
+  },
+  "app.hosted-packs.install": {
+    "message": "重試自動安裝"
+  },
+  "app.home.luck.title": {
+    "message": "每日幸運指數"
+  },
+  "app.home.luck.get": {
+    "message": "一鍵獲取"
+  },
+  "app.home.luck.login-to-get": {
+    "message": "登入後獲取"
+  },
+  "app.home.luck.loading": {
+    "message": "正在詢問小精靈..."
+  },
+  "app.home.luck.error": {
+    "message": "小精靈暫時沒有回應，請稍後重試。"
+  },
+  "app.home.luck.out-of": {
+    "message": "滿分 100"
+  },
+  "minecraft-account.skin-site.signed-in": {
+    "message": "已登入 StarLight皮膚站"
+  },
+  "minecraft-account.skin-site.checking": {
+    "message": "正在驗證皮膚站登入狀態…"
+  },
   "minecraft-account.skin-site.sync-error": {
     "message": "暫時無法驗證皮膚站登入狀態，將自動重試。"
   },
-  "minecraft-account.skin-site.players": { "message": "皮膚站玩家（{count}）" },
-  "minecraft-account.skin-site.players.retry": { "message": "重試" },
-  "minecraft-account.skin-site.players.empty": { "message": "這個皮膚站帳號還沒有玩家。" },
+  "minecraft-account.skin-site.players": {
+    "message": "皮膚站玩家（{count}）"
+  },
+  "minecraft-account.skin-site.players.retry": {
+    "message": "重試"
+  },
+  "minecraft-account.skin-site.players.empty": {
+    "message": "這個皮膚站帳號還沒有玩家。"
+  },
   "minecraft-account.skin-site.players.error": {
     "message": "暫時無法重新整理玩家清單，已保留上一次結果。"
   },
@@ -973,24 +1090,6 @@
   },
   "app.close-launcher.tray": {
     "message": "隱藏至系統匣"
-  },
-  "app.community-announcement.feedback-middle": {
-    "message": "，或於 "
-  },
-  "app.community-announcement.feedback-prefix": {
-    "message": "如果您有更多、更好的想法或建議，歡迎加入我們的 QQ 群組："
-  },
-  "app.community-announcement.feedback-suffix": {
-    "message": " 上向我們提出。期待與大家共同完善 Starlight Launcher！"
-  },
-  "app.community-announcement.response": {
-    "message": "自從 Starlight Launcher 在影片平台宣傳以來，我們收穫了遠超預期的喜愛與關注，同時也收到了許多高品質的回饋與提議。"
-  },
-  "app.community-announcement.thanks": {
-    "message": "對於影片評論區裡的留言，我都已盡可能地逐一回覆。承蒙各位厚愛，在此表達最誠摯的感謝！"
-  },
-  "app.community-announcement.title": {
-    "message": "致各位使用者"
   },
   "app.content-favorites.add": {
     "message": "新增到收藏夾"
@@ -2258,12 +2357,6 @@
   "app.home.minimal.picker.title": {
     "message": "選擇首頁實例"
   },
-  "app.home.news.open-article": {
-    "message": "在 minecraft.net 上閱讀"
-  },
-  "app.home.news.title": {
-    "message": "Minecraft 新聞"
-  },
   "app.home.playtime.hours-minutes": {
     "message": "{hours} 小時 {minutes} 分鐘"
   },
@@ -2348,12 +2441,6 @@
   "app.home.widgets.choose-world": {
     "message": "選擇世界"
   },
-  "app.home.widgets.customize": {
-    "message": "自定義小元件"
-  },
-  "app.home.widgets.done": {
-    "message": "完成編輯"
-  },
   "app.home.widgets.drag": {
     "message": "拖動小元件"
   },
@@ -2380,15 +2467,6 @@
   },
   "app.home.widgets.instance-description": {
     "message": "選擇一個例項，建立獨立的快速啟動入口。"
-  },
-  "app.home.widgets.layout.switch-to-free": {
-    "message": "切換到自由小元件佈局"
-  },
-  "app.home.widgets.layout.switch-to-grid": {
-    "message": "切換到網格小元件佈局"
-  },
-  "app.home.widgets.layout.toggle": {
-    "message": "小元件佈局模式"
   },
   "app.home.widgets.loading": {
     "message": "正在載入……"
@@ -2437,12 +2515,6 @@
   },
   "app.home.widgets.replace": {
     "message": "替換目標"
-  },
-  "app.home.widgets.reset": {
-    "message": "恢復預設小元件"
-  },
-  "app.home.widgets.reset-confirm": {
-    "message": "要恢復預設小元件佈局嗎？"
   },
   "app.home.widgets.search": {
     "message": "搜尋"
@@ -2524,9 +2596,6 @@
   },
   "app.install.phase.running_loader_processors": {
     "message": "正在執行載入器處理程式"
-  },
-  "app.instance-item.already-open": {
-    "message": "實例已經在運行"
   },
   "app.instance-item.loading-modpack": {
     "message": "正在載入整合包……"
@@ -4982,9 +5051,6 @@
   "app.library.tabs.saved": {
     "message": "已儲存"
   },
-  "app.library.tabs.servers": {
-    "message": "伺服器"
-  },
   "app.library.tabs.shared": {
     "message": "與我共用"
   },
@@ -5528,9 +5594,6 @@
   "app.multiplayer.tab.rooms": {
     "message": "聯機房間"
   },
-  "app.multiplayer.tab.servers": {
-    "message": "伺服器"
-  },
   "app.multiplayer.terracotta.public-node-invalid": {
     "message": "節點 URI 無效：{node}。請使用 http、https、tcp、tls、udp、ws 或 wss。"
   },
@@ -5825,18 +5888,6 @@
   "app.project.install-context.install-content-to-instance": {
     "message": "將內容安裝至實例"
   },
-  "app.project.modpack-server.created-description": {
-    "message": "{name} 已就緒。請在多人遊戲中配置並啟動。"
-  },
-  "app.project.modpack-server.created-title": {
-    "message": "伺服器已建立"
-  },
-  "app.project.modpack-server.open": {
-    "message": "開啟伺服器"
-  },
-  "app.project.modpack-server.start": {
-    "message": "開服"
-  },
   "app.project.mcarchive.install": {
     "message": "安裝"
   },
@@ -5942,9 +5993,6 @@
   "app.project.versions.already-installed": {
     "message": "已安裝"
   },
-  "app.project.versions.start-server": {
-    "message": "開服"
-  },
   "app.restarting": {
     "message": "正在重新啟動..."
   },
@@ -5966,584 +6014,14 @@
   "app.server.search-instance": {
     "message": "搜尋實例"
   },
-  "app.servers.action.open-folder": {
-    "message": "開啟資料夾"
-  },
-  "app.servers.action.share": {
-    "message": "分享至公開網路"
-  },
-  "app.servers.action.start": {
-    "message": "啟動"
-  },
-  "app.servers.action.stop": {
-    "message": "停止"
-  },
-  "app.servers.card.port": {
-    "message": "連接埠 {port}"
-  },
-  "app.servers.card.type": {
-    "message": "{type} · {version}"
-  },
-  "app.servers.console.command-echo": {
-    "message": "> {command}"
-  },
-  "app.servers.console.not-running": {
-    "message": "伺服器未執行"
-  },
-  "app.servers.count": {
-    "message": "{count, plural, =0 {還沒有伺服器} other {共 # 個伺服器}}"
-  },
-  "app.servers.create.title": {
-    "message": "建立伺服器"
-  },
-  "app.servers.detail.back": {
-    "message": "伺服器"
-  },
-  "app.servers.detail.console": {
-    "message": "主控台"
-  },
-  "app.servers.detail.files": {
-    "message": "檔案"
-  },
-  "app.servers.detail.not-found": {
-    "message": "該伺服器已不存在。"
-  },
-  "app.servers.detail.settings": {
-    "message": "設定"
-  },
-  "app.servers.empty.description": {
-    "message": "在啟動器中建立伺服器，與好友一起遊玩。"
-  },
-  "app.servers.empty.heading": {
-    "message": "還沒有伺服器"
-  },
-  "app.servers.eula.continue": {
-    "message": "繼續"
-  },
-  "app.servers.eula.decline": {
-    "message": "取消"
-  },
-  "app.servers.eula.description": {
-    "message": "繼續即表示同意 Minecraft 最終使用者授權條款 (EULA)。"
-  },
-  "app.servers.eula.title": {
-    "message": "Minecraft EULA"
-  },
-  "app.servers.files.busy-tooltip": {
-    "message": "停止伺服器後才能修改檔案"
-  },
-  "app.servers.files.save-as": {
-    "message": "另存為..."
-  },
-  "app.servers.icon.change": {
-    "message": "變更圖示"
-  },
-  "app.servers.icon.edit": {
-    "message": "編輯圖示"
-  },
-  "app.servers.icon.remove": {
-    "message": "移除圖示"
-  },
-  "app.servers.icon.select": {
-    "message": "選擇圖示"
-  },
-  "app.servers.loading": {
-    "message": "載入中"
-  },
-  "app.servers.port.change": {
-    "message": "修改連接埠"
-  },
-  "app.servers.port.conflict-description": {
-    "message": "{process} 正在佔用此連接埠，伺服器無法啟動。建議修改伺服器連接埠，也可以強制結束佔用程序後再啟動。"
-  },
-  "app.servers.port.conflict-title": {
-    "message": "連接埠 {port} 已被佔用"
-  },
-  "app.servers.port.force-quit": {
-    "message": "強制結束佔用程序"
-  },
-  "app.servers.port.force-quit-failed": {
-    "message": "結束佔用連接埠的程序失敗"
-  },
-  "app.servers.port.recheck": {
-    "message": "重新偵測"
-  },
-  "app.servers.port.unknown-process": {
-    "message": "未知程序（PID {pid}）"
-  },
-  "app.servers.properties.field.accepts-transfers": {
-    "message": "接受玩家轉移"
-  },
-  "app.servers.properties.field.allow-end": {
-    "message": "允許終界"
-  },
-  "app.servers.properties.field.allow-flight": {
-    "message": "允許飛行"
-  },
-  "app.servers.properties.field.allow-nether": {
-    "message": "允許地獄"
-  },
-  "app.servers.properties.field.announce-player-achievements": {
-    "message": "廣播玩家成就"
-  },
-  "app.servers.properties.field.broadcast-console-to-ops": {
-    "message": "向管理員廣播主控台訊息"
-  },
-  "app.servers.properties.field.broadcast-rcon-to-ops": {
-    "message": "向管理員廣播 RCON 訊息"
-  },
-  "app.servers.properties.field.bug-report-link": {
-    "message": "Bug 回報連結"
-  },
-  "app.servers.properties.field.chat-spam-threshold-seconds": {
-    "message": "聊天洗版門檻（秒）"
-  },
-  "app.servers.properties.field.command-spam-threshold-seconds": {
-    "message": "指令洗版門檻（秒）"
-  },
-  "app.servers.properties.field.difficulty": {
-    "message": "難度"
-  },
-  "app.servers.properties.field.enable-code-of-conduct": {
-    "message": "啟用行為準則"
-  },
-  "app.servers.properties.field.enable-command-block": {
-    "message": "啟用指令方塊"
-  },
-  "app.servers.properties.field.enable-jmx-monitoring": {
-    "message": "啟用 JMX 監控"
-  },
-  "app.servers.properties.field.enable-lan": {
-    "message": "啟用區域網路"
-  },
-  "app.servers.properties.field.enable-query": {
-    "message": "啟用查詢"
-  },
-  "app.servers.properties.field.enable-rcon": {
-    "message": "啟用 RCON"
-  },
-  "app.servers.properties.field.enable-status": {
-    "message": "啟用伺服器狀態"
-  },
-  "app.servers.properties.field.enforce-secure-profile": {
-    "message": "強制安全設定檔"
-  },
-  "app.servers.properties.field.enforce-whitelist": {
-    "message": "強制白名單"
-  },
-  "app.servers.properties.field.entity-broadcast-range-percentage": {
-    "message": "實體廣播範圍百分比"
-  },
-  "app.servers.properties.field.force-gamemode": {
-    "message": "強制遊戲模式"
-  },
-  "app.servers.properties.field.function-permission-level": {
-    "message": "函式權限等級"
-  },
-  "app.servers.properties.field.gamemode": {
-    "message": "遊戲模式"
-  },
-  "app.servers.properties.field.generate-structures": {
-    "message": "生成結構"
-  },
-  "app.servers.properties.field.generator-settings": {
-    "message": "生成器設定"
-  },
-  "app.servers.properties.field.hardcore": {
-    "message": "核心模式"
-  },
-  "app.servers.properties.field.hide-online-players": {
-    "message": "隱藏線上玩家"
-  },
-  "app.servers.properties.field.initial-disabled-packs": {
-    "message": "初始停用的資料包"
-  },
-  "app.servers.properties.field.initial-enabled-packs": {
-    "message": "初始啟用的資料包"
-  },
-  "app.servers.properties.field.level-name": {
-    "message": "世界名稱"
-  },
-  "app.servers.properties.field.level-seed": {
-    "message": "世界種子"
-  },
-  "app.servers.properties.field.level-type": {
-    "message": "世界類型"
-  },
-  "app.servers.properties.field.log-ips": {
-    "message": "記錄 IP"
-  },
-  "app.servers.properties.field.management-server-allowed-origins": {
-    "message": "管理伺服器允許的來源"
-  },
-  "app.servers.properties.field.management-server-enabled": {
-    "message": "啟用管理伺服器"
-  },
-  "app.servers.properties.field.management-server-host": {
-    "message": "管理伺服器主機"
-  },
-  "app.servers.properties.field.management-server-port": {
-    "message": "管理伺服器連接埠"
-  },
-  "app.servers.properties.field.management-server-secret": {
-    "message": "管理伺服器金鑰"
-  },
-  "app.servers.properties.field.management-server-tls-enabled": {
-    "message": "管理伺服器啟用 TLS"
-  },
-  "app.servers.properties.field.management-server-tls-keystore": {
-    "message": "管理伺服器 TLS 金鑰儲存庫"
-  },
-  "app.servers.properties.field.management-server-tls-keystore-password": {
-    "message": "管理伺服器 TLS 金鑰儲存庫密碼"
-  },
-  "app.servers.properties.field.max-chained-neighbor-updates": {
-    "message": "最大連鎖鄰近更新次數"
-  },
-  "app.servers.properties.field.max-players": {
-    "message": "最大玩家數"
-  },
-  "app.servers.properties.field.max-tick-time": {
-    "message": "最大單 Tick 時間"
-  },
-  "app.servers.properties.field.max-world-size": {
-    "message": "最大世界大小"
-  },
-  "app.servers.properties.field.motd": {
-    "message": "伺服器標語（MOTD）"
-  },
-  "app.servers.properties.field.network-compression-threshold": {
-    "message": "網路壓縮門檻"
-  },
-  "app.servers.properties.field.online-mode": {
-    "message": "正版驗證"
-  },
-  "app.servers.properties.field.op-permission-level": {
-    "message": "管理員權限等級"
-  },
-  "app.servers.properties.field.pause-when-empty-seconds": {
-    "message": "空服暫停（秒）"
-  },
-  "app.servers.properties.field.player-idle-timeout": {
-    "message": "玩家閒置逾時"
-  },
-  "app.servers.properties.field.prevent-proxy-connections": {
-    "message": "禁止代理連線"
-  },
-  "app.servers.properties.field.pvp": {
-    "message": "玩家對戰（PvP）"
-  },
-  "app.servers.properties.field.query.port": {
-    "message": "查詢連接埠"
-  },
-  "app.servers.properties.field.rate-limit": {
-    "message": "頻率限制"
-  },
-  "app.servers.properties.field.rcon.password": {
-    "message": "RCON 密碼"
-  },
-  "app.servers.properties.field.rcon.port": {
-    "message": "RCON 連接埠"
-  },
-  "app.servers.properties.field.region-file-compression": {
-    "message": "區域檔案壓縮方式"
-  },
-  "app.servers.properties.field.require-resource-pack": {
-    "message": "強制資源包"
-  },
-  "app.servers.properties.field.resource-pack": {
-    "message": "資源包"
-  },
-  "app.servers.properties.field.resource-pack-id": {
-    "message": "資源包 ID"
-  },
-  "app.servers.properties.field.resource-pack-prompt": {
-    "message": "資源包提示"
-  },
-  "app.servers.properties.field.resource-pack-sha1": {
-    "message": "資源包 SHA-1"
-  },
-  "app.servers.properties.field.server-ip": {
-    "message": "伺服器 IP"
-  },
-  "app.servers.properties.field.server-port": {
-    "message": "伺服器連接埠"
-  },
-  "app.servers.properties.field.simulation-distance": {
-    "message": "模擬距離"
-  },
-  "app.servers.properties.field.spawn-animals": {
-    "message": "生成動物"
-  },
-  "app.servers.properties.field.spawn-monsters": {
-    "message": "生成怪物"
-  },
-  "app.servers.properties.field.spawn-npcs": {
-    "message": "生成 NPC"
-  },
-  "app.servers.properties.field.spawn-protection": {
-    "message": "重生點保護範圍"
-  },
-  "app.servers.properties.field.status-heartbeat-interval": {
-    "message": "狀態心跳間隔"
-  },
-  "app.servers.properties.field.sync-chunk-writes": {
-    "message": "同步區塊寫入"
-  },
-  "app.servers.properties.field.text-filtering-config": {
-    "message": "文字過濾設定"
-  },
-  "app.servers.properties.field.text-filtering-version": {
-    "message": "文字過濾版本"
-  },
-  "app.servers.properties.field.use-native-transport": {
-    "message": "使用原生傳輸"
-  },
-  "app.servers.properties.field.view-distance": {
-    "message": "繪製距離"
-  },
-  "app.servers.properties.field.white-list": {
-    "message": "白名單"
-  },
-  "app.servers.properties.load-failed": {
-    "message": "載入伺服器設定失敗。"
-  },
-  "app.servers.properties.missing": {
-    "message": "啟動一次伺服器即可產生此檔案。"
-  },
-  "app.servers.properties.mode.form": {
-    "message": "表單"
-  },
-  "app.servers.properties.mode.text": {
-    "message": "文字"
-  },
-  "app.servers.properties.section.advanced": {
-    "message": "進階"
-  },
-  "app.servers.properties.section.content": {
-    "message": "資源與內容"
-  },
-  "app.servers.properties.section.gameplay": {
-    "message": "遊戲玩法"
-  },
-  "app.servers.properties.section.network": {
-    "message": "網路與安全"
-  },
-  "app.servers.properties.section.others": {
-    "message": "其他"
-  },
-  "app.servers.properties.section.world": {
-    "message": "世界"
-  },
-  "app.servers.properties.title": {
-    "message": "伺服器屬性"
-  },
-  "app.servers.refresh": {
-    "message": "重新整理"
-  },
-  "app.servers.settings.cancel": {
-    "message": "取消"
-  },
-  "app.servers.settings.config": {
-    "message": "設定檔"
-  },
-  "app.servers.settings.delete": {
-    "message": "刪除伺服器"
-  },
-  "app.servers.settings.delete-confirm": {
-    "message": "刪除 {name} 及其所有檔案？此操作無法復原。"
-  },
-  "app.servers.settings.delete-hint": {
-    "message": "永久刪除該伺服器及其所有檔案。"
-  },
-  "app.servers.settings.delete-proceed": {
-    "message": "刪除"
-  },
-  "app.servers.settings.general": {
-    "message": "一般"
-  },
-  "app.servers.settings.icon": {
-    "message": "圖示"
-  },
-  "app.servers.settings.java": {
-    "message": "Java"
-  },
-  "app.servers.settings.jvm-args": {
-    "message": "JVM 參數"
-  },
-  "app.servers.settings.jvm-args-hint": {
-    "message": "以空格分隔的參數，例如 -XX:+UseG1GC"
-  },
-  "app.servers.settings.memory": {
-    "message": "記憶體"
-  },
-  "app.servers.settings.name": {
-    "message": "伺服器名稱"
-  },
-  "app.servers.settings.running-hint": {
-    "message": "您的變更在下次啟動伺服器後才會生效。"
-  },
-  "app.servers.settings.running-title": {
-    "message": "伺服器執行中"
-  },
-  "app.servers.settings.save": {
-    "message": "儲存變更"
-  },
-  "app.servers.settings.saved": {
-    "message": "伺服器設定已儲存"
-  },
-  "app.servers.status.crashed": {
-    "message": "已崩潰"
-  },
-  "app.servers.status.downloading": {
-    "message": "下載中"
-  },
-  "app.servers.status.created": {
-    "message": "未設定"
-  },
-  "app.servers.status.eula-pending": {
-    "message": "待同意 EULA"
-  },
-  "app.servers.status.ready": {
-    "message": "就緒"
-  },
-  "app.servers.status.running": {
-    "message": "執行中"
-  },
-  "app.servers.status.starting": {
-    "message": "啟動中"
-  },
-  "app.servers.wizard.background-hint": {
-    "message": "您可以關閉此視窗，下載將在背景繼續進行。"
-  },
-  "app.servers.wizard.configure-heading": {
-    "message": "調整伺服器設定，或直接完成，稍後再編輯。"
-  },
-  "app.servers.wizard.configure-title": {
-    "message": "設定"
-  },
-  "app.servers.wizard.done": {
-    "message": "伺服器已就緒"
-  },
-  "app.servers.wizard.download-in-background": {
-    "message": "背景下載"
-  },
-  "app.servers.wizard.downloading": {
-    "message": "正在下載伺服器端檔案…"
-  },
-  "app.servers.wizard.eula-wait": {
-    "message": "等待確認 EULA"
-  },
-  "app.servers.wizard.failed": {
-    "message": "建立失敗"
-  },
-  "app.servers.wizard.finish": {
-    "message": "完成"
-  },
-  "app.servers.wizard.first-run": {
-    "message": "正在首次啟動…"
-  },
-  "app.servers.wizard.game-version": {
-    "message": "遊戲版本"
-  },
-  "app.servers.wizard.install-title": {
-    "message": "安裝"
-  },
-  "app.servers.wizard.loader-version": {
-    "message": "載入器版本"
-  },
-  "app.servers.wizard.log": {
-    "message": "輸出"
-  },
-  "app.servers.wizard.memory-value": {
-    "message": "{value} MB"
-  },
-  "app.servers.wizard.name": {
-    "message": "伺服器名稱"
-  },
-  "app.servers.wizard.name-placeholder": {
-    "message": "生存服"
-  },
-  "app.servers.wizard.next": {
-    "message": "下一步"
-  },
-  "app.servers.wizard.retry": {
-    "message": "重試"
-  },
-  "app.servers.wizard.setup-title": {
-    "message": "設定"
-  },
-  "app.servers.wizard.show-snapshots": {
-    "message": "顯示快照版本"
-  },
-  "app.servers.wizard.type-heading": {
-    "message": "選擇伺服器端類型"
-  },
-  "app.servers.wizard.type-title": {
-    "message": "伺服器端類型"
-  },
-  "app.servers.type.vanilla": {
-    "message": "原版"
-  },
-  "app.servers.type.fabric": {
-    "message": "Fabric"
-  },
-  "app.servers.type.paper": {
-    "message": "Paper"
-  },
-  "app.servers.type.forge": {
-    "message": "Forge"
-  },
-  "app.servers.modpack.downloading": {
-    "message": "正在下載整合包檔案..."
-  },
-  "app.servers.modpack.preparing": {
-    "message": "正在準備伺服器..."
-  },
-  "app.servers.modpack.done": {
-    "message": "安裝完成"
-  },
-  "app.servers.modpack.current-file": {
-    "message": "正在安裝 {file}"
-  },
-  "app.servers.modpack.background-hint": {
-    "message": "您可以關閉此視窗，下載將在背景持續進行。"
-  },
-  "app.servers.modpack.first-run-crashed": {
-    "message": "伺服器在首次啟動時當機。請檢查所選 Java 版本是否相容，然後重試。"
-  },
-  "app.servers.modpack.download-in-background": {
-    "message": "背景下載"
-  },
-  "app.servers.modpack.unsupported-loader-title": {
-    "message": "{loader} 伺服器端暫不支援"
-  },
-  "app.servers.modpack.unsupported-loader-description": {
-    "message": "此整合包使用 {loader}，但 Starlight 目前僅支援原版、Fabric 與 Quilt 整合包伺服器端。{loader} 支援即將推出。"
-  },
-  "app.settings.about.afdian": {
-    "message": "在愛發電贊助"
-  },
-  "app.settings.about.afdian-description": {
-    "message": "支持專案持續開發"
-  },
   "app.settings.about.attribution": {
     "message": "Starlight Launcher 是基於 Axolotl 啟動器修改的版本，Axolotl 啟動器基於開源專案 Modrinth 程式碼庫。"
-  },
-  "app.settings.about.community-support": {
-    "message": "專案與社群"
   },
   "app.settings.about.contributors": {
     "message": "貢獻者"
   },
   "app.settings.about.contributors-count": {
     "message": "{count} 位貢獻者"
-  },
-  "app.settings.about.copied-qq-group": {
-    "message": "已複製群組號碼"
-  },
-  "app.settings.about.copy-qq-group": {
-    "message": "複製群組號碼"
   },
   "app.settings.about.description": {
     "message": "你的最後一款啟動器。"
@@ -6572,29 +6050,8 @@
   "app.settings.about.project-license": {
     "message": "專案授權條款（GPL-3.0）"
   },
-  "app.settings.about.project-website": {
-    "message": "專案網站"
-  },
-  "app.settings.about.qq-channel": {
-    "message": "QQ 頻道"
-  },
-  "app.settings.about.qq-group": {
-    "message": "使用者 QQ 群組"
-  },
   "app.settings.about.replay-onboarding": {
     "message": "重放導覽"
-  },
-  "app.settings.about.report-issue": {
-    "message": "問題與意見回饋"
-  },
-  "app.settings.about.repository": {
-    "message": "原始碼"
-  },
-  "app.settings.about.survey": {
-    "message": "調查問卷"
-  },
-  "app.settings.about.survey-description": {
-    "message": "幫助我們改進 Starlight Launcher"
   },
   "app.settings.about.test-error": {
     "message": "觸發測試錯誤"
@@ -7346,9 +6803,6 @@
   "app.settings.updates.checking": {
     "message": "正在檢查更新..."
   },
-  "app.settings.updates.cnb": {
-    "message": "CNB 管道"
-  },
   "app.settings.updates.current-version": {
     "message": "目前版本 {version}"
   },
@@ -7360,9 +6814,6 @@
   },
   "app.settings.updates.latest-version-loading": {
     "message": "正在取得"
-  },
-  "app.settings.updates.description": {
-    "message": "選擇 Starlight 檢查啟動器更新的管道。"
   },
   "app.settings.updates.disabled": {
     "message": "此組建已停用更新功能。"
@@ -7378,9 +6829,6 @@
   },
   "app.settings.updates.immediate-fetch.beta-description": {
     "message": "Beta 更新一律立即可用。"
-  },
-  "app.settings.updates.github": {
-    "message": "GitHub 管道"
   },
   "app.settings.updates.offline": {
     "message": "請連線至網際網路後再檢查更新。"
@@ -7399,9 +6847,6 @@
   },
   "app.settings.updates.preferences.title": {
     "message": "更新行為"
-  },
-  "app.settings.updates.preview-announcement": {
-    "message": "預覽更新公告彈出視窗"
   },
   "app.settings.updates.security": {
     "message": "只有透過加密簽章驗證的更新才會被安裝。"
@@ -7607,21 +7052,6 @@
   "app.splash.updating-app-directory": {
     "message": "正在更新應用程式目錄……"
   },
-  "app.survey-promotion.defer-hint": {
-    "message": "關閉此彈窗後，你仍可以隨時在「設定 → 關於」頁面中找到並填寫問卷。"
-  },
-  "app.survey-promotion.fill-survey": {
-    "message": "填寫問卷"
-  },
-  "app.survey-promotion.intro": {
-    "message": "為了更好地改進 Starlight Launcher，我們準備了一份簡短的調查問卷，期待聽到你的回饋。"
-  },
-  "app.survey-promotion.reward": {
-    "message": "我們將從填寫問卷的使用者中抽取幸運使用者，贈送 Minecraft 正版帳號（可折現）。"
-  },
-  "app.survey-promotion.title": {
-    "message": "調查問卷"
-  },
   "app.symlink-capability.unsupported": {
     "message": "系統不支持軟連結。"
   },
@@ -7805,9 +7235,6 @@
   "app.update-announcement.category.security": {
     "message": "安全修復"
   },
-  "app.update-announcement.modal.header": {
-    "message": "What"
-  },
   "app.update-announcement.notes": {
     "message": "說明"
   },
@@ -7825,9 +7252,6 @@
   },
   "app.update-popup.body.download-complete": {
     "message": "Starlight Launcher v{version} 已完成下載！立即重新載入以更新，或在關閉 Starlight Launcher 時自動更新。"
-  },
-  "app.update-popup.body.linux": {
-    "message": "Starlight Launcher v{version} 現已推出。請使用軟體包管理員進行更新，以取得最新的功能與修正！"
   },
   "app.update-popup.body.metered": {
     "message": "Starlight Launcher v{version} 現已推出！由於你目前使用的是計量付費網路，我們並未自動下載更新。"
@@ -9866,9 +9290,6 @@
   "minecraft-account.add-microsoft-account": {
     "message": "新增自己的正版帳號"
   },
-  "minecraft-account.add-offline-account": {
-    "message": "新增離線帳號"
-  },
   "minecraft-account.sign-in-starlight": {
     "message": "登入 StarLight皮膚站"
   },
@@ -9947,56 +9368,11 @@
   "minecraft-account.select-account": {
     "message": "選擇帳號"
   },
-  "minecraft-account.sign-in": {
-    "message": "登入 Minecraft"
-  },
   "minecraft-account.third-party-account": {
     "message": "Minecraft 第三方帳號"
   },
   "minecraft-account.third-party-badge": {
     "message": "第三方"
-  },
-  "minecraft-account.third-party-modal.account": {
-    "message": "帳號或電子郵件"
-  },
-  "minecraft-account.third-party-modal.account-placeholder": {
-    "message": "請輸入帳號或電子郵件"
-  },
-  "minecraft-account.third-party-modal.api-root": {
-    "message": "Yggdrasil API 網址"
-  },
-  "minecraft-account.third-party-modal.api-root-placeholder": {
-    "message": "https://example.com/api/yggdrasil"
-  },
-  "minecraft-account.third-party-modal.description": {
-    "message": "使用 LittleSkin 或其他相容的 Yggdrasil 外掛登入服務。"
-  },
-  "minecraft-account.third-party-modal.littleskin": {
-    "message": "使用 LittleSkin"
-  },
-  "minecraft-account.third-party-modal.password": {
-    "message": "密碼"
-  },
-  "minecraft-account.third-party-modal.remember-password": {
-    "message": "在此裝置上儲存登入資訊"
-  },
-  "minecraft-account.third-party-modal.remove-saved-login": {
-    "message": "刪除已儲存的登入紀錄"
-  },
-  "minecraft-account.third-party-modal.saved-logins": {
-    "message": "已儲存的登入紀錄"
-  },
-  "minecraft-account.third-party-modal.sign-in": {
-    "message": "登入"
-  },
-  "minecraft-account.third-party-modal.title": {
-    "message": "登入第三方帳號"
-  },
-  "minecraft-account.third-party-profile.description": {
-    "message": "請選擇此帳號要使用的 Minecraft 角色。"
-  },
-  "minecraft-account.third-party-profile.title": {
-    "message": "選擇角色"
   },
   "minecraft-login.browser": {
     "message": "使用瀏覽器登入"

@@ -10,6 +10,8 @@ import {
 import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
+import { get } from '@/helpers/settings.ts'
+
 import SkinSiteSelectionRail from './SkinSiteSelectionRail.vue'
 
 defineProps<{ active: string }>()
@@ -54,47 +56,86 @@ const messages = defineMessages({
 	},
 })
 
-const destinations = ['downloads', 'review', 'wiki', 'bugs', 'map', 'players'] as const
-const items = computed(() => [
-	{
-		id: 'downloads',
-		label: formatMessage(messages.download),
-		description: formatMessage(messages.downloadDesc),
-		icon: DownloadIcon,
-	},
-	{
-		id: 'review',
-		label: formatMessage(messages.review),
-		description: formatMessage(messages.reviewDesc),
-		icon: ShieldCheckIcon,
-	},
-	{
-		id: 'wiki',
-		label: formatMessage(messages.wiki),
-		description: formatMessage(messages.wikiDesc),
-		icon: BookIcon,
-	},
-	{
-		id: 'bugs',
-		label: formatMessage(messages.bugs),
-		description: formatMessage(messages.bugsDesc),
-		icon: BugIcon,
-	},
-	{
-		id: 'map',
-		label: formatMessage(messages.map),
-		description: formatMessage(messages.mapDesc),
-		icon: MapIcon,
-	},
-	{
-		id: 'players',
-		label: formatMessage(messages.profile),
-		description: formatMessage(messages.profileDesc),
-		icon: UserIcon,
-	},
-])
+const defaultDestinations = ['downloads', 'review', 'wiki', 'bugs', 'map', 'players'] as const
+
+const iconFor = (id: string) => {
+	switch (id) {
+		case 'downloads':
+			return DownloadIcon
+		case 'review':
+			return ShieldCheckIcon
+		case 'wiki':
+			return BookIcon
+		case 'bugs':
+			return BugIcon
+		case 'map':
+			return MapIcon
+		case 'players':
+			return UserIcon
+		default:
+			return undefined
+	}
+}
+
+const labelFor = (id: string) => {
+	switch (id) {
+		case 'downloads':
+			return messages.download
+		case 'review':
+			return messages.review
+		case 'wiki':
+			return messages.wiki
+		case 'bugs':
+			return messages.bugs
+		case 'map':
+			return messages.map
+		case 'players':
+			return messages.profile
+		default:
+			return messages.download
+	}
+}
+
+const descFor = (id: string) => {
+	switch (id) {
+		case 'downloads':
+			return messages.downloadDesc
+		case 'review':
+			return messages.reviewDesc
+		case 'wiki':
+			return messages.wikiDesc
+		case 'bugs':
+			return messages.bugsDesc
+		case 'map':
+			return messages.mapDesc
+		case 'players':
+			return messages.profileDesc
+		default:
+			return messages.downloadDesc
+	}
+}
+
+const settings = await get()
+
+const destinations = computed(() => {
+	const known = settings.skin_site_nav_order.filter((id) =>
+		defaultDestinations.includes(id as (typeof defaultDestinations)[number]),
+	)
+	const missing = defaultDestinations.filter((id) => !known.includes(id))
+	return [...known, ...missing] as (typeof defaultDestinations)[number][]
+})
+
+const items = computed(() =>
+	destinations.value.map((id) => ({
+		id,
+		label: formatMessage(labelFor(id)),
+		description: formatMessage(descFor(id)),
+		icon: iconFor(id),
+	})),
+)
+
 function navigate(id: string) {
-	const destination = destinations.find((value) => value === id)
+	const destination = destinations.value.find((value) => value === id)
 	if (destination) emit('navigate', destination)
 }
 </script>

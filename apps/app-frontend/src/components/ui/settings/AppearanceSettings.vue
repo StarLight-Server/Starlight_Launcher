@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import {
+	BookIcon,
+	BugIcon,
 	CheckIcon,
+	ChevronDownIcon,
+	ChevronUpIcon,
+	DownloadIcon,
 	ImageIcon,
 	LayoutTemplateIcon,
+	MapIcon,
 	MinimizeIcon,
+	ShieldCheckIcon,
 	TrashIcon,
 	UploadIcon,
+	UserIcon,
 } from '@modrinth/assets'
 import {
 	Combobox,
@@ -22,11 +30,24 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { appDataDir, join } from '@tauri-apps/api/path'
 import { open } from '@tauri-apps/plugin-dialog'
 import { exists, mkdir, readFile, remove, writeFile } from '@tauri-apps/plugin-fs'
+import type { Component } from 'vue'
 import { computed, onMounted, ref, watch } from 'vue'
 
+import {
+	buildFontFamilyOptions,
+	canonicalFontFamily,
+	DEFAULT_MONO_FONT_STACK,
+	DEFAULT_UI_FONT_STACK,
+	type FontFamilyOption,
+	type FontFamilyOptionOrDivider,
+	optionValueToFontSetting,
+	resolveFontFamily,
+	type SystemFontFamily,
+} from '@/helpers/font-family.ts'
 import { get, set } from '@/helpers/settings.ts'
-import { getOS } from '@/helpers/utils'
+import { getSystemFontFamilies } from '@/helpers/system-fonts.ts'
 import { setUiScale, uiScale } from '@/helpers/ui-scale'
+import { getOS } from '@/helpers/utils'
 import { useTheming } from '@/store/state'
 import {
 	type AccentColor,
@@ -40,19 +61,6 @@ import {
 	hslToHex,
 	parseCustomAccentColor,
 } from '@/store/theme.ts'
-
-import {
-	buildFontFamilyOptions,
-	canonicalFontFamily,
-	DEFAULT_MONO_FONT_STACK,
-	DEFAULT_UI_FONT_STACK,
-	type FontFamilyOption,
-	type FontFamilyOptionOrDivider,
-	optionValueToFontSetting,
-	resolveFontFamily,
-	type SystemFontFamily,
-} from '@/helpers/font-family.ts'
-import { getSystemFontFamilies } from '@/helpers/system-fonts.ts'
 
 import SettingsRow from './SettingsRow.vue'
 import SettingsSection from './SettingsSection.vue'
@@ -376,6 +384,22 @@ const messages = defineMessages({
 		defaultMessage:
 			'Hide the downloads button in the sidebar when there are no active download tasks.',
 	},
+	skinSiteNavOrderTitle: {
+		id: 'app.appearance-settings.skin-site-nav-order.title',
+		defaultMessage: 'Skin site navigation order',
+	},
+	skinSiteNavOrderDescription: {
+		id: 'app.appearance-settings.skin-site-nav-order.description',
+		defaultMessage: 'Change the order of the navigation tabs shown on the skin site home page.',
+	},
+	skinSiteNavMoveUp: {
+		id: 'app.appearance-settings.skin-site-nav-order.move-up',
+		defaultMessage: 'Move {name} up',
+	},
+	skinSiteNavMoveDown: {
+		id: 'app.appearance-settings.skin-site-nav-order.move-down',
+		defaultMessage: 'Move {name} down',
+	},
 	fontsTitle: { id: 'app.appearance-settings.fonts.title', defaultMessage: 'Fonts' },
 	fontsDescription: {
 		id: 'app.appearance-settings.fonts.description',
@@ -437,6 +461,51 @@ const messages = defineMessages({
 
 const os = ref(await getOS())
 const settings = ref(await get())
+
+const skinSiteNavDestinations = ['downloads', 'review', 'wiki', 'bugs', 'map', 'players'] as const
+type SkinSiteNavDestination = (typeof skinSiteNavDestinations)[number]
+
+const defaultSkinSiteNavItems: {
+	id: SkinSiteNavDestination
+	icon: Component
+	label: MessageDescriptor
+	description: MessageDescriptor
+}[] = [
+	{
+		id: 'downloads',
+		icon: DownloadIcon,
+		label: messages.download,
+		description: messages.downloadDesc,
+	},
+	{ id: 'review', icon: ShieldCheckIcon, label: messages.review, description: messages.reviewDesc },
+	{ id: 'wiki', icon: BookIcon, label: messages.wiki, description: messages.wikiDesc },
+	{ id: 'bugs', icon: BugIcon, label: messages.bugs, description: messages.bugsDesc },
+	{ id: 'map', icon: MapIcon, label: messages.map, description: messages.mapDesc },
+	{ id: 'players', icon: UserIcon, label: messages.profile, description: messages.profileDesc },
+]
+
+function normalizeSkinSiteNavOrder(order: string[]): SkinSiteNavDestination[] {
+	const known = order.filter((id): id is SkinSiteNavDestination =>
+		skinSiteNavDestinations.includes(id as SkinSiteNavDestination),
+	)
+	const missing = skinSiteNavDestinations.filter((id) => !known.includes(id))
+	return [...known, ...missing]
+}
+
+const skinSiteNavOrder = ref<SkinSiteNavDestination[]>(
+	normalizeSkinSiteNavOrder(settings.value.skin_site_nav_order),
+)
+
+function moveSkinSiteNavItem(id: SkinSiteNavDestination, offset: number) {
+	const index = skinSiteNavOrder.value.indexOf(id)
+	const target = index + offset
+	if (index === -1 || target < 0 || target >= skinSiteNavOrder.value.length) return
+	const order = [...skinSiteNavOrder.value]
+	order.splice(target, 0, ...order.splice(index, 1))
+	skinSiteNavOrder.value = order
+	settings.value.skin_site_nav_order = order
+}
+
 const customBackgroundPreview = computed(() =>
 	settings.value.custom_background_path
 		? convertFileSrc(settings.value.custom_background_path)
@@ -1166,6 +1235,67 @@ watch(
 							}
 						"
 					/>
+				</template>
+			</SettingsRow>
+			<SettingsRow stacked>
+				<template #label>
+					<span id="settings-target-appearance-skin-site-nav-order" tabindex="-1">
+						{{ formatMessage(messages.skinSiteNavOrderTitle) }}
+					</span>
+				</template>
+				<template #description>
+					{{ formatMessage(messages.skinSiteNavOrderDescription) }}
+				</template>
+				<template #control>
+					<div class="flex w-full flex-col gap-1">
+						<div
+							v-for="(item, index) in skinSiteNavOrder"
+							:key="item"
+							class="flex items-center gap-3 rounded-lg border border-solid border-surface-4 bg-surface-3 p-3"
+						>
+							<component
+								:is="defaultSkinSiteNavItems.find((entry) => entry.id === item)?.icon"
+								class="size-4 shrink-0"
+							/>
+							<span class="flex-1 truncate text-sm font-semibold text-contrast">
+								{{
+									formatMessage(defaultSkinSiteNavItems.find((entry) => entry.id === item)!.label)
+								}}
+							</span>
+							<div class="flex shrink-0 items-center gap-1">
+								<button
+									type="button"
+									class="flex size-7 items-center justify-center rounded-md text-secondary transition-colors hover:bg-surface-4 hover:text-contrast disabled:cursor-not-allowed disabled:opacity-40"
+									:disabled="index === 0"
+									:aria-label="
+										formatMessage(messages.skinSiteNavMoveUp, {
+											name: formatMessage(
+												defaultSkinSiteNavItems.find((entry) => entry.id === item)!.label,
+											),
+										})
+									"
+									@click="moveSkinSiteNavItem(item, -1)"
+								>
+									<ChevronUpIcon />
+								</button>
+								<button
+									type="button"
+									class="flex size-7 items-center justify-center rounded-md text-secondary transition-colors hover:bg-surface-4 hover:text-contrast disabled:cursor-not-allowed disabled:opacity-40"
+									:disabled="index === skinSiteNavOrder.length - 1"
+									:aria-label="
+										formatMessage(messages.skinSiteNavMoveDown, {
+											name: formatMessage(
+												defaultSkinSiteNavItems.find((entry) => entry.id === item)!.label,
+											),
+										})
+									"
+									@click="moveSkinSiteNavItem(item, 1)"
+								>
+									<ChevronDownIcon />
+								</button>
+							</div>
+						</div>
+					</div>
 				</template>
 			</SettingsRow>
 		</SettingsSection>

@@ -4,19 +4,19 @@ import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/u
 import { computed, onMounted, ref } from 'vue'
 
 import {
-	type SkinSiteWikiPageDetail,
-	skinSiteWikiPage,
 	skinSiteWikiDiff,
+	type SkinSiteWikiDiffLine,
 	skinSiteWikiHistory,
+	type SkinSiteWikiNode,
+	skinSiteWikiPage,
+	type SkinSiteWikiPageDetail,
 	skinSiteWikiRevert,
 	skinSiteWikiRevision,
-	type SkinSiteWikiDiffLine,
-	type SkinSiteWikiNode,
 	type SkinSiteWikiRevisionInfo,
 } from '@/helpers/skin-site-api'
 
-import WikiNodeRenderer from './wiki/WikiNodeRenderer.vue'
 import WikiBrowser from './wiki/WikiBrowser.vue'
+import WikiNodeRenderer from './wiki/WikiNodeRenderer.vue'
 
 const { formatMessage } = useVIntl()
 const { handleError, addNotification } = injectNotificationManager()

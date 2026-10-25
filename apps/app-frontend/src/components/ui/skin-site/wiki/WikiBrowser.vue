@@ -4,11 +4,11 @@ import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/u
 import { computed, onMounted, ref, watch } from 'vue'
 
 import {
-	type SkinSiteWikiPageSummary,
-	type SkinSiteWikiSearchPage,
 	skinSiteWikiCategory,
+	type SkinSiteWikiPageSummary,
 	skinSiteWikiRecent,
 	skinSiteWikiSearch,
+	type SkinSiteWikiSearchPage,
 } from '@/helpers/skin-site-api'
 
 const emit = defineEmits<{ navigate: [title: string] }>()

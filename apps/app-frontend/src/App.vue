@@ -105,6 +105,7 @@ import { setupKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
 import { minecraftLaunchErrorKey } from '@/composables/useMinecraftLaunchError'
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
 import { AxolotlBrandConfig, config, getOfficialLabrinthBaseUrl } from '@/config'
+import { shouldDelayAppUpdate } from '@/helpers/app-update-policy'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { configureCurseForgeManualDownloadWatcher } from '@/helpers/curseforge'
@@ -134,7 +135,6 @@ import {
 import { getSidebarExpanded, setSidebarExpanded } from '@/helpers/sidebar-state.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import { installUiScale, setUiScale } from '@/helpers/ui-scale'
-import { shouldDelayAppUpdate } from '@/helpers/app-update-policy'
 import {
 	areUpdatesEnabled,
 	backupAppDbForUpdate,

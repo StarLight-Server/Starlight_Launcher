@@ -29,13 +29,13 @@ import {
 import { syncedPackKeys, syncedPackQueryOptions } from '@/helpers/synced-packs'
 import { instanceKeys, instanceListQueryOptions } from '@/pages/instance/query-options'
 
-import SettingsRow from '../settings/SettingsRow.vue'
-import SettingsSection from '../settings/SettingsSection.vue'
 import CommandHistoryModal from '../settings/instances/command-history-modal.vue'
+import GameSettingsModal from '../settings/instances/game-settings-modal/index.vue'
 import SyncedServersModal from '../settings/instances/servers-modal.vue'
 import SyncedPacksModal from '../settings/instances/SyncedPacksModal.vue'
 import SyncSourceModal from '../settings/instances/SyncSourceModal.vue'
-import GameSettingsModal from '../settings/instances/game-settings-modal/index.vue'
+import SettingsRow from '../settings/SettingsRow.vue'
+import SettingsSection from '../settings/SettingsSection.vue'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()

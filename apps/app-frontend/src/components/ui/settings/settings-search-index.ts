@@ -107,6 +107,16 @@ export const settingsSearchEntries: SettingsSearchEntry[] = [
 		),
 	},
 	{
+		id: 'appearance-skin-site-nav-order',
+		categoryId: 'home-navigation',
+		targetId: 'settings-target-appearance-skin-site-nav-order',
+		label: message(
+			'app.appearance-settings.skin-site-nav-order.title',
+			'Skin site navigation order',
+		),
+		keywords: [message('app.skin-site.home.nav.title', 'Skin site')],
+	},
+	{
 		id: 'appearance-native-decorations',
 		categoryId: 'interface',
 		targetId: 'settings-target-appearance-native-decorations',

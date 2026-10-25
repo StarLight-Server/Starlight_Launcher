@@ -13,6 +13,11 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 
 import {
+	requestSkinSiteDownloadToken,
+	skinSiteStatus,
+	waitForSkinSiteSession,
+} from '@/composables/skin-site-session.ts'
+import {
 	announcementKey,
 	isAnnouncementActive,
 	mapBroadcastAnnouncements,
@@ -22,12 +27,6 @@ import {
 	type RemoteAnnouncement,
 	safeAnnouncementUrl,
 } from '@/helpers/remote-announcements'
-
-import {
-	requestSkinSiteDownloadToken,
-	skinSiteStatus,
-	waitForSkinSiteSession,
-} from '@/composables/skin-site-session.ts'
 
 const props = defineProps<{ ready: boolean; previewOnly?: boolean }>()
 const { formatMessage } = useVIntl()
@@ -69,7 +68,7 @@ const queuedThisSession = new Set<string>()
 const startupNotified = new Set<string>()
 let items: RemoteAnnouncement[] = []
 let pending: RemoteAnnouncement[] = []
-let cacheKey = 'starlight-remote-announcements-cache-v1'
+const cacheKey = 'starlight-remote-announcements-cache-v1'
 let cacheLoaded = false
 let disposed = false
 let interval: ReturnType<typeof setInterval> | undefined

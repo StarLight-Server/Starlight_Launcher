@@ -548,9 +548,6 @@
   "app.update-popup.body.download-complete": {
     "message": "Starlight Launcher versio {version} on ladattu. Voit käynnistää sovelluksen uudelleen päivittääksesi heti tai antaa päivityksen asentua automaattisesti, kun suljet Starlight Launcherin."
   },
-  "app.update-popup.body.linux": {
-    "message": "Starlight Launcher versio {version} on saatavilla. Käytä paketinhallintasi ja päivitä käyttääksesi uusimpia ominaisuuksia ja korjauksia!"
-  },
   "app.update-popup.body.metered": {
     "message": "Starlight Launcher versio {version} on nyt saatavilla! Koska käytät käytön mukaan laskutettavaa verkkoa, emme ladannut sitä automaattisesti."
   },
@@ -922,9 +919,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Valitse tili"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Kirjaudu sisään Minecraftiin"
   },
   "search.filter.locked.instance": {
     "message": "Annettu instanssin toimesta"

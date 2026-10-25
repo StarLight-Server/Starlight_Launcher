@@ -4,21 +4,21 @@ import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/u
 import { computed, onMounted, ref } from 'vue'
 
 import {
+	skinSiteCreateReviewPaperAdmin,
 	skinSiteDecideReviewSubmission,
 	skinSiteRegenerateReviewInvite,
-	type SkinSiteReviewResult,
-	type SkinSiteReviewSubmission,
-	skinSiteReviewPaperAdmin,
-	skinSiteReviewPaperList,
-	skinSiteReviewSubmissionCount,
-	skinSiteReviewSubmissions,
-	skinSiteCreateReviewPaperAdmin,
-	skinSiteUpdateReviewPaperAdmin,
 	type SkinSiteReviewAnswer,
 	type SkinSiteReviewConfigData,
-	type SkinSiteReviewQuestion,
 	type SkinSiteReviewMailConfig,
+	skinSiteReviewPaperAdmin,
+	skinSiteReviewPaperList,
 	type SkinSiteReviewPaperSummary,
+	type SkinSiteReviewQuestion,
+	type SkinSiteReviewResult,
+	type SkinSiteReviewSubmission,
+	skinSiteReviewSubmissionCount,
+	skinSiteReviewSubmissions,
+	skinSiteUpdateReviewPaperAdmin,
 } from '@/helpers/skin-site-api'
 
 const { formatMessage } = useVIntl()
