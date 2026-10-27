@@ -180,6 +180,7 @@
 		"terracotta:default",
 		"multiplayer:default",
 		"servers:default",
-		"planet-minecraft:default"
+		"planet-minecraft:default",
+		"fonts:default"
 	]
 }

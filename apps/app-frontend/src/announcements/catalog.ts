@@ -33,6 +33,250 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.2',
+		version: '1.0.2',
+		publishedAt: '2026-10-25',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.2',
+			'zh-CN': 'Starlight Launcher 1.0.2',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'Native skin site: sign-in, registration, password reset, account settings, players, downloads, world map, wiki, bug tracker, player review, chat rooms, and announcements all run inside the launcher, with a full admin console for server operators.',
+					'zh-CN':
+						'皮肤站全面原生化：登录、注册、找回密码、账号设置、玩家管理、资源下载、世界地图、维基、问题追踪、玩家审核、聊天室与公告中心均在启动器内运行，并为服务器管理员提供完整管理台。',
+				},
+				{
+					'en-US':
+						'Cross-instance sync: share game options, resource packs, data packs, multiplayer servers, command history, and creative hotbars across instances, with per-option toggles and a fine-grained game-settings editor.',
+					'zh-CN':
+						'跨实例同步：在实例间共享游戏设置、资源包、数据包、多人游戏服务器、命令历史与创造模式物品栏，支持逐项开关与精细的游戏设置编辑器。',
+				},
+				{
+					'en-US':
+						'Crash analysis: JVM and launcher crash logs can be uploaded, shared, and explained by an AI assistant, with automatic mod-change snapshots for quick diagnosis.',
+					'zh-CN':
+						'崩溃分析：支持上传与分享 JVM 崩溃和启动器日志，AI 助手自动解释崩溃原因，并自动对比崩溃前的模组变更以便快速定位。',
+				},
+				{
+					'en-US':
+						'Keyboard shortcuts: navigate and scroll the launcher with rebindable shortcuts configured in Settings.',
+					'zh-CN': '键盘快捷键：可在设置中自定义启用并重排导航与快速滚动快捷键。',
+				},
+				{
+					'en-US':
+						'Instance groups: drag instances into groups in the library, with the grouping saved and synced.',
+					'zh-CN': '实例分组：在资源库中拖拽实例进行分组，分组结果保存并同步。',
+				},
+				{
+					'en-US':
+						'Customize the Minecraft window title, and reorder both the skin site navigation tabs and the instance page tabs in Settings.',
+					'zh-CN':
+						'支持自定义 Minecraft 窗口标题；皮肤站导航标签与实例页面标签顺序均可在设置中调整。',
+				},
+				{
+					'en-US':
+						'Announcement center: launcher release notes and community announcements are browsable in-app.',
+					'zh-CN': '公告中心：可在启动器内浏览版本更新日志与社区公告。',
+				},
+				{
+					'en-US':
+						'Anniversary easter egg on October 4th, with extra hidden triggers to discover.',
+					'zh-CN': '每年 10 月 4 日的周年庆彩蛋，另藏有其他触发方式等你发现。',
+				},
+			],
+			changed: [
+				{
+					'en-US':
+						'The skin site no longer runs in an embedded web page; all views are native launcher interfaces.',
+					'zh-CN': '皮肤站不再依赖内嵌网页，全部界面改为启动器原生实现。',
+				},
+				{
+					'en-US':
+						'Modpack downloads are served from a dedicated download domain.',
+					'zh-CN': '整合包下载改由独立下载域名提供。',
+				},
+				{
+					'en-US':
+						'The launcher repository was renamed to Starlight_Launcher.',
+					'zh-CN': '启动器仓库更名为 Starlight_Launcher。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'Security fixes backported from upstream: modpack path traversal patches now protect installs from unsafe paths.',
+					'zh-CN':
+						'合入上游安全修复：整合包路径穿越补丁现已保护安装过程免受不安全路径影响。',
+				},
+				{
+					'en-US':
+						'Fixed live logs falling behind and crash-log uploads failing; LogShare collection was switched to a lightweight collector.',
+					'zh-CN':
+						'修复实时日志积压与崩溃日志上传失败；LogShare 采集改用轻量日志收集器。',
+				},
+				{
+					'en-US':
+						'Fixed the announcement center crashing, wiki and profile pages going blank, garbled skin previews after switching players, instance groups not refreshing, and the server map being blocked by the content security policy.',
+					'zh-CN':
+						'修复公告中心崩溃、维基与个人资料页面空白、切换玩家后皮肤预览错乱、实例分组不刷新，以及服务器地图被内容安全策略拦截的问题。',
+				},
+				{
+					'en-US':
+						'Fixed false "content updated" prompts after automatic sync, and cross-instance sync tables missing on upgrade.',
+					'zh-CN': '修复自动同步后误报内容更新，以及升级后跨实例同步数据表缺失的问题。',
+				},
+				{
+					'en-US':
+						'Fixed online-player prompts not rendering MOTD colors, backups failing for instances with external game directories, and the captcha image being cropped.',
+					'zh-CN':
+						'修复在线玩家提示不渲染 MOTD 颜色、外部游戏目录实例备份失败，以及验证码图片被裁切的问题。',
+				},
+				{
+					'en-US':
+						'Fixed Linux installs defaulting the game directory incorrectly, onboarding steps not scrolling to the target, and the update channel defaulting incorrectly for fresh installs.',
+					'zh-CN':
+						'修复 Linux 安装时游戏目录默认值错误、引导步骤不自动滚动到目标，以及全新安装更新渠道默认值错误的问题。',
+				},
+			],
+		},
+	},
+	{
+		id: 'launcher-1.0.2-beta16',
+		version: '1.0.2-beta16',
+		publishedAt: '2026-10-25',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.2-beta16',
+			'zh-CN': 'Starlight Launcher 1.0.2-beta16',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'The order of the skin site navigation tabs can now be customized in Settings, under Home & navigation.',
+					'zh-CN': '新增皮肤站导航标签顺序自定义，可在设置的「主页与导航」中调整。',
+				},
+			],
+		},
+	},
+	{
+		id: 'launcher-1.0.2-beta15',
+		version: '1.0.2-beta15',
+		publishedAt: '2026-10-24',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.2-beta15',
+			'zh-CN': 'Starlight Launcher 1.0.2-beta15',
+		},
+		changes: {
+			fixed: [
+				{
+					'en-US':
+						'Fixed the announcement center failing to open and blank pages in the wiki and profile views caused by it.',
+					'zh-CN': '修复公告中心无法打开，以及由此导致的维基与个人资料页面空白。',
+				},
+				{
+					'en-US':
+						'Fixed the skin preview showing garbled textures after switching between players.',
+					'zh-CN': '修复切换玩家后皮肤预览出现纹理错乱的问题。',
+				},
+				{
+					'en-US':
+						'Fixed instance group changes only showing up after refreshing the page.',
+					'zh-CN': '修复实例分组修改后需要刷新页面才能生效的问题。',
+				},
+				{
+					'en-US':
+						'Fixed server maps not loading because the map iframe was blocked by the content security policy.',
+					'zh-CN': '修复服务器地图因 iframe 被内容安全策略拦截而无法显示的问题。',
+				},
+			],
+		},
+	},
+	{
+		id: 'launcher-1.0.2-beta14',
+		version: '1.0.2-beta14',
+		publishedAt: '2026-10-23',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.2-beta14',
+			'zh-CN': 'Starlight Launcher 1.0.2-beta14',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'Skin-site players can now be created, renamed and deleted, and one can be marked as the default account.',
+					'zh-CN': '皮肤站玩家支持新建、重命名与删除，并可设置默认角色。',
+				},
+				{
+					'en-US':
+						'The wiki gained search, recent changes and category browsing, plus page watching and title moves.',
+					'zh-CN': '维基支持搜索、最近更新与分类浏览，页面可关注并修改标题。',
+				},
+				{
+					'en-US':
+						'Wiki pages now support reading revision history, diffing versions and reverting to an older revision.',
+					'zh-CN': '维基页面支持查看历史修订、版本对比与撤销到指定版本。',
+				},
+				{
+					'en-US': 'Announcements now display the images attached on the skin site.',
+					'zh-CN': '公告中心可显示皮肤站公告附带的图片。',
+				},
+				{
+					'en-US': 'Bug reports now render their attached screenshots instead of file hashes.',
+					'zh-CN': '问题追踪的附件图片改为直接展示，不再显示文件哈希。',
+				},
+			],
+			changed: [
+				{
+					'en-US': 'The downloads page shows a sign-in prompt instead of an error when signed out.',
+					'zh-CN': '未登录时资源下载页改为提示登录，不再弹出错误。',
+				},
+			],
+			fixed: [
+				{
+					'en-US': 'Fixed the downloads page reporting a sign-in error even when already signed in.',
+					'zh-CN': '修复资源下载页在已登录状态下仍提示未登录的问题。',
+				},
+				{
+					'en-US':
+						'Fixed the admin panel missing user permission groups, showing UUIDs instead of names for announcement authors, and showing option IDs in review answers.',
+					'zh-CN':
+						'修复管理面板不显示用户权限组、公告发布人显示为 UUID、审核作答显示选项 ID 的问题。',
+				},
+				{
+					'en-US': 'Fixed the wiki opening a blank page and internal links not navigating correctly.',
+					'zh-CN': '修复维基首次打开为空白、内部链接跳转异常的问题。',
+				},
+				{
+					'en-US': 'Skin-site player login errors now surface the server-provided reason.',
+					'zh-CN': '皮肤站玩家登录失败时改为显示服务端给出的具体原因。',
+				},
+				{
+					'en-US': 'Fixed server maps being blocked by CSP and font commands missing permission.',
+					'zh-CN': '修复服务器地图被 CSP 拦截、字体命令缺少权限的问题。',
+				},
+				{
+					'en-US': 'Backups now support instances that use an external game directory.',
+					'zh-CN': '备份支持使用外部游戏目录的实例。',
+				},
+				{
+					'en-US': 'The online-player tooltip now renders MOTD colour codes.',
+					'zh-CN': '在线玩家提示可渲染 MOTD 颜色代码。',
+				},
+				{
+					'en-US': 'Fixed captcha images being cropped and missing the rotation hint.',
+					'zh-CN': '修复验证码图片被裁切、缺少旋转提示的问题。',
+				},
+				{
+					'en-US': 'The skin-site player list now retries automatically and shows an error state after failures.',
+					'zh-CN': '皮肤站玩家列表加载失败后自动重试，并显示错误状态。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-1.0.2-beta13',
 		version: '1.0.2-beta13',
 		publishedAt: '2026-10-21',

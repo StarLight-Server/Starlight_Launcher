@@ -9,12 +9,12 @@ argument-hint: <path-to-page>
 1. **Read the target page** at `$ARGUMENTS` and understand its data sources, mutations, and navigation.
 2. **Identify platform boundaries**: keep identical page implementations wrapped in `packages/ui`; use dependency injection only when website and desktop data sources differ.
 3. **Decide the category:**
-   - **Wrapped** (`layouts/wrapped/`) — if the page uses the same API source on both platforms (e.g. web requests, not Tauri plugins). Just move the page component into `packages/ui` and import it from both frontends.
-   - **Shared** (`layouts/shared/`) — if the page has different data-fetching logic per platform (e.g. website uses `api-client`, app uses Tauri `invoke`). Requires a DI contract.
+   - **Wrapped** (`packages/ui/src/layouts/wrapped/`) — if the page uses the same API source on both platforms (e.g. web requests, not Tauri plugins). Just move the page component into `packages/ui` and import it from both frontends.
+   - **Shared** (`packages/ui/src/layouts/shared/`) — if the page has different data-fetching logic per platform (e.g. website uses `api-client`, app uses Tauri `invoke`). Requires a DI contract.
 4. **For shared layouts:**
-   - Define a DI contract interface in `providers/` capturing all platform-specific operations.
+   - Define a DI contract interface in `packages/ui/src/providers/` capturing all platform-specific operations.
    - Create the layout component that injects the context and handles all UI logic.
-   - Extract reusable stateful logic (search, filtering, selection) into `composables/`.
+   - Extract reusable stateful logic (search, filtering, selection) into `packages/ui/src/composables/`.
    - Implement the contract separately in each frontend (`apps/website/`, `apps/app-frontend/`).
 5. **For wrapped pages:**
    - Move the page component into `packages/ui/src/layouts/wrapped/` matching the route structure.
@@ -22,3 +22,13 @@ argument-hint: <path-to-page>
    - Import and render the wrapped page from both frontends as a simple component.
    - If the layout uses TanStack Query for first paint, keep route-shell prefetch keys and fetchers identical to the layout queries.
 6. **Verify** the page renders correctly by checking for missing imports and that all DI contracts are satisfied.
+
+## Existing Layout Structure
+
+```
+packages/ui/src/layouts/
+├── shared/          # Reusable layout modules with own components, composables, providers, types
+└── wrapped/         # Page-level Vue components mirroring route structures
+```
+
+Shared modules (e.g. `shared/content-tab/`) contain `layout.vue`, `components/`, `composables/`, `providers/`, and `types.ts`. Files use the `#ui/*` import alias (resolved via `"imports"` field in `package.json`) to reference other `src/` modules like `#ui/components/base/ButtonStyled.vue` or `#ui/composables/i18n`.

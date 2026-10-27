@@ -67,7 +67,7 @@ impl<T> UpdateTarget<T> {
 // "betaN" scheme where N is a decimal counter, so a strict lexical compare
 // would wrongly report an older beta as the latest. Use a comparator that
 // treats the trailing digits of a prerelease identifier numerically.
-fn is_remote_newer(current: &Version, remote: &Version) -> bool {
+pub fn is_remote_newer(current: &Version, remote: &Version) -> bool {
     use std::cmp::Ordering;
 
     let core = (remote.major, remote.minor, remote.patch).cmp(&(
@@ -177,6 +177,33 @@ mod tests {
         assert!(is_rollback(&version("1.2.0"), &version("1.1.0")));
         assert!(!is_rollback(&version("1.1.0"), &version("1.2.0")));
         assert!(!is_rollback(&version("1.2.0"), &version("1.2.0")));
+    }
+
+    #[test]
+    fn a_final_release_outranks_the_matching_prerelease() {
+        // Graduation: the release channel's final version is newer than the
+        // beta channel's prerelease of the same x.y.z.
+        assert!(is_remote_newer(&version("1.0.2-beta16"), &version("1.0.2")));
+        assert!(!is_remote_newer(
+            &version("1.0.2"),
+            &version("1.0.2-beta16")
+        ));
+        // A final release of an older x.y.z does not graduate a newer beta.
+        assert!(!is_remote_newer(
+            &version("1.0.2-beta16"),
+            &version("1.0.1")
+        ));
+        // Beta-to-beta comparisons still use the numeric suffix rule.
+        assert!(is_remote_newer(
+            &version("1.0.2-beta9"),
+            &version("1.0.2-beta16")
+        ));
+        assert!(!is_remote_newer(
+            &version("1.0.2-beta16"),
+            &version("1.0.2-beta16")
+        ));
+        // A newer prerelease of a future x.y.z outranks the final release.
+        assert!(is_remote_newer(&version("1.0.2"), &version("1.0.3-beta1")));
     }
 
     #[test]

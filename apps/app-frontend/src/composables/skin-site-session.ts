@@ -294,6 +294,9 @@ async function buildPlayer(entry: {
 export function requestSkinSitePlayers(): Promise<SkinSitePlayer[]> {
 	if (playersRequest) return playersRequest
 	if (status.value !== 'signed-in' || !user.value) {
+		// Keep the status meaningful so the UI does not spin forever: an
+		// unauthenticated request means "not loaded yet", not "loading".
+		playersStatus.value = 'idle'
 		return Promise.reject(new Error('请先登录 StarLight 皮肤站。'))
 	}
 
@@ -317,6 +320,16 @@ export function requestSkinSitePlayers(): Promise<SkinSitePlayer[]> {
 		}
 	})()
 	return playersRequest
+}
+
+/**
+ * Drop any in-flight or cached player request and fetch again. Used by views
+ * that need to recover after a failed load (e.g. signing in from the skin
+ * page while the first attempt raced the session check).
+ */
+export function reloadSkinSitePlayers(): Promise<SkinSitePlayer[]> {
+	playersRequest = null
+	return requestSkinSitePlayers()
 }
 
 export function selectSkinSitePlayer(playerId: string | null) {

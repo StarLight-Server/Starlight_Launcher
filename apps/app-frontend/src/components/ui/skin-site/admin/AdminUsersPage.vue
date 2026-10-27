@@ -4,24 +4,24 @@ import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/u
 import { computed, onMounted, ref } from 'vue'
 
 import {
-	type SkinSiteAdminPlayer,
-	type SkinSiteAdminUser,
-	type SkinSiteBotInfo,
-	type SkinSiteUserAdminAuditInfo,
-	type SkinSiteUserFrequencyLimit,
 	skinSiteAdminBotInfo,
 	skinSiteAdminDeleteUser,
 	skinSiteAdminInvalidateBotToken,
 	skinSiteAdminInviteUser,
+	type SkinSiteAdminPlayer,
 	skinSiteAdminRenameBot,
 	skinSiteAdminSetBotCreationBanned,
 	skinSiteAdminUpdateUser,
 	skinSiteAdminUpdateUserFrequencyLimit,
+	type SkinSiteAdminUser,
 	skinSiteAdminUserAudit,
 	skinSiteAdminUserCount,
 	skinSiteAdminUserFrequencyLimit,
 	skinSiteAdminUserList,
 	skinSiteAdminUserPlayers,
+	type SkinSiteBotInfo,
+	type SkinSiteUserAdminAuditInfo,
+	type SkinSiteUserFrequencyLimit,
 } from '@/helpers/skin-site-api'
 
 const { formatMessage } = useVIntl()
@@ -57,6 +57,10 @@ const messages = defineMessages({
 	},
 	banned: { id: 'app.skin-site.admin.users.banned', defaultMessage: 'Banned' },
 	permissions: { id: 'app.skin-site.admin.users.permissions', defaultMessage: 'Permissions' },
+	permissionGroups: {
+		id: 'app.skin-site.admin.users.permission-groups',
+		defaultMessage: 'Groups',
+	},
 	permissionsHint: {
 		id: 'app.skin-site.admin.users.permissions-hint',
 		defaultMessage: 'Comma separated, e.g. WEB_ADMIN, SERVER_ADMIN.',
@@ -514,6 +518,21 @@ async function nextPage() {
 	await load()
 }
 
+const PERMISSION_META: Record<string, { label: string; color: string }> = {
+	GUEST: { label: '游客', color: 'bg-button-bg text-secondary' },
+	EXTERNAL_MEMBER: { label: 'Mod服玩家', color: 'bg-blue text-contrast' },
+	INTERNAL_MEMBER: { label: '原版服玩家', color: 'bg-orange text-contrast' },
+	SENIOR_MEMBER: { label: '老资历', color: 'bg-purple text-contrast' },
+	SPONSOR: { label: '捐赠者', color: 'bg-yellow text-contrast' },
+	SERVER_ADMIN: { label: '服务器管理', color: 'bg-green text-contrast' },
+	WEB_ADMIN: { label: 'Web 管理', color: 'bg-brand text-contrast' },
+	DEVELOPER: { label: '开发者', color: 'bg-red text-contrast' },
+}
+
+function permissionMeta(perm: string) {
+	return PERMISSION_META[perm] ?? { label: perm, color: 'bg-button-bg text-secondary' }
+}
+
 function startEdit(user: SkinSiteAdminUser) {
 	editingUuid.value = user.uuid
 	editForm.value = {
@@ -676,6 +695,9 @@ onMounted(() => void load())
 							<th class="px-3 py-2 font-semibold">{{ formatMessage(messages.email) }}</th>
 							<th class="px-3 py-2 font-semibold">{{ formatMessage(messages.qq) }}</th>
 							<th class="px-3 py-2 font-semibold">{{ formatMessage(messages.status) }}</th>
+							<th class="px-3 py-2 font-semibold">
+								{{ formatMessage(messages.permissionGroups) }}
+							</th>
 							<th class="px-3 py-2 font-semibold">{{ formatMessage(messages.registeredAt) }}</th>
 							<th class="px-3 py-2 font-semibold">{{ formatMessage(messages.actions) }}</th>
 						</tr>
@@ -703,6 +725,24 @@ onMounted(() => void load())
 											: formatMessage(messages.statusNormal)
 									}}
 								</span>
+							</td>
+							<td class="px-3 py-2">
+								<div class="flex flex-wrap gap-1">
+									<span
+										v-for="perm in user.permissions ?? []"
+										:key="perm"
+										class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
+										:class="permissionMeta(perm).color"
+									>
+										{{ permissionMeta(perm).label }}
+									</span>
+									<span
+										v-if="!user.permissions?.length"
+										class="text-[11px] text-secondary"
+									>
+										—
+									</span>
+								</div>
 							</td>
 							<td class="px-3 py-2 text-xs text-secondary">
 								{{ formatDateTime(user.registerTime) }}

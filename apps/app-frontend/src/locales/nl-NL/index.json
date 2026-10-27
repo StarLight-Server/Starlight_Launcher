@@ -440,9 +440,6 @@
   "app.update-popup.body.download-complete": {
     "message": "Starlight Launcher v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Starlight Launcher afsluit."
   },
-  "app.update-popup.body.linux": {
-    "message": "Starlight Launcher v{version} is beschikbaar. Gebruik je pakketbeheerder om te updaten voor de laatste functies en oplossingen!"
-  },
   "app.update-popup.body.metered": {
     "message": "Starlight Launcher v{version} is nu beschikbaar! Omdat je nu op een netwerk met datalimiet zit, is de download niet automatisch gestart."
   },
@@ -811,9 +808,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Selecteer account"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Log in bij Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Aangeboden door de instantie"

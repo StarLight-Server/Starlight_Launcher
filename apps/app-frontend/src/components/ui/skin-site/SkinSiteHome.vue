@@ -101,7 +101,7 @@ function onBugCreated(id: number) {
 				@open="openBug"
 			/>
 			<SkinSiteAdminView v-else-if="view === 'admin'" @back="view = 'home'" />
-			<WikiView v-else-if="view === 'wiki'" />
+			<WikiView v-else-if="view === 'wiki'" initial-title="The Land Of StarLight" />
 
 			<SkinSiteBugDetailView
 				v-else-if="view === 'bug-detail' && selectedBugId !== null"

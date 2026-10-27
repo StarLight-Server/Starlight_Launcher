@@ -356,9 +356,6 @@
   "content.filter.updates": {
     "defaultMessage": "Aktualizace"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Varování"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "Prozkoumat"
   },

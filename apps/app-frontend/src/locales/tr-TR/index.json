@@ -548,9 +548,6 @@
   "app.update-popup.body.download-complete": {
     "message": "Starlight Launcher v{version} indirildi. Güncellemek için yeniden başlatın veya Starlight Launcher’i kapattığınızda otomatik olarak güncellenecektir."
   },
-  "app.update-popup.body.linux": {
-    "message": "Starlight Launcher v{version} yayımlandı. En yeni özellikler ve hata düzeltmeleri için paket yöneticin üzerinden güncelle!"
-  },
   "app.update-popup.body.metered": {
     "message": "Starlight Launcher v{version} mevcut! Kısıtlı bağlantıda olduğunuzdan otomatik olarak indirmedik."
   },
@@ -922,9 +919,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Hesap seçin"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Minecraft'a giriş yapın"
   },
   "search.filter.locked.instance": {
     "message": "Kurulum tarafından sağlanan"

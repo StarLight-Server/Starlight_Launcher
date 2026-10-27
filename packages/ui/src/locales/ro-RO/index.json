@@ -305,9 +305,6 @@
   "content.filter.updates": {
     "defaultMessage": "Actualizări"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Avertismente"
-  },
   "content.page-layout.share.label": {
     "defaultMessage": "Distribuie"
   },

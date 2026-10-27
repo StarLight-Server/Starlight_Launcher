@@ -344,9 +344,6 @@
   "content.filter.updates": {
     "defaultMessage": "Uppdateringar"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Varningar"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "Utforska innehåll"
   },

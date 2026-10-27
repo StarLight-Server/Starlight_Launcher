@@ -60,7 +60,7 @@ const emailValid = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.
 
 const requiredAnswered = computed(() => {
 	if (!activePaper.value) return false
-	return activePaper.value.questions.every((q) => {
+	return (activePaper.value.questions ?? []).every((q) => {
 		if (q.informationQuestion || q.optional) return true
 		const value = answers.value[q.id]
 		if (Array.isArray(value)) return value.length > 0
@@ -81,7 +81,7 @@ function defaultAnswer(q: SkinSiteReviewPublicQuestion): string | string[] {
 function openPaper(paper: SkinSiteReviewPublicPaper) {
 	activePaper.value = paper
 	answers.value = {}
-	for (const q of paper.questions) answers.value[q.id] = defaultAnswer(q)
+	for (const q of paper.questions ?? []) answers.value[q.id] = defaultAnswer(q)
 	email.value = ''
 	inviteCode.value = ''
 	receipt.value = null
@@ -119,7 +119,7 @@ async function submitApplication() {
 	submitting.value = true
 	try {
 		const payloadAnswers: Record<string, unknown> = {}
-		for (const q of activePaper.value.questions) {
+		for (const q of activePaper.value.questions ?? []) {
 			if (q.informationQuestion) continue
 			payloadAnswers[q.id] = answers.value[q.id] ?? ''
 		}
@@ -226,7 +226,7 @@ onMounted(loadCatalog)
 			</label>
 
 			<div
-				v-for="question in activePaper.questions"
+				v-for="question in activePaper.questions ?? []"
 				:key="question.id"
 				class="flex flex-col gap-2 rounded-xl border border-solid border-surface-5 bg-bg-raised p-3"
 			>

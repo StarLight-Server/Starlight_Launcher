@@ -728,7 +728,23 @@ async fn instance_and_root(
         .ok_or_else(|| {
             crate::ErrorKind::InputError("Unknown instance".to_string())
         })?;
-    let root = state.directories.instances_dir().join(&instance.path);
+    // Back up the directory the game actually writes to. The runtime adapter
+    // is the authoritative resolver used by `instance_get_full_path` and the
+    // launch path, so backups follow the same rules: a per-instance
+    // `game_dir_override` (hosted/SLS packs, external folders) resolves through
+    // its launcher dialect and version isolation, and direct-linked
+    // installations resolve into the linked `.minecraft`.
+    let root = crate::launcher::instance_runtime::InstanceRuntimeAdapter::
+        for_instance(&instance, &state.directories)
+        .map(|adapter| adapter.game_dir())
+        .unwrap_or_else(|error| {
+            tracing::warn!(
+                %error,
+                instance_id = %instance.id,
+                "Falling back to the unresolved game directory for backup root"
+            );
+            state.directories.instance_game_dir(&instance)
+        });
     Ok((instance, root))
 }
 
@@ -745,13 +761,6 @@ async fn eligibility_for(
     }
     if instance.is_direct_linked() {
         return Ok(InstanceBackupEligibility::DirectLinkedInstance);
-    }
-    if instance
-        .game_dir_override
-        .as_deref()
-        .is_some_and(|path| !path.trim().is_empty())
-    {
-        return Ok(InstanceBackupEligibility::ExternalGameDirectory);
     }
     let metadata = match tokio::fs::symlink_metadata(&root).await {
         Ok(metadata) => metadata,
@@ -1658,6 +1667,42 @@ async fn create_snapshot_inner(
     })
 }
 
+/// Game-body directories that live at a shared `.minecraft` root but do not
+/// belong to any single instance. Excluding them keeps backups of externally
+/// managed instances to their own saves, configs and mods instead of
+/// re-copying several gigabytes of libraries and assets.
+const SHARED_ROOT_EXCLUSIONS: [&str; 5] =
+    ["libraries", "assets", "versions", "logs", "crash-reports"];
+
+/// True when `path` looks like a shared `.minecraft` root rather than a
+/// per-instance folder (mirrors the removal heuristic used elsewhere).
+fn is_shared_minecraft_root(path: &Path) -> bool {
+    path.join("libraries").is_dir() || path.join("assets").is_dir()
+}
+
+/// Adds the shared game-body exclusions when the backup root is a shared
+/// `.minecraft` root. Per-instance folders (hosted packs, isolated profiles)
+/// are left untouched so their own `logs` or `versions` stay backed up.
+fn with_shared_root_exclusions(
+    root: &Path,
+    exclusions: &[BackupExclusion],
+) -> Vec<BackupExclusion> {
+    let mut merged = exclusions.to_vec();
+    if !is_shared_minecraft_root(root) {
+        return merged;
+    }
+    for name in SHARED_ROOT_EXCLUSIONS {
+        if merged.iter().any(|existing| existing.path == name) {
+            continue;
+        }
+        merged.push(BackupExclusion {
+            path: name.to_string(),
+            kind: BackupExclusionKind::Directory,
+        });
+    }
+    merged
+}
+
 async fn scan_snapshot_attempt(
     root: &Path,
     repository: &Path,
@@ -1680,6 +1725,8 @@ async fn scan_snapshot_attempt(
         None,
     )
     .await;
+    let exclusions = with_shared_root_exclusions(root, exclusions);
+    let exclusions = exclusions.as_slice();
     let total_bytes = measure_snapshot(root, exclusions, cancellation).await?;
     emit_backup_progress(
         operation_id,
@@ -2642,13 +2689,10 @@ pub(crate) async fn ensure_backup_eligible_edit(
     instance_id: &str,
     patch: &crate::state::EditInstance,
 ) -> crate::Result<()> {
+    // Only symlink instances stay ineligible; switching to an external game
+    // directory is fine because the backup root follows it.
     let becomes_ineligible =
-        patch.symlink_target.as_ref().is_some_and(Option::is_some)
-            || patch
-                .game_dir_override
-                .as_ref()
-                .and_then(|path| path.as_deref())
-                .is_some_and(|path| !path.trim().is_empty());
+        patch.symlink_target.as_ref().is_some_and(Option::is_some);
     if !becomes_ineligible {
         return Ok(());
     }
@@ -3020,11 +3064,16 @@ async fn build_restore_plan(
             .into());
         }
     }
+    // The snapshot never captured the shared game body (see
+    // `with_shared_root_exclusions`), so the current tree must be compared with
+    // the same exclusions or those directories would look like files the
+    // snapshot dropped and get deleted on restore.
+    let scan_exclusions = with_shared_root_exclusions(root, &exclusions);
     let current = scan_restore_entries(
         root,
         whole_root,
         &selected_roots,
-        &exclusions,
+        &scan_exclusions,
         progress,
     )
     .await?;

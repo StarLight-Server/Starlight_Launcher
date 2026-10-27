@@ -362,9 +362,6 @@
   "content.filter.updates": {
     "defaultMessage": "Mises à jour"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Avertissements"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "Parcourir du contenu"
   },

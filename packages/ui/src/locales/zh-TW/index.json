@@ -704,9 +704,6 @@
   "content.filter.client-only-description": {
     "defaultMessage": "包含僅供用戶端或單人遊戲使用的模組，以及依賴它們的模組。這些模組可能不相容於獨立伺服器。"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "警告"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "瀏覽內容"
   },
@@ -4223,15 +4220,6 @@
   "content.metadata-filter.source.shared-instance": {
     "defaultMessage": "共享例項"
   },
-  "content.metadata-filter.state": {
-    "defaultMessage": "狀態"
-  },
-  "content.metadata-filter.state.disabled": {
-    "defaultMessage": "已禁用"
-  },
-  "content.metadata-filter.state.enabled": {
-    "defaultMessage": "已啟用"
-  },
   "content.metadata-filter.toggle": {
     "defaultMessage": "篩選"
   },
@@ -4240,15 +4228,6 @@
   },
   "content.metadata-filter.unknown": {
     "defaultMessage": "未知"
-  },
-  "content.metadata-filter.update.available": {
-    "defaultMessage": "可更新"
-  },
-  "content.metadata-filter.update.up-to-date": {
-    "defaultMessage": "已是最新"
-  },
-  "content.metadata-filter.updates": {
-    "defaultMessage": "更新"
   },
   "content.page-layout.sort.file-name-ascending": {
     "defaultMessage": "檔名 A-Z"

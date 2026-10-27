@@ -629,10 +629,26 @@ pub async fn login_skin_site_player(
         .send()
         .await?;
     if !response.status().is_success() {
-        return Err(ErrorKind::InputError(format!(
-            "皮肤站玩家登录失败（HTTP {}），请检查登录状态后重试",
-            response.status().as_u16()
-        ))
+        let status = response.status().as_u16();
+        // 皮肤站的错误响应体形如 {"error": "...", "errorMessage": "..."}，
+        // 优先透出服务端给出的具体原因（例如正版玩家需用正版账号登录）。
+        let detail = response
+            .json::<serde_json::Value>()
+            .await
+            .ok()
+            .and_then(|value| {
+                value
+                    .get("errorMessage")
+                    .and_then(|msg| msg.as_str())
+                    .map(str::to_string)
+            })
+            .filter(|msg| !msg.trim().is_empty());
+        return Err(ErrorKind::InputError(match detail {
+            Some(msg) => format!("皮肤站玩家登录失败：{msg}（HTTP {status}）"),
+            None => format!(
+                "皮肤站玩家登录失败（HTTP {status}），请检查登录状态后重试"
+            ),
+        })
         .as_error());
     }
     let login = response.json::<Envelope>().await?.payload;

@@ -10,7 +10,6 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	NewButton,
 	Card,
 	commonMessages,
 	defineMessages,
@@ -18,6 +17,7 @@ import {
 	injectNotificationManager,
 	type LogLine,
 	LogViewport,
+	NewButton,
 	NewModal,
 	ProgressBar,
 	shareLogs,

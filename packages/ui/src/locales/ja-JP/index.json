@@ -311,9 +311,6 @@
   "content.filter.updates": {
     "defaultMessage": "更新"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "警告"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "コンテンツを探す"
   },

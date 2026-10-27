@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { type SkinSiteWikiNode } from '@/helpers/skin-site-api'
+import type { SkinSiteWikiNode } from '@/helpers/skin-site-api'
 
 import { safeExternalUrl, safeWikiColor } from './wiki-color'
+import WikiAttachmentNode from './WikiAttachmentNode.vue'
+import WikiNotice from './WikiNotice.vue'
 
 defineOptions({ name: 'WikiNodeRenderer' })
 
@@ -13,7 +15,7 @@ function headingTag(level?: number | null): string {
 }
 
 function navigate(title?: string | null) {
-	emit('navigate', (title ?? '').replaceAll('_', ' '))
+	emit('navigate', title ?? '')
 }
 </script>
 

@@ -414,6 +414,61 @@ fn update_channel_state_path(app: &tauri::AppHandle) -> api::Result<PathBuf> {
     Ok(settings_dir.join("update-channel.json"))
 }
 
+/// Graduates a beta-channel client to the release channel when the pending
+/// update installs a final (non-prerelease) version. Carries the beta data
+/// into the still-inactive release database first, then flips the channel
+/// file so the restarted launcher opens the migrated data. Failures are
+/// logged and never block the install.
+#[cfg(feature = "updater")]
+fn graduate_beta_to_release_on_final_update(
+    app: &tauri::AppHandle,
+    target_version: &str,
+) {
+    use std::str::FromStr as _;
+
+    let graduate = (|| -> api::Result<()> {
+        let state = read_update_channel_state(app)?;
+        if state.active_channel.as_deref() != Some("beta") {
+            return Ok(());
+        }
+        let target =
+            semver::Version::from_str(target_version).map_err(|error| {
+                theseus::Error::from(theseus::ErrorKind::OtherError(format!(
+                    "Invalid target version '{target_version}': {error}"
+                )))
+            })?;
+        // Only graduate when the pending update is a final release; a
+        // beta-to-beta update keeps the client on the beta channel.
+        if !target.pre.is_empty() {
+            return Ok(());
+        }
+        if let Err(error) = tauri::async_runtime::block_on(
+            theseus::copy_database_between_channels(
+                &app.config().identifier,
+                "beta",
+                "release",
+            ),
+        ) {
+            // The release database may already exist from an earlier
+            // release-channel install; keep it and just switch channels.
+            tracing::warn!(
+                "Could not migrate the beta database to release during graduation: {error}"
+            );
+        }
+        let mut state = state;
+        state.active_channel = Some("release".to_string());
+        write_update_channel_state(app, &state)?;
+        tracing::info!(
+            "Graduated the launcher to the release channel while installing {target_version}"
+        );
+        Ok(())
+    })();
+
+    if let Err(error) = graduate {
+        tracing::warn!("Release-channel graduation skipped: {error}");
+    }
+}
+
 fn read_update_channel_state(
     app: &tauri::AppHandle,
 ) -> api::Result<UpdateChannelState> {
@@ -1063,6 +1118,16 @@ fn main() {
                             // runs there.
                             #[cfg(target_os = "windows")]
                             set_changelog_toast(Some(update.version.clone()));
+
+                            // A prerelease installing a final (no prerelease
+                            // suffix) update graduates to the release channel.
+                            // Migrate the beta data while the release database
+                            // is still inactive, then flip the channel so the
+                            // restarted launcher picks up the migrated data.
+                            graduate_beta_to_release_on_final_update(
+                                app,
+                                &update.version,
+                            );
 
                             update.install(data).map_err(|error| error.to_string())
                         };

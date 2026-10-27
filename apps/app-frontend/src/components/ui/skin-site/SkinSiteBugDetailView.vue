@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { SpinnerIcon } from '@modrinth/assets'
 import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import {
 	type SkinSiteBugComment,
 	skinSiteBugComments,
+	skinSiteBugImageFetch,
 	type SkinSiteBugIssue,
 	skinSiteBugIssue,
 	type SkinSiteBugIssueType,
@@ -169,6 +170,26 @@ function formatDateTime(ts: number): string {
 
 const canSubmit = computed(() => !commentSending.value && commentDraft.value.trim().length > 0)
 
+const imageUrls = ref<Record<string, string>>({})
+
+function revokeImageUrls() {
+	for (const url of Object.values(imageUrls.value)) URL.revokeObjectURL(url)
+	imageUrls.value = {}
+}
+
+async function loadIssueImages(issue: SkinSiteBugIssue) {
+	revokeImageUrls()
+	const entries = await Promise.all(
+		(issue.images ?? []).map(async (image) => {
+			const blob = await skinSiteBugImageFetch(image.hash)
+			return blob ? [image.hash, URL.createObjectURL(blob)] : null
+		}),
+	)
+	const map: Record<string, string> = {}
+	for (const entry of entries) if (entry) map[entry[0]] = entry[1]
+	imageUrls.value = map
+}
+
 async function loadIssue() {
 	loading.value = true
 	failed.value = false
@@ -176,6 +197,7 @@ async function loadIssue() {
 		const result = await skinSiteBugIssue(props.issueId)
 		if (!result.success) throw new Error(result.errorMessage)
 		issue.value = result.payload
+		void loadIssueImages(result.payload)
 	} catch (error) {
 		failed.value = true
 		handleError(error)
@@ -241,6 +263,8 @@ onMounted(() => {
 	void loadIssue()
 	void loadComments(true)
 })
+
+onUnmounted(revokeImageUrls)
 </script>
 <template>
 	<div class="flex flex-col gap-4">
@@ -328,13 +352,27 @@ onMounted(() => {
 					{{ formatMessage(messages.descriptionEmpty) }}
 				</p>
 				<div v-if="issue.images.length" class="mt-3 flex flex-wrap gap-2">
-					<span
+					<a
 						v-for="image in issue.images"
 						:key="image.hash"
-						class="rounded-lg bg-surface-5 px-2 py-1 text-[10px] font-mono text-secondary"
+						:href="imageUrls[image.hash]"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="block overflow-hidden rounded-lg border border-solid border-surface-5"
 					>
-						{{ image.hash }}
-					</span>
+						<img
+							v-if="imageUrls[image.hash]"
+							:src="imageUrls[image.hash]"
+							alt="attachment"
+							class="max-h-48 max-w-full object-contain"
+						/>
+						<span
+							v-else
+							class="block bg-surface-5 px-2 py-1 text-[10px] font-mono text-secondary"
+						>
+							{{ image.hash }}
+						</span>
+					</a>
 				</div>
 			</div>
 

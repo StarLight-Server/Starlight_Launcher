@@ -1,11 +1,21 @@
 <script setup lang="ts">
 import {
+	BookIcon,
+	BoxesIcon,
+	BugIcon,
 	CheckIcon,
+	DownloadIcon,
+	FolderOpenIcon,
+	GlobeIcon,
 	ImageIcon,
 	LayoutTemplateIcon,
+	MapIcon,
 	MinimizeIcon,
+	ShieldCheckIcon,
+	TerminalSquareIcon,
 	TrashIcon,
 	UploadIcon,
+	UserIcon,
 } from '@modrinth/assets'
 import {
 	Combobox,
@@ -22,11 +32,24 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { appDataDir, join } from '@tauri-apps/api/path'
 import { open } from '@tauri-apps/plugin-dialog'
 import { exists, mkdir, readFile, remove, writeFile } from '@tauri-apps/plugin-fs'
+import type { Component } from 'vue'
 import { computed, onMounted, ref, watch } from 'vue'
 
+import {
+	buildFontFamilyOptions,
+	canonicalFontFamily,
+	DEFAULT_MONO_FONT_STACK,
+	DEFAULT_UI_FONT_STACK,
+	type FontFamilyOption,
+	type FontFamilyOptionOrDivider,
+	optionValueToFontSetting,
+	resolveFontFamily,
+	type SystemFontFamily,
+} from '@/helpers/font-family.ts'
 import { get, set } from '@/helpers/settings.ts'
-import { getOS } from '@/helpers/utils'
+import { getSystemFontFamilies } from '@/helpers/system-fonts.ts'
 import { setUiScale, uiScale } from '@/helpers/ui-scale'
+import { getOS } from '@/helpers/utils'
 import { useTheming } from '@/store/state'
 import {
 	type AccentColor,
@@ -41,19 +64,7 @@ import {
 	parseCustomAccentColor,
 } from '@/store/theme.ts'
 
-import {
-	buildFontFamilyOptions,
-	canonicalFontFamily,
-	DEFAULT_MONO_FONT_STACK,
-	DEFAULT_UI_FONT_STACK,
-	type FontFamilyOption,
-	type FontFamilyOptionOrDivider,
-	optionValueToFontSetting,
-	resolveFontFamily,
-	type SystemFontFamily,
-} from '@/helpers/font-family.ts'
-import { getSystemFontFamilies } from '@/helpers/system-fonts.ts'
-
+import SettingsOrderList from './SettingsOrderList.vue'
 import SettingsRow from './SettingsRow.vue'
 import SettingsSection from './SettingsSection.vue'
 
@@ -376,6 +387,27 @@ const messages = defineMessages({
 		defaultMessage:
 			'Hide the downloads button in the sidebar when there are no active download tasks.',
 	},
+	skinSiteNavOrderTitle: {
+		id: 'app.appearance-settings.skin-site-nav-order.title',
+		defaultMessage: 'Skin site navigation order',
+	},
+	skinSiteNavOrderDescription: {
+		id: 'app.appearance-settings.skin-site-nav-order.description',
+		defaultMessage: 'Change the order of the navigation tabs shown on the skin site home page.',
+	},
+	instanceTabOrderTitle: {
+		id: 'app.appearance-settings.instance-tab-order.title',
+		defaultMessage: 'Instance page tab order',
+	},
+	instanceTabOrderDescription: {
+		id: 'app.appearance-settings.instance-tab-order.description',
+		defaultMessage: 'Change the order of the content, files, screenshots, worlds, and logs tabs.',
+	},
+	instanceTabContent: { id: 'app.instance.tabs.content', defaultMessage: 'Content' },
+	instanceTabFiles: { id: 'app.instance.tabs.files', defaultMessage: 'Files' },
+	instanceTabWorlds: { id: 'app.instance.tabs.worlds', defaultMessage: 'Worlds' },
+	instanceTabScreenshots: { id: 'app.instance.tabs.screenshots', defaultMessage: 'Screenshots' },
+	instanceTabLogs: { id: 'app.instance.tabs.logs', defaultMessage: 'Logs' },
 	fontsTitle: { id: 'app.appearance-settings.fonts.title', defaultMessage: 'Fonts' },
 	fontsDescription: {
 		id: 'app.appearance-settings.fonts.description',
@@ -437,6 +469,53 @@ const messages = defineMessages({
 
 const os = ref(await getOS())
 const settings = ref(await get())
+
+const skinSiteNavDestinations = ['downloads', 'review', 'wiki', 'bugs', 'map', 'players'] as const
+type SkinSiteNavDestination = (typeof skinSiteNavDestinations)[number]
+
+const defaultSkinSiteNavItems: {
+	id: SkinSiteNavDestination
+	icon: Component
+	label: MessageDescriptor
+	description: MessageDescriptor
+}[] = [
+	{
+		id: 'downloads',
+		icon: DownloadIcon,
+		label: messages.download,
+		description: messages.downloadDesc,
+	},
+	{ id: 'review', icon: ShieldCheckIcon, label: messages.review, description: messages.reviewDesc },
+	{ id: 'wiki', icon: BookIcon, label: messages.wiki, description: messages.wikiDesc },
+	{ id: 'bugs', icon: BugIcon, label: messages.bugs, description: messages.bugsDesc },
+	{ id: 'map', icon: MapIcon, label: messages.map, description: messages.mapDesc },
+	{ id: 'players', icon: UserIcon, label: messages.profile, description: messages.profileDesc },
+]
+
+function normalizeSkinSiteNavOrder(order: string[]): SkinSiteNavDestination[] {
+	const known = order.filter((id): id is SkinSiteNavDestination =>
+		skinSiteNavDestinations.includes(id as SkinSiteNavDestination),
+	)
+	const missing = skinSiteNavDestinations.filter((id) => !known.includes(id))
+	return [...known, ...missing]
+}
+
+const skinSiteNavOrder = ref<SkinSiteNavDestination[]>(
+	normalizeSkinSiteNavOrder(settings.value.skin_site_nav_order),
+)
+
+const instanceTabItems: {
+	id: string
+	icon: Component
+	label: MessageDescriptor
+}[] = [
+	{ id: 'content', icon: BoxesIcon, label: messages.instanceTabContent },
+	{ id: 'files', icon: FolderOpenIcon, label: messages.instanceTabFiles },
+	{ id: 'screenshots', icon: ImageIcon, label: messages.instanceTabScreenshots },
+	{ id: 'worlds', icon: GlobeIcon, label: messages.instanceTabWorlds },
+	{ id: 'logs', icon: TerminalSquareIcon, label: messages.instanceTabLogs },
+]
+
 const customBackgroundPreview = computed(() =>
 	settings.value.custom_background_path
 		? convertFileSrc(settings.value.custom_background_path)
@@ -1165,6 +1244,45 @@ watch(
 								settings.feature_flags[showPlayTimeFlag] = newValue
 							}
 						"
+					/>
+				</template>
+			</SettingsRow>
+			<SettingsRow stacked>
+				<template #label>
+					<span id="settings-target-appearance-skin-site-nav-order" tabindex="-1">
+						{{ formatMessage(messages.skinSiteNavOrderTitle) }}
+					</span>
+				</template>
+				<template #description>
+					{{ formatMessage(messages.skinSiteNavOrderDescription) }}
+				</template>
+				<template #control>
+					<SettingsOrderList
+						:items="defaultSkinSiteNavItems"
+						:model-value="skinSiteNavOrder"
+						@update:model-value="
+							(order) => {
+								skinSiteNavOrder = order as SkinSiteNavDestination[]
+								settings.skin_site_nav_order = order
+							}
+						"
+					/>
+				</template>
+			</SettingsRow>
+			<SettingsRow stacked>
+				<template #label>
+					<span id="settings-target-appearance-instance-tab-order" tabindex="-1">
+						{{ formatMessage(messages.instanceTabOrderTitle) }}
+					</span>
+				</template>
+				<template #description>
+					{{ formatMessage(messages.instanceTabOrderDescription) }}
+				</template>
+				<template #control>
+					<SettingsOrderList
+						:items="instanceTabItems"
+						:model-value="settings.instance_tab_order"
+						@update:model-value="(order) => (settings.instance_tab_order = order)"
 					/>
 				</template>
 			</SettingsRow>

@@ -105,6 +105,7 @@ import { setupKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
 import { minecraftLaunchErrorKey } from '@/composables/useMinecraftLaunchError'
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
 import { AxolotlBrandConfig, config, getOfficialLabrinthBaseUrl } from '@/config'
+import { shouldDelayAppUpdate } from '@/helpers/app-update-policy'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { configureCurseForgeManualDownloadWatcher } from '@/helpers/curseforge'
@@ -124,17 +125,18 @@ import { reconcileMojangAuthSourceAtStartup } from '@/helpers/mojang-auth'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import {
+	copyDatabaseBetweenChannels,
 	get as getSettings,
 	getLastBrowseContentProjectType,
 	getUpdateChannel,
 	getUpdatePreferences,
 	isBrowseContentProjectType,
 	set as setSettings,
+	setUpdateChannel,
 } from '@/helpers/settings.ts'
 import { getSidebarExpanded, setSidebarExpanded } from '@/helpers/sidebar-state.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import { installUiScale, setUiScale } from '@/helpers/ui-scale'
-import { shouldDelayAppUpdate } from '@/helpers/app-update-policy'
 import {
 	areUpdatesEnabled,
 	backupAppDbForUpdate,
@@ -2156,6 +2158,18 @@ async function installUpdate() {
 	restarting.value = true
 
 	try {
+		// A prerelease updating to a final release graduates the client to
+		// the release channel. Carry the beta data over first — while the
+		// release database is still the inactive one — then flip the
+		// channel so the restarted app picks up the migrated data.
+		if (availableUpdate.value?.channelOrigin) {
+			try {
+				await copyDatabaseBetweenChannels('beta', 'release')
+			} catch (error) {
+				console.warn('Failed to migrate the beta database to release:', error)
+			}
+			await setUpdateChannel(availableUpdate.value.channelOrigin)
+		}
 		await backupAppDbForUpdate(availableUpdate.value?.version)
 		await setRestartAfterPendingUpdate(true)
 	} catch (e) {

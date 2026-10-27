@@ -39,6 +39,7 @@ import SkinListSkeleton from '@/components/ui/skin/SkinListSkeleton.vue'
 import VirtualSkinSectionList from '@/components/ui/skin/VirtualSkinSectionList.vue'
 import {
 	openSkinSiteLogin,
+	reloadSkinSitePlayers,
 	requestSkinSitePlayers,
 	requestSkinSiteSkinUpdate,
 	selectedSkinSitePlayerId,
@@ -213,6 +214,18 @@ const messages = defineMessages({
 	noSkinSitePlayersDescription: {
 		id: 'app.skins.skin-site-account.empty-description',
 		defaultMessage: 'This skin site account does not have an available player profile yet.',
+	},
+	errorSkinSitePlayersTitle: {
+		id: 'app.skins.skin-site-account.error-title',
+		defaultMessage: 'Could not load your players',
+	},
+	errorSkinSitePlayersDescription: {
+		id: 'app.skins.skin-site-account.error-description',
+		defaultMessage: 'Check your connection and try again.',
+	},
+	retryButton: {
+		id: 'app.skins.skin-site-account.retry',
+		defaultMessage: 'Retry',
 	},
 	offlineCompatibility: {
 		id: 'app.skins.offline-account.compatibility',
@@ -982,6 +995,37 @@ watch(
 	},
 )
 
+// Load the player list whenever the session becomes available or the view is
+// opened while the list never started loading. Without this the skin page can
+// sit on "loading" forever when the first request raced the session check.
+function ensureSkinSitePlayersLoaded() {
+	if (!skinSiteUser.value) return
+	if (skinSitePlayersStatus.value === 'checking') return
+	if (skinSitePlayersStatus.value === 'ready' && skinSitePlayers.value.length) return
+	if (skinSitePlayersStatus.value === 'error') return
+	void reloadSkinSitePlayers().catch((error) => {
+		console.warn('Failed to load skin site players:', error)
+	})
+}
+
+watch(
+	() => [skinSiteUser.value?.uuid, skinSiteStatus.value] as const,
+	([uuid, sessionStatus]) => {
+		if (uuid && sessionStatus === 'signed-in') ensureSkinSitePlayersLoaded()
+	},
+	{ immediate: true },
+)
+
+watch(skinSitePlayersStatus, (value) => {
+	if (value === 'idle' && skinSiteUser.value) ensureSkinSitePlayersLoaded()
+})
+
+function retrySkinSitePlayers() {
+	void reloadSkinSitePlayers().catch((error) => {
+		console.warn('Failed to reload skin site players:', error)
+	})
+}
+
 function getBakedSkinTextures(skin: Skin): RenderResult | undefined {
 	const key = `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`
 	return skinBlobUrlMap.get(key)
@@ -1436,22 +1480,26 @@ await loadSkins()
 				<h1 class="text-3xl font-extrabold m-0">
 					{{
 						formatMessage(
-							skinSiteUser
-								? skinSitePlayersStatus === 'checking' || skinSitePlayersStatus === 'idle'
-									? messages.loadingSkinSitePlayersTitle
-									: messages.noSkinSitePlayersTitle
-								: messages.signInTitle,
+							!skinSiteUser
+								? messages.signInTitle
+								: skinSitePlayersStatus === 'error'
+									? messages.errorSkinSitePlayersTitle
+									: skinSitePlayersStatus === 'checking' || skinSitePlayersStatus === 'idle'
+										? messages.loadingSkinSitePlayersTitle
+										: messages.noSkinSitePlayersTitle,
 						)
 					}}
 				</h1>
 				<p class="text-lg m-0">
 					{{
 						formatMessage(
-							skinSiteUser
-								? skinSitePlayersStatus === 'checking' || skinSitePlayersStatus === 'idle'
-									? messages.loadingSkinSitePlayersDescription
-									: messages.noSkinSitePlayersDescription
-								: messages.signInDescription,
+							!skinSiteUser
+								? messages.signInDescription
+								: skinSitePlayersStatus === 'error'
+									? messages.errorSkinSitePlayersDescription
+									: skinSitePlayersStatus === 'checking' || skinSitePlayersStatus === 'idle'
+										? messages.loadingSkinSitePlayersDescription
+										: messages.noSkinSitePlayersDescription,
 						)
 					}}
 				</p>
@@ -1462,6 +1510,11 @@ await loadSkins()
 					"
 					class="h-8 w-8 animate-spin text-brand"
 				/>
+				<ButtonStyled v-if="skinSiteUser && skinSitePlayersStatus === 'error'" color="brand">
+					<button @click="retrySkinSitePlayers">
+						{{ formatMessage(messages.retryButton) }}
+					</button>
+				</ButtonStyled>
 				<ButtonStyled v-if="!offline && !skinSiteUser" color="brand">
 					<button @click="loginToSkinSite">
 						<LogInIcon />

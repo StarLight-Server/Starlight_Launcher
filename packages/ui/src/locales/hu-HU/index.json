@@ -311,9 +311,6 @@
   "content.filter.updates": {
     "defaultMessage": "Frissítések"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Figyelmeztetések"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "Tartalom böngészése"
   },

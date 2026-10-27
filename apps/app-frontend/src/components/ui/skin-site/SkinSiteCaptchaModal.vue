@@ -100,16 +100,19 @@ defineExpose({ show })
 			<p class="m-0 text-secondary">{{ formatMessage(messages.subtitle) }}</p>
 
 			<div
-				class="size-44 overflow-hidden rounded-full border-4 border-solid border-bg-raised bg-button-bg"
+				class="relative size-64 overflow-hidden rounded-2xl border-2 border-solid border-surface-5 bg-bg"
 			>
 				<img
 					v-if="image"
 					:src="image"
 					alt=""
-					class="size-full object-cover transition-transform duration-75"
+					class="size-full object-contain transition-transform duration-75"
 					:style="{ transform: `rotate(${previewRotation})` }"
 					draggable="false"
 				/>
+				<div v-else class="flex size-full items-center justify-center text-sm text-secondary">
+					{{ formatMessage(messages.loading) }}
+				</div>
 			</div>
 
 			<div class="w-full max-w-sm">
@@ -122,11 +125,9 @@ defineExpose({ show })
 					class="w-full accent-brand"
 					:disabled="loading || submitting"
 				/>
-				<div class="mt-1 flex justify-between text-xs text-secondary">
+				<div class="mt-1 flex items-center justify-between text-xs text-secondary">
 					<span>0°</span>
-					<span>90°</span>
-					<span>180°</span>
-					<span>270°</span>
+					<span class="font-semibold text-contrast">{{ degree }}°</span>
 					<span>360°</span>
 				</div>
 			</div>

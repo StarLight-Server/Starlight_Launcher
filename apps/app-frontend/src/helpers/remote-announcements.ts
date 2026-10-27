@@ -11,6 +11,7 @@ export type RemoteAnnouncement = {
 	published_at: string
 	action_url: string | null
 	action_label: string | null
+	image_name: string | null
 }
 
 export function safeAnnouncementUrl(value: unknown): string | null {
@@ -62,6 +63,10 @@ export function parseAnnouncements(value: unknown): RemoteAnnouncement[] | null 
 			ends_at: item.ends_at ?? null,
 			action_label: item.action_label ?? null,
 			action_url: item.action_url ?? null,
+			image_name:
+				typeof item.image_name === 'string' && item.image_name.trim()
+					? item.image_name
+					: null,
 		} as RemoteAnnouncement)
 	}
 	const rank = { low: 0, normal: 1, high: 2, critical: 3 }
@@ -144,6 +149,10 @@ export function mapBroadcastAnnouncements(payload: unknown): RemoteAnnouncement[
 			published_at: published,
 			action_url: null,
 			action_label: null,
+			image_name:
+				typeof item.imageName === 'string' && item.imageName.trim()
+					? item.imageName
+					: null,
 		})
 	}
 	const rank = { low: 0, normal: 1, high: 2, critical: 3 }

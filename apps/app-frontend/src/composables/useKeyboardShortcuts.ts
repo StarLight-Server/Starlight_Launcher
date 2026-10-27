@@ -1,22 +1,22 @@
 import {
-	type KeyBinding,
 	bindingMatchesKeyboardEvent,
 	bindingMatchesMouseEvent,
 	bindingMatchesWheelEvent,
+	type KeyBinding,
 	useModalStack,
 } from '@modrinth/ui'
 import { computed, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
+import { getNavShortcutEnabled } from '@/helpers/nav-shortcut-state'
+import { getQuickScrollEnabled } from '@/helpers/scroll-top-state'
 import {
 	SCROLL_ACTIONS,
 	SHORTCUT_ACTIONS,
 	type ShortcutAction,
 } from '@/helpers/shortcut-actions'
 import { resolveAllBindings } from '@/helpers/shortcut-bindings'
-import { getNavShortcutEnabled } from '@/helpers/nav-shortcut-state'
-import { getQuickScrollEnabled } from '@/helpers/scroll-top-state'
 import { useTheming } from '@/store/theme'
 
 /** Editing surfaces keep these keys for themselves. */

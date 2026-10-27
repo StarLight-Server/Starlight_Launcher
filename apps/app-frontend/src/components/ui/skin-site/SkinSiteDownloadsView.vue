@@ -3,6 +3,7 @@ import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
+import { skinSiteStatus, skinSiteUser } from '@/composables/skin-site-session'
 import {
 	skinSitePublicDownloadCategories,
 	type SkinSitePublicDownloadCategory,
@@ -32,6 +33,10 @@ const messages = defineMessages({
 	statusLegacy: { id: 'app.skin-site.downloads.status.legacy', defaultMessage: 'Legacy' },
 	statusOutdated: { id: 'app.skin-site.downloads.status.outdated', defaultMessage: 'Outdated' },
 	statusRemoval: { id: 'app.skin-site.downloads.status.removal', defaultMessage: 'Removal' },
+	signedOut: {
+		id: 'app.skin-site.downloads.signed-out',
+		defaultMessage: 'Sign in to browse downloads.',
+	},
 })
 
 const emit = defineEmits<{ (e: 'back'): void }>()
@@ -41,6 +46,8 @@ const categories = ref<SkinSitePublicDownloadCategory[]>([])
 const selectedCategory = ref<string | null>(null)
 const loading = ref(true)
 const failed = ref(false)
+
+const signedIn = computed(() => skinSiteStatus.value === 'signed-in' && !!skinSiteUser.value)
 
 const filtered = computed(() =>
 	selectedCategory.value
@@ -76,6 +83,10 @@ function download(item: SkinSitePublicDownloadItem) {
 async function load() {
 	loading.value = true
 	failed.value = false
+	if (!signedIn.value) {
+		loading.value = false
+		return
+	}
 	try {
 		const [listResult, categoryResult] = await Promise.all([
 			skinSitePublicDownloadList(),
@@ -138,7 +149,10 @@ onMounted(load)
 			</button>
 		</div>
 
-		<div v-if="loading" class="flex items-center gap-2 text-sm text-secondary">
+		<p v-if="!signedIn" class="m-0 text-sm text-secondary">
+			{{ formatMessage(messages.signedOut) }}
+		</p>
+		<div v-else-if="loading" class="flex items-center gap-2 text-sm text-secondary">
 			<SpinnerIcon class="size-4 animate-spin" />
 			{{ formatMessage(messages.loading) }}
 		</div>

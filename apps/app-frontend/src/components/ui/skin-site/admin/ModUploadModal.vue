@@ -4,10 +4,10 @@ import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/u
 import { computed, ref } from 'vue'
 
 import {
-	type SkinSiteModRuleTag,
 	skinSiteModExistsByHash,
 	skinSiteModExistsByName,
 	skinSiteModHashFromFile,
+	type SkinSiteModRuleTag,
 	skinSiteUploadMod,
 } from '@/helpers/skin-site-api'
 

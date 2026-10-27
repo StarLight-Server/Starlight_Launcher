@@ -157,6 +157,13 @@ export function useInstanceGroups(instances: Ref<{ id: string; groups: string[] 
 
 	async function setMemberships(updates: InstanceGroupMembershipUpdate[]): Promise<boolean> {
 		await set_group_memberships(updates)
+		// 接口成功后同步本地实例的 groups 字段，否则依赖 instances 的分组视图不会重算，
+		// 用户必须刷新页面才能看到新的分组归属。
+		const byId = new Map(updates.map((update) => [update.instance_id, update.group_ids]))
+		instances.value = instances.value.map((instance) => {
+			const nextGroups = byId.get(instance.id)
+			return nextGroups ? { ...instance, groups: [...nextGroups] } : instance
+		})
 		return true
 	}
 

@@ -4,6 +4,8 @@ import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/u
 import { computed, onMounted, ref } from 'vue'
 
 import {
+	type SkinSiteAdminUser,
+	skinSiteAdminUserList,
 	type SkinSiteBroadcast,
 	type SkinSiteBroadcastInput,
 	skinSiteBroadcasts,
@@ -44,6 +46,7 @@ const messages = defineMessages({
 })
 
 const items = ref<SkinSiteBroadcast[]>([])
+const uploaderNames = ref<Record<string, string>>({})
 const loading = ref(true)
 const failed = ref(false)
 const saving = ref(false)
@@ -154,11 +157,28 @@ const canSave = computed(
 	() => form.value.title.trim().length > 0 && form.value.content.length > 0 && !saving.value,
 )
 
+function uploaderName(uuid: string): string {
+	return uploaderNames.value[uuid] ?? uuid
+}
+
+async function loadUploaderNames() {
+	try {
+		const res = await skinSiteAdminUserList({ limit: 200, offset: 0 })
+		if (!res.success) return
+		const users: SkinSiteAdminUser[] = res.payload ?? []
+		const map: Record<string, string> = {}
+		for (const u of users) map[u.uuid] = u.username
+		uploaderNames.value = map
+	} catch {
+		// 名称映射失败不影响公告列表展示
+	}
+}
+
 async function load() {
 	loading.value = true
 	failed.value = false
 	try {
-		const result = await skinSiteBroadcasts()
+		const [result] = await Promise.all([skinSiteBroadcasts(), loadUploaderNames()])
 		if (!result.success) throw new Error(result.errorMessage)
 		items.value = result.payload ?? []
 	} catch (error) {
@@ -248,7 +268,7 @@ onMounted(() => void load())
 				</div>
 				<span class="shrink-0 text-xs text-secondary">{{ formatDate(item.updateAt) }}</span>
 				<span v-if="item.uploader" class="shrink-0 text-xs text-secondary">
-					{{ formatMessage(messages.uploader, { name: item.uploader }) }}
+					{{ formatMessage(messages.uploader, { name: uploaderName(item.uploader) }) }}
 				</span>
 				<button
 					type="button"

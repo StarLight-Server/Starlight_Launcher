@@ -216,9 +216,32 @@ async fn modrinth_update_candidates(
             .get(&file.id)
             .map(Vec::as_slice)
             .unwrap_or_default();
+        // A file whose provider release tracking was invalidated (e.g. by an
+        // external sync replacing the jar) no longer carries a release id. In
+        // that case the SHA1 lookup below may resolve to an unrelated project
+        // or to a different version of the same project, which would surface a
+        // bogus "update available" right after a sync. Only trust the hash
+        // lookup when it resolves to the same project we already track.
+        let recorded_project_id =
+            provider_refs.iter().find_map(|reference| match reference {
+                ContentProviderRef::Modrinth { project_id, .. } => {
+                    Some(project_id.as_str())
+                }
+                ContentProviderRef::CurseForge { .. }
+                | ContentProviderRef::McArchive { .. } => None,
+            });
+        let Some(current_version_id) =
+            installed_modrinth_version_id(provider_refs).or_else(|| {
+                if recorded_project_id == Some(metadata.project_id.as_str()) {
+                    ModrinthVersionId::new(metadata.version_id.to_string()).ok()
+                } else {
+                    None
+                }
+            })
+        else {
+            continue;
+        };
         let project_id = ModrinthProjectId::new(metadata.project_id.clone())?;
-        let current_version_id = installed_modrinth_version_id(provider_refs)
-            .unwrap_or(ModrinthVersionId::new(metadata.version_id.clone())?);
         candidates.push(UpdateCandidate {
             entry: context.entries_by_file_id.get(&file.id).cloned(),
             file: file.clone(),

@@ -5,13 +5,13 @@
   <p><strong>次世代 Minecraft 桌面客户端，全能、美观、全平台覆盖。</strong></p>
 
   <p>
-    <a href="https://github.com/ApTx2012/Starlight_Lancher/actions">
+    <a href="https://github.com/StarLight-Server/Starlight_Launcher/actions">
       <img src="https://img.shields.io/badge/Repo-GitHub-black?style=for-the-badge&logo=github" alt="Repository" />
     </a>
-    <a href="https://github.com/ApTx2012/Starlight_Lancher/releases">
+    <a href="https://github.com/StarLight-Server/Starlight_Launcher/releases">
       <img src="https://img.shields.io/badge/Releases-Download-green?style=for-the-badge&logo=github" alt="Releases" />
     </a>
-    <a href="https://github.com/ApTx2012/Starlight_Lancher/stargazers">
+    <a href="https://github.com/StarLight-Server/Starlight_Launcher/stargazers">
       <img src="https://img.shields.io/badge/Stars-★-ffb800?style=for-the-badge&logo=github" alt="Stars" />
     </a>
     <a href="COPYING.md">
@@ -21,7 +21,7 @@
 
   <p>
     <a href="https://skin.starlight.cool/">官方网站</a> ｜
-    <a href="https://github.com/ApTx2012/Starlight_Lancher/releases/latest">下载最新版</a> ｜
+    <a href="https://github.com/StarLight-Server/Starlight_Launcher/releases/latest">下载最新版</a> ｜
     <a href="CONTRIBUTING.md">参与贡献</a>
     ｜ <a href="CODE_OF_CONDUCT.md">行为准则</a>
   </p>
@@ -57,7 +57,7 @@ _(注：本项目是调用 Modrinth 公开 API 的独立客户端，与 Rinth, I
 
 ## 下载与安装
 
-请前往 [Releases](https://github.com/ApTx2012/Starlight_Lancher/releases/latest) 下载适合你操作系统的最新安装包。
+请前往 [Releases](https://github.com/StarLight-Server/Starlight_Launcher/releases/latest) 下载适合你操作系统的最新安装包。
 已安装的用户每次均可通过内置的 Tauri 签名校验机制，自动在后台完成更新，无需手动下载安装更新。
 
 | 系统平台                | 推荐下载文件                              |

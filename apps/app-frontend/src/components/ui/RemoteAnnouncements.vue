@@ -222,6 +222,32 @@ function saveCache(next: RemoteAnnouncement[]) {
 		// localStorage may be unavailable (private mode / quota)
 	}
 }
+const imageUrls = reactive<Record<string, string>>({})
+
+async function loadImage(item: RemoteAnnouncement, token: string) {
+	const name = item.image_name
+	if (!name || imageUrls[item.id]) return
+	try {
+		const url = `https://skin.starlight.cool/starlight/skin/image/BROADCAST_ATTACHMENT/${encodeURIComponent(name)}`
+		const response = await tauriFetch(url, {
+			method: 'GET',
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		if (!response.ok) return
+		const type = response.headers.get('content-type') ?? ''
+		if (type.includes('application/json') || type.includes('text/')) return
+		const blob = await response.blob()
+		imageUrls[item.id] = URL.createObjectURL(blob)
+	} catch {
+		// 图片加载失败不影响公告本身展示
+	}
+}
+
+function revokeImages() {
+	for (const url of Object.values(imageUrls)) URL.revokeObjectURL(url)
+	for (const key of Object.keys(imageUrls)) delete imageUrls[key]
+}
+
 async function refresh() {
 	if (disposed) return
 	loadCache()
@@ -239,6 +265,7 @@ async function refresh() {
 		if (parsed && !disposed) {
 			sync(parsed, true)
 			saveCache(parsed)
+			for (const item of parsed) void loadImage(item, token)
 		}
 	} catch {
 		// Remote fetch failed; previously cached items remain displayed
@@ -319,6 +346,7 @@ onUnmounted(() => {
 	if (interval) clearInterval(interval)
 	if (advanceTimer) clearTimeout(advanceTimer)
 	window.removeEventListener(OPEN_REMOTE_ANNOUNCEMENT_CENTER_EVENT, handleOpenCenter)
+	revokeImages()
 })
 </script>
 
@@ -381,6 +409,12 @@ onUnmounted(() => {
 							class="mt-1.5 size-2 shrink-0 rounded-full"
 							:class="read.has(announcementKey(item)) ? 'opacity-0' : 'bg-red'"
 						/>
+						<img
+							v-if="imageUrls[item.id]"
+							:src="imageUrls[item.id]"
+							alt=""
+							class="size-10 shrink-0 rounded object-cover"
+						/>
 						<span class="min-w-0 flex-1">
 							<span class="block truncate font-medium text-[var(--color-text-primary)]">{{
 								item.title
@@ -396,6 +430,12 @@ onUnmounted(() => {
 				<h2 class="mb-4 text-xl font-semibold text-[var(--color-text-primary)]">
 					{{ selected.title }}
 				</h2>
+				<img
+					v-if="imageUrls[selected.id]"
+					:src="imageUrls[selected.id]"
+					alt=""
+					class="mb-4 max-h-80 w-full rounded-lg object-contain"
+				/>
 				<div
 					class="markdown-body break-words"
 					@click="contentClick"

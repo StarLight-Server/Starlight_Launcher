@@ -2,8 +2,8 @@
 import { computed, onMounted, ref } from 'vue'
 
 import {
-	type SkinSiteWikiAttachmentInfo,
 	skinSiteWikiAttachment,
+	type SkinSiteWikiAttachmentInfo,
 	skinSiteWikiAttachmentUrl,
 } from '@/helpers/skin-site-api'
 

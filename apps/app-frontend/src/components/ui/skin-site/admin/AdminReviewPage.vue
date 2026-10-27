@@ -4,21 +4,21 @@ import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/u
 import { computed, onMounted, ref } from 'vue'
 
 import {
+	skinSiteCreateReviewPaperAdmin,
 	skinSiteDecideReviewSubmission,
 	skinSiteRegenerateReviewInvite,
-	type SkinSiteReviewResult,
-	type SkinSiteReviewSubmission,
-	skinSiteReviewPaperAdmin,
-	skinSiteReviewPaperList,
-	skinSiteReviewSubmissionCount,
-	skinSiteReviewSubmissions,
-	skinSiteCreateReviewPaperAdmin,
-	skinSiteUpdateReviewPaperAdmin,
 	type SkinSiteReviewAnswer,
 	type SkinSiteReviewConfigData,
-	type SkinSiteReviewQuestion,
 	type SkinSiteReviewMailConfig,
+	skinSiteReviewPaperAdmin,
+	skinSiteReviewPaperList,
 	type SkinSiteReviewPaperSummary,
+	type SkinSiteReviewQuestion,
+	type SkinSiteReviewResult,
+	type SkinSiteReviewSubmission,
+	skinSiteReviewSubmissionCount,
+	skinSiteReviewSubmissions,
+	skinSiteUpdateReviewPaperAdmin,
 } from '@/helpers/skin-site-api'
 
 const { formatMessage } = useVIntl()
@@ -270,9 +270,18 @@ function questionFor(submission: SkinSiteReviewSubmission, questionId: string) {
 	return submission.paper?.questions?.find((q) => q.id === questionId)
 }
 
-function answerText(answer: SkinSiteReviewAnswer): string {
+function answerText(
+	submission: SkinSiteReviewSubmission,
+	answer: SkinSiteReviewAnswer,
+): string {
 	if (answer.text) return answer.text
-	if (Array.isArray(answer.values) && answer.values.length) return answer.values.join(', ')
+	if (Array.isArray(answer.values) && answer.values.length) {
+		const question = answer.questionId ? questionFor(submission, answer.questionId) : undefined
+		const options = question?.options ?? []
+		return answer.values
+			.map((value) => options.find((o) => o.id === value)?.description ?? value)
+			.join(', ')
+	}
 	return '—'
 }
 
@@ -1046,7 +1055,7 @@ onMounted(() => void load())
 							<span
 								class="mt-1 rounded-lg bg-bg px-3 py-2 text-sm break-words whitespace-pre-wrap text-contrast"
 							>
-								{{ answerText(answer) }}
+								{{ answerText(detailSubmission, answer) }}
 							</span>
 							<span
 								v-if="answer.awardedScore !== null && answer.awardedScore !== undefined"

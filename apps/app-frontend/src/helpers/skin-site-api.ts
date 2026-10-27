@@ -336,6 +336,40 @@ export function skinSiteRenamePlayer(
 		{ method: 'POST', type: 'skin' },
 	)
 }
+
+/** Mark a player as the account default (used by launcher login). */
+export function skinSiteSetDefaultPlayer(uuid: string): Promise<SkinSiteResponse<string>> {
+	return skinSiteRequest<string>(`player/default/set?uuid=${encodeURIComponent(uuid)}`, {
+		method: 'POST',
+		type: 'skin',
+	})
+}
+
+/** Clear the account default player. */
+export function skinSiteClearDefaultPlayer(): Promise<SkinSiteResponse<string>> {
+	return skinSiteRequest<string>('player/default', { method: 'DELETE', type: 'skin' })
+}
+
+/** Fetch the account default player, if one is set. */
+export function skinSiteDefaultPlayer(): Promise<SkinSiteResponse<SkinSitePlayerInfo | null>> {
+	return skinSiteRequest<SkinSitePlayerInfo | null>('player/default', { type: 'skin' })
+}
+
+/** Toggle the Mojang (official) status of a player and resync its profile. */
+export function skinSiteSwitchMojang(uuid: string): Promise<SkinSiteResponse<string>> {
+	return skinSiteRequest<string>(`player/${encodeURIComponent(uuid)}/switchMojang`, {
+		method: 'GET',
+		type: 'skin',
+	})
+}
+
+/** Convert a legacy internal player so it can log in through the modern flow. */
+export function skinSiteAdaptLegacyInternal(uuid: string): Promise<SkinSiteResponse<string>> {
+	return skinSiteRequest<string>(`player/${encodeURIComponent(uuid)}/adaptLegacyInternal`, {
+		method: 'POST',
+		type: 'skin',
+	})
+}
 // ---------------------------------------------------------------------------
 // Registration & password reset
 // ---------------------------------------------------------------------------
@@ -414,8 +448,8 @@ export function skinSitePublicDonationSummary(): Promise<
 	return skinSiteRequest<SkinSitePublicDonationSummary>('donation/summary', { auth: false })
 }
 
-export function skinSiteDonationList(offset = 0): Promise<SkinSiteResponse<SkinSitePublicDonationPage>> {
-	return skinSiteRequest<SkinSitePublicDonationPage>(`donation/list?limit=20&offset=${offset}`, {
+export function skinSiteDonationList(offset = 0): Promise<SkinSiteResponse<SkinSiteDonationPage>> {
+	return skinSiteRequest<SkinSiteDonationPage>(`donation/list?limit=20&offset=${offset}`, {
 		auth: false,
 	})
 }
@@ -522,22 +556,18 @@ export function skinSitePublicDownloadList(options?: {
 		offset: String(options?.offset ?? 0),
 	})
 	if (options?.category) query.set('category', options.category)
-	return skinSiteRequest<SkinSitePublicDownloadItem[]>(`download/list?${query.toString()}`, {
-		auth: false,
-	})
+	return skinSiteRequest<SkinSitePublicDownloadItem[]>(`download/list?${query.toString()}`)
 }
 
 export function skinSitePublicDownloadCount(category?: string): Promise<SkinSiteResponse<number>> {
 	const suffix = category ? `?category=${encodeURIComponent(category)}` : ''
-	return skinSiteRequest<number>(`download/count${suffix}`, { auth: false })
+	return skinSiteRequest<number>(`download/count${suffix}`)
 }
 
 export function skinSitePublicDownloadCategories(): Promise<
 	SkinSiteResponse<SkinSitePublicDownloadCategory[]>
 > {
-	return skinSiteRequest<SkinSitePublicDownloadCategory[]>('download/category/list', {
-		auth: false,
-	})
+	return skinSiteRequest<SkinSitePublicDownloadCategory[]>('download/category/list')
 }
 // ---------------------------------------------------------------------------
 // Maps
@@ -660,6 +690,24 @@ export type SkinSiteBugResolution =
 export interface SkinSiteBugImage {
 	hash: string
 	[key: string]: unknown
+}
+
+/** Download a bug attachment image. The endpoint requires auth, so the image
+ * must be fetched as a blob and rendered through an object URL. */
+export async function skinSiteBugImageFetch(hash: string): Promise<Blob | null> {
+	const url = `${SKIN_SITE_ORIGIN}${REQUEST_TYPE_PATH.starlight}/bug/images/${encodeURIComponent(hash)}`
+	const headers: Record<string, string> = { Accept: 'image/*' }
+	const token = getSkinSiteToken()
+	if (token) headers['Authorization'] = `Bearer ${token}`
+	try {
+		const response = await tauriFetch(url, { method: 'GET', headers })
+		if (!response.ok) return null
+		const type = response.headers.get('content-type') ?? ''
+		if (type.includes('application/json') || type.includes('text/')) return null
+		return await response.blob()
+	} catch {
+		return null
+	}
 }
 
 export interface SkinSiteBugIssue {
@@ -1217,7 +1265,6 @@ export function skinSiteActivateLauncherRelease(
 export function skinSiteDeleteLauncherRelease(id: number): Promise<SkinSiteResponse<boolean>> {
 	return skinSiteRequest<boolean>('launcher/admin/' + id, { method: 'DELETE' })
 }
-
 export interface SkinSiteLauncherUploadStatus {
 	id: string
 	chunkSize: number
@@ -1865,7 +1912,6 @@ export function skinSiteWikiUpdateSettings(
 	})
 }
 
-
 export interface SkinSiteReviewPaperSummary {
 	id: string
 	enabled: boolean
@@ -1908,9 +1954,7 @@ export interface SkinSiteReviewConfigData {
 	prerequisitePermissions: string[]
 }
 
-export function skinSiteReviewPaperList(): Promise<
-	SkinSiteResponse<SkinSiteReviewPaperSummary[]>
-> {
+export function skinSiteReviewPaperList(): Promise<SkinSiteResponse<SkinSiteReviewPaperSummary[]>> {
 	return skinSiteRequest<SkinSiteReviewPaperSummary[]>('review/admin/papers')
 }
 
@@ -1991,9 +2035,7 @@ export interface SkinSiteInviteCode {
 	code: string
 }
 
-export function skinSiteAdminBotInfo(
-	userUuid: string,
-): Promise<SkinSiteResponse<SkinSiteBotInfo>> {
+export function skinSiteAdminBotInfo(userUuid: string): Promise<SkinSiteResponse<SkinSiteBotInfo>> {
 	return skinSiteRequest<SkinSiteBotInfo>('admin/users/' + encodeURIComponent(userUuid) + '/bot')
 }
 
@@ -2047,7 +2089,9 @@ export function skinSiteAdminUserAudit(params?: {
 	return skinSiteRequest<SkinSiteUserAdminAuditPage>('admin/users/audit' + suffix)
 }
 
-export function skinSiteAdminInviteUser(email: string): Promise<SkinSiteResponse<SkinSiteInviteCode>> {
+export function skinSiteAdminInviteUser(
+	email: string,
+): Promise<SkinSiteResponse<SkinSiteInviteCode>> {
 	return skinSiteRequest<SkinSiteInviteCode>('admin/inviteCode', {
 		method: 'POST',
 		body: { email },
@@ -2381,10 +2425,10 @@ export function skinSiteChatVoiceConfig(): Promise<
 export function skinSiteChatVoiceConfigUpdate(
 	data: SkinSiteChatVoiceGlobalConfig,
 ): Promise<SkinSiteResponse<SkinSiteChatVoiceGlobalConfigUpdateResult>> {
-	return skinSiteRequest<SkinSiteChatVoiceGlobalConfigUpdateResult>(
-		'chat/voice/admin/config',
-		{ method: 'PUT', body: data },
-	)
+	return skinSiteRequest<SkinSiteChatVoiceGlobalConfigUpdateResult>('chat/voice/admin/config', {
+		method: 'PUT',
+		body: data,
+	})
 }
 
 export function skinSiteChatVoiceLogs(
@@ -2503,7 +2547,11 @@ export function skinSiteWikiMigrationCandidates(
 
 export function skinSiteWikiMigrationDecide(
 	candidateId: number,
-	data: { decision: SkinSiteWikiMigrationDecision; targetTitle?: string | null; overwrite?: boolean },
+	data: {
+		decision: SkinSiteWikiMigrationDecision
+		targetTitle?: string | null
+		overwrite?: boolean
+	},
 ): Promise<SkinSiteResponse<void>> {
 	return skinSiteRequest<void>('wiki/admin/migration/candidates/' + candidateId, {
 		method: 'POST',
@@ -2520,9 +2568,7 @@ export function skinSiteWikiMigrationPublish(
 	)
 }
 
-export function skinSiteWikiMigrationRollback(
-	jobId: number,
-): Promise<SkinSiteResponse<void>> {
+export function skinSiteWikiMigrationRollback(jobId: number): Promise<SkinSiteResponse<void>> {
 	return skinSiteRequest<void>('wiki/admin/migration/' + jobId + '/rollback', {
 		method: 'POST',
 	})
@@ -2542,4 +2588,171 @@ export function skinSiteWikiAttachment(
 
 export function skinSiteWikiAttachmentUrl(id: number): string {
 	return `${SKIN_SITE_ORIGIN}${REQUEST_TYPE_PATH.starlight}/wiki/attachment/${id}/content`
+}
+
+export interface SkinSiteWikiRevisionInfo {
+	id: number
+	authorName: string
+	summary: string
+	minor: boolean
+	createdAt: number
+	sourceWiki?: string | null
+	sourceRevisionId?: number | null
+}
+
+export interface SkinSiteWikiRevisionPage {
+	items: SkinSiteWikiRevisionInfo[]
+	nextCursor?: number | null
+}
+
+export interface SkinSiteWikiRevisionDetail {
+	revision: SkinSiteWikiRevisionInfo
+	source: string
+	nodes: SkinSiteWikiNode[]
+}
+
+export interface SkinSiteWikiDiffLine {
+	type: 'UNCHANGED' | 'REMOVED' | 'ADDED'
+	oldLine?: number | null
+	newLine?: number | null
+	text: string
+}
+
+export function skinSiteWikiHistory(
+	title: string,
+	before?: number,
+): Promise<SkinSiteResponse<SkinSiteWikiRevisionPage>> {
+	const query = new URLSearchParams({ title })
+	if (before) query.set('before', String(before))
+	return skinSiteRequest<SkinSiteWikiRevisionPage>('wiki/history?' + query.toString())
+}
+
+export function skinSiteWikiRevision(
+	title: string,
+	revisionId: number,
+): Promise<SkinSiteResponse<SkinSiteWikiRevisionDetail>> {
+	return skinSiteRequest<SkinSiteWikiRevisionDetail>(
+		'wiki/revision/' + revisionId + '?title=' + encodeURIComponent(title),
+	)
+}
+
+export function skinSiteWikiDiff(
+	title: string,
+	older: number,
+	newer: number,
+): Promise<SkinSiteResponse<SkinSiteWikiDiffLine[]>> {
+	const query = new URLSearchParams({ title, older: String(older), newer: String(newer) })
+	return skinSiteRequest<SkinSiteWikiDiffLine[]>('wiki/diff?' + query.toString())
+}
+
+export function skinSiteWikiRevert(data: {
+	title: string
+	revisionId: number
+	baseRevisionId: number
+}): Promise<SkinSiteResponse<SkinSiteWikiPageDetail>> {
+	return skinSiteRequest<SkinSiteWikiPageDetail>('wiki/revert', {
+		method: 'POST',
+		body: data,
+	})
+}
+// ─── Wiki: 搜索 / 列表 / 最近 / 分类 ───────────────────────────────────────
+
+export interface SkinSiteWikiPageSummary {
+	title: string
+	updatedAt: number
+	authorName: string
+	readPolicy: SkinSiteWikiReadPolicy
+	editPolicy: SkinSiteWikiEditPolicy
+	redirectTarget?: string | null
+}
+
+export interface SkinSiteWikiPageListItem {
+	id: number
+	title: string
+	namespace: string
+	revisionId: number
+	updatedAt: number
+	authorName: string
+	readPolicy: SkinSiteWikiReadPolicy
+	editPolicy: SkinSiteWikiEditPolicy
+	redirectTarget?: string | null
+}
+
+export interface SkinSiteWikiPageList {
+	items: SkinSiteWikiPageListItem[]
+	nextCursor?: string | null
+}
+
+export interface SkinSiteWikiSearchPage {
+	items: SkinSiteWikiPageSummary[]
+	nextCursor?: number | null
+}
+
+export function skinSiteWikiSearch(
+	query: string,
+): Promise<SkinSiteResponse<SkinSiteWikiPageSummary[]>> {
+	const q = query.trim()
+	if (!q) {
+		return Promise.resolve({
+			success: true,
+			payload: [],
+			timestamp: Date.now(),
+		} as SkinSiteResponse<SkinSiteWikiPageSummary[]>)
+	}
+	return skinSiteRequest<SkinSiteWikiPageSummary[]>('wiki/search?q=' + encodeURIComponent(q))
+}
+
+export function skinSiteWikiPages(
+	params: {
+		prefix?: string
+		namespace?: string
+		limit?: number
+		cursor?: string
+	} = {},
+): Promise<SkinSiteResponse<SkinSiteWikiPageList>> {
+	const query = new URLSearchParams()
+	if (params.prefix) query.set('prefix', params.prefix)
+	if (params.namespace != null) query.set('namespace', params.namespace)
+	if (params.limit != null) query.set('limit', String(params.limit))
+	if (params.cursor) query.set('cursor', params.cursor)
+	return skinSiteRequest<SkinSiteWikiPageList>('wiki/pages?' + query.toString())
+}
+
+export function skinSiteWikiRecent(
+	before?: number,
+): Promise<SkinSiteResponse<SkinSiteWikiSearchPage>> {
+	const query = new URLSearchParams()
+	if (before != null) query.set('before', String(before))
+	return skinSiteRequest<SkinSiteWikiSearchPage>('wiki/recent?' + query.toString())
+}
+
+export function skinSiteWikiCategory(
+	name: string,
+	before?: number,
+): Promise<SkinSiteResponse<SkinSiteWikiSearchPage>> {
+	const query = new URLSearchParams({ name })
+	if (before != null) query.set('before', String(before))
+	return skinSiteRequest<SkinSiteWikiSearchPage>('wiki/category?' + query.toString())
+}
+// ─── Wiki: 移动 / 关注 / 设首页 ─────────────────────────────────────────
+
+export function skinSiteWikiMove(data: {
+	title: string
+	targetTitle: string
+	leaveRedirect?: boolean
+}): Promise<SkinSiteResponse<SkinSiteWikiPageDetail>> {
+	return skinSiteRequest<SkinSiteWikiPageDetail>('wiki/move', {
+		method: 'POST',
+		body: data,
+	})
+}
+
+export function skinSiteWikiWatch(
+	title: string,
+	watched: boolean,
+): Promise<SkinSiteResponse<boolean>> {
+	return skinSiteRequest<boolean>('wiki/watch', {
+		method: 'POST',
+		body: { title, watched },
+	})
 }

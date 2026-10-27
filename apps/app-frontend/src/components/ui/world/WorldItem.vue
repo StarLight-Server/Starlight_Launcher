@@ -34,6 +34,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { getPingLevel } from '@modrinth/utils'
+import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 import type { Component } from 'vue'
@@ -360,10 +361,12 @@ const messages = defineMessages({
 									}}
 								</span>
 								<template #popper>
-									<div class="flex flex-col gap-1">
-										<span v-for="player in serverStatus.players?.sample" :key="player.name">
-											{{ player.name }}
-										</span>
+									<div class="flex flex-col gap-1 font-minecraft">
+										<span
+											v-for="player in serverStatus.players?.sample"
+											:key="player.name"
+											v-html="autoToHTML(player.name)"
+										/>
 									</div>
 								</template>
 							</Tooltip>

@@ -533,9 +533,6 @@
   "app.update-popup.body.download-complete": {
     "message": "Starlight Launcher v{version} har laddats ner. Ladda om för att uppdatera nu, eller automatiskt när du stänger Starlight Launcher."
   },
-  "app.update-popup.body.linux": {
-    "message": "Starlight Launcher v{version} är tillgänglig. Använd din pakethanterare för att uppdatera och få tillgång till de senaste funktionerna och buggfixarna!"
-  },
   "app.update-popup.body.metered": {
     "message": "Starlight Launcher v{version} är nu tillgänglig! Eftersom du använder ett nätverk med datatrafikbegränsningar har vi inte laddat ner det automatiskt."
   },
@@ -907,9 +904,6 @@
   },
   "minecraft-account.select-account": {
     "message": "Välj konto"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Logga in till Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Tillhandahållet av instansen"

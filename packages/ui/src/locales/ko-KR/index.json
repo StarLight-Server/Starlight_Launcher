@@ -314,9 +314,6 @@
   "content.filter.updates": {
     "defaultMessage": "업데이트"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "경고"
-  },
   "content.page-layout.browse-content": {
     "defaultMessage": "콘텐츠 탐색"
   },
