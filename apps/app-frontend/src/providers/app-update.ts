@@ -11,6 +11,8 @@ export interface AppUpdate {
 	publishedAt?: string
 	forceUpdate?: boolean
 	rollback?: boolean
+	/** Set when the update moves the client to another channel (e.g. a beta graduating to release). */
+	channelOrigin?: 'release' | 'beta' | null
 }
 
 interface UpdatePromptState {

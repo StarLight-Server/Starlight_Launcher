@@ -1,5 +1,7 @@
 use crate::api::Result;
-use crate::update_policy::{UpdateTarget, is_rollback, requires_update};
+use crate::update_policy::{
+    UpdateTarget, is_remote_newer, is_rollback, requires_update,
+};
 use futures::StreamExt;
 use semver::Version;
 use serde::{Deserialize, Serialize};
@@ -30,6 +32,17 @@ const UPDATE_DOWNLOAD_TIMEOUT: std::time::Duration =
 
 // ── Shared types ─────────────────────────────────────────────────
 
+/// The channel the update comes from. Present when it differs from the
+/// active channel, so the frontend can migrate the channel setting after
+/// installing (a beta client updating to a final release graduates to
+/// the release channel).
+#[derive(Serialize, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum UpdateChannelOrigin {
+    Release,
+    Beta,
+}
+
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateMetadata {
@@ -41,6 +54,7 @@ pub struct UpdateMetadata {
     published_at: Option<String>,
     force_update: bool,
     rollback: bool,
+    channel_origin: Option<UpdateChannelOrigin>,
     raw_json: serde_json::Value,
 }
 
@@ -274,6 +288,46 @@ async fn check_with_updater<R: Runtime>(
     let pending_data = webview.state::<PendingUpdateData>();
     let revision = pending_data.0.lock().unwrap().begin_check();
     let checked = check_with_endpoints(webview, channel).await?;
+    let checked = match checked {
+        Some(update) => Some(update),
+        // Beta-channel clients also graduate to final releases: the release
+        // channel's latest outranks the current prerelease once a final
+        // version ships, even though the server keys `latest` per channel.
+        None if channel == "beta" => {
+            match check_with_endpoints(webview, "release").await {
+                Ok(Some(release_update)) => {
+                    let current =
+                        webview.app_handle().package_info().version.clone();
+                    let release_version = semver::Version::parse(
+                        &release_update.version,
+                    )
+                    .map_err(|error| {
+                        theseus::Error::from(theseus::ErrorKind::OtherError(
+                            format!(
+                                "Invalid release-channel version '{}': {error}",
+                                release_update.version
+                            ),
+                        ))
+                    })?;
+                    if is_remote_newer(&current, &release_version) {
+                        Some(release_update)
+                    } else {
+                        None
+                    }
+                }
+                Ok(None) => None,
+                // The release-channel probe is best-effort: report "no update"
+                // rather than failing a check that succeeded on the beta channel.
+                Err(error) => {
+                    tracing::warn!(
+                        "Release-channel graduation probe failed: {error}"
+                    );
+                    None
+                }
+            }
+        }
+        None => None,
+    };
     if !pending_data.0.lock().unwrap().select_checked(
         revision,
         checked.as_ref().map(|update| update.version.as_str()),
@@ -307,11 +361,18 @@ async fn check_with_updater<R: Runtime>(
         .get("force_update")
         .and_then(serde_json::Value::as_bool)
         .unwrap_or(false);
+    let current_parsed =
+        Version::parse(&update.current_version).map_err(Error::from)?;
+    let target_parsed = Version::parse(&update.version).map_err(Error::from)?;
+    // A beta-channel client being offered a final release (no prerelease
+    // suffix) is graduating to the release channel.
+    let channel_origin = if channel == "beta" && target_parsed.pre.is_empty() {
+        Some(UpdateChannelOrigin::Release)
+    } else {
+        None
+    };
     let metadata = UpdateMetadata {
-        rollback: is_rollback(
-            &Version::parse(&update.current_version).map_err(Error::from)?,
-            &Version::parse(&update.version).map_err(Error::from)?,
-        ),
+        rollback: is_rollback(&current_parsed, &target_parsed),
         rid: webview.resources_table().add(update.clone()),
         current_version: update.current_version.clone(),
         version: update.version.clone(),
@@ -319,6 +380,7 @@ async fn check_with_updater<R: Runtime>(
         body: update.body.clone(),
         published_at,
         force_update,
+        channel_origin,
         raw_json: update.raw_json,
     };
 
