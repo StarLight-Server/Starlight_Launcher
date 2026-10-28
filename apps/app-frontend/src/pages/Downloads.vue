@@ -57,35 +57,37 @@
 				:key="String(bar.loading_bar_uuid ?? bar.id)"
 				class="!p-4"
 			>
-				<div class="flex items-center gap-3">
+				<div class="flex flex-wrap items-center gap-3">
 					<img
 						v-if="bar.bar_type?.icon"
 						:src="displayIcon(bar.bar_type.icon)"
 						alt=""
-						class="size-12 rounded-xl object-cover"
+						class="size-12 shrink-0 rounded-xl object-cover"
 					/>
 					<div
 						v-else
-						class="flex size-12 items-center justify-center rounded-xl bg-brand-highlight text-brand"
+						class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-highlight text-brand"
 					>
 						<DownloadIcon />
 					</div>
-					<div class="min-w-0 flex-grow">
+					<div class="min-w-0 basis-48 grow">
 						<div class="truncate font-semibold text-contrast">{{ bar.title || bar.message }}</div>
 						<div class="break-words text-sm text-secondary">{{ bar.message }}</div>
 					</div>
-					<TagItem
-						v-if="['hosted_pack_sync', 'hosted_mod_download'].includes(bar.bar_type?.type ?? '')"
-						>StarLight</TagItem
-					>
-					<TagItem v-else>
-						<component :is="providerIcon(legacyProvider(bar))" />
-						{{ providerLabel(legacyProvider(bar)) }}
-					</TagItem>
-					<Badge
-						:color="bar.bar_type?.error ? 'red' : 'orange'"
-						:type="statusLabel(hostedDownloadState(bar))"
-					/>
+					<div class="ml-auto flex shrink-0 items-center gap-3">
+						<TagItem
+							v-if="['hosted_pack_sync', 'hosted_mod_download'].includes(bar.bar_type?.type ?? '')"
+							>StarLight</TagItem
+						>
+						<TagItem v-else>
+							<component :is="providerIcon(legacyProvider(bar))" />
+							{{ providerLabel(legacyProvider(bar)) }}
+						</TagItem>
+						<Badge
+							:color="bar.bar_type?.error ? 'red' : 'orange'"
+							:type="statusLabel(hostedDownloadState(bar))"
+						/>
+					</div>
 				</div>
 				<ProgressBar
 					v-if="!bar.bar_type?.error"

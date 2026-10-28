@@ -23,12 +23,13 @@ const props = withDefaults(
 	{ vertical: false, disabled: false },
 )
 const emit = defineEmits<{ select: [id: string] }>()
+const viewport = ref<HTMLElement>()
 const rail = ref<HTMLElement>()
 const indicator = ref({ x: 0, y: 0, width: 0, height: 0 })
 const ready = ref(false)
 const active = computed(() => props.items.some((item) => item.id === props.selected))
 
-async function updateIndicator() {
+async function updateIndicator(reveal = false) {
 	await nextTick()
 	const button = rail.value?.querySelector<HTMLElement>('[aria-pressed="true"]')
 	if (!button) return
@@ -38,18 +39,36 @@ async function updateIndicator() {
 		width: button.offsetWidth,
 		height: button.offsetHeight,
 	}
+	if (reveal && props.vertical && viewport.value) {
+		const container = viewport.value
+		const bounds = button.getBoundingClientRect()
+		const top = container.getBoundingClientRect().top + container.clientTop
+		const above = bounds.top - top
+		const below = bounds.bottom - top - container.clientHeight
+		if (above < 0 || below > 0) {
+			const reducedMotion =
+				typeof window !== 'undefined' &&
+				window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+			container.scrollTo({
+				top: Math.max(0, container.scrollTop + (above < 0 ? above : below)),
+				behavior: reducedMotion ? 'auto' : 'smooth',
+			})
+		}
+	}
 	if (!ready.value)
 		requestAnimationFrame(() => {
 			ready.value = true
 		})
 }
-watch(() => [props.selected, props.items], updateIndicator, { deep: true })
-onMounted(updateIndicator)
-useResizeObserver(rail, updateIndicator)
+watch([() => props.selected, () => props.items.map((item) => item.id).join('\0')], () =>
+	updateIndicator(true),
+)
+onMounted(() => updateIndicator(true))
+useResizeObserver(rail, () => updateIndicator())
 </script>
 
 <template>
-	<div class="selection-rail" :class="{ vertical }" :aria-label="label" role="group">
+	<div ref="viewport" class="selection-rail" :class="{ vertical }" :aria-label="label" role="group">
 		<div ref="rail" class="selection-track">
 			<span
 				v-show="active"
@@ -163,6 +182,12 @@ useResizeObserver(rail, updateIndicator)
 }
 .vertical {
 	align-self: start;
+	box-sizing: border-box;
+	min-height: 0;
+	max-height: 100%;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-width: thin;
 }
 .vertical .selection-track {
 	flex-direction: column;

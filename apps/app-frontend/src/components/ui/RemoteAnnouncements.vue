@@ -109,9 +109,10 @@ function openCenter(item?: RemoteAnnouncement) {
 	}
 	void nextTick(() => modal.value?.show())
 }
-function handleOpenCenter() {
+function handleOpenCenter(event: Event) {
 	if (props.previewOnly) return
-	openCenter()
+	const requested = event instanceof CustomEvent ? event.detail?.announcement : undefined
+	openCenter(parseAnnouncements([requested])?.[0])
 }
 async function show(item: RemoteAnnouncement) {
 	if (
@@ -131,11 +132,14 @@ function selectAnnouncement(item: RemoteAnnouncement) {
 	selected.value = item
 	const key = announcementKey(item)
 	read.add(key)
+	if (startupNotice.value && announcementKey(startupNotice.value) === key)
+		startupNotice.value = null
 	pending = pending.filter((entry) => announcementKey(entry) !== key)
 	persist()
 	emitState()
 }
 function markAllRead() {
+	startupNotice.value = null
 	for (const item of items) {
 		read.add(announcementKey(item))
 	}

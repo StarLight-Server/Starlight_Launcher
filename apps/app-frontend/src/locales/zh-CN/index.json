@@ -10115,9 +10115,6 @@
   "instance.upgrade.select.loading-versions": {
     "message": "正在加载 Minecraft 版本……"
   },
-  "instance.upgrade.select.manual-fabric-version-unavailable": {
-    "message": "无法手动选择 Fabric 版本。"
-  },
   "instance.upgrade.select.metadata-error-body": {
     "message": "请检查网络连接后重试。"
   },
@@ -10132,9 +10129,6 @@
   },
   "instance.upgrade.select.no-newer-release": {
     "message": "此实例已是最新的 Minecraft 稳定版。"
-  },
-  "instance.upgrade.select.no-non-downgrade-fabric-version": {
-    "message": "此目标没有可避免降级的 Fabric 版本。"
   },
   "instance.upgrade.select.planning-error-title": {
     "message": "兼容性分析失败"
@@ -14836,5 +14830,71 @@
   },
   "app.skin-site.home.preview.failed": {
     "message": "无法加载皮肤站玩家。"
+  },
+  "app.skin-site.home.preview.skin-failed": {
+    "message": "无法加载此玩家的皮肤。"
+  },
+  "app.skin-site.home.preview.cape-failed": {
+    "message": "无法加载此玩家的披风。"
+  },
+  "app.skin-site.home.preview.manage": {
+    "message": "管理皮肤"
+  },
+  "app.skin-site.home.preview.choose": {
+    "message": "选择玩家"
+  },
+  "app.skin-site.home.preview.choose-hint": {
+    "message": "从左侧选择一个玩家，即可预览皮肤。"
+  },
+  "app.skin-site.home.preview.skin-loading": {
+    "message": "正在加载皮肤…"
+  },
+  "app.skin-site.home.announcements.view-all": {
+    "message": "查看全部"
+  },
+  "instance.version-change.linked-title": {
+    "message": "允许修改此关联实例？"
+  },
+  "instance.version-change.linked-body": {
+    "message": "Starlight 将修改此关联实例的启动配置和组件。操作后，原启动器（如 PCL、HMCL）可能无法正常识别或启动此实例。"
+  },
+  "instance.version-change.downgrade-title": {
+    "message": "允许降级 Mod Loader？"
+  },
+  "instance.version-change.downgrade-body": {
+    "message": "降级 Mod Loader 可能导致模组不兼容、游戏启动失败，或在加载世界后损坏存档。建议先备份存档，再继续操作。"
+  },
+  "instance.version-change.unknown-title": {
+    "message": "确认 Mod Loader 兼容性风险"
+  },
+  "instance.version-change.unknown-body": {
+    "message": "无法可靠比较当前与目标 Mod Loader 的版本先后。此次更改可能属于降级，可能导致模组不兼容、启动失败，或在加载世界后损坏存档。建议先备份存档，再继续操作。"
+  },
+  "instance.version-change.remember": {
+    "message": "本实例相同操作后续均允许，不再提示"
+  },
+  "instance.version-change.allow": {
+    "message": "我已了解，允许操作"
+  },
+  "instance.version-change.unknown-version": {
+    "message": "未知版本"
+  },
+  "instance.version-change.read-error": {
+    "message": "无法读取当前安装配置，请确认相关文件可以访问后重试。"
+  },
+  "instance.version-change.loading": {
+    "message": "正在读取当前版本…"
+  },
+  "instance.version-change.retry": {
+    "message": "重试"
+  },
+  "instance.upgrade.select.no-fabric-version": {
+    "message": "没有适用于目标 Minecraft 版本的 Fabric 版本。"
+  },
+  "instance.version-change.reset": {
+    "message": "重新显示本实例的版本修改提示"
+  },
+  "instance.version-change.reset-failed": {
+    "message": "无法重置已保存的授权，请重试。"
   }
 }

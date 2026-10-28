@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { NewspaperIcon, SpinnerIcon, StarIcon } from '@modrinth/assets'
 import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
-import { onUnmounted, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 
 import {
 	reloadSkinSiteSession,
 	skinSiteStatus,
 	skinSiteUser,
 } from '@/composables/skin-site-session'
+import {
+	mapBroadcastAnnouncements,
+	OPEN_REMOTE_ANNOUNCEMENT_CENTER_EVENT,
+} from '@/helpers/remote-announcements'
 import { type SkinSiteAnnouncement, skinSiteAnnouncements } from '@/helpers/skin-site-api'
 
 const { formatMessage } = useVIntl()
@@ -27,12 +31,21 @@ const messages = defineMessages({
 		id: 'app.skin-site.home.announcements.signed-out',
 		defaultMessage: 'Sign in to view announcements.',
 	},
+	viewAll: { id: 'app.skin-site.home.announcements.view-all', defaultMessage: 'View all' },
 })
 
 const announcements = ref<SkinSiteAnnouncement[]>([])
+const visibleAnnouncements = computed(() => announcements.value.slice(0, 5))
 const loading = ref(true)
 const failed = ref(false)
 let requestId = 0
+
+function openAnnouncement(item?: SkinSiteAnnouncement) {
+	const announcement = item ? mapBroadcastAnnouncements([item])?.[0] : undefined
+	window.dispatchEvent(
+		new CustomEvent(OPEN_REMOTE_ANNOUNCEMENT_CENTER_EVENT, { detail: { announcement } }),
+	)
+}
 
 function formatDate(ts: number): string {
 	try {
@@ -53,12 +66,10 @@ async function load() {
 		const result = await skinSiteAnnouncements()
 		if (currentRequest !== requestId) return
 		if (result.success) {
-			announcements.value = [...(result.payload ?? [])]
-				.sort((a, b) => {
-					if (a.star !== b.star) return a.star ? -1 : 1
-					return b.updateAt - a.updateAt
-				})
-				.slice(0, 5)
+			announcements.value = [...(result.payload ?? [])].sort((a, b) => {
+				if (a.star !== b.star) return a.star ? -1 : 1
+				return b.updateAt - a.updateAt
+			})
 		} else {
 			failed.value = true
 		}
@@ -85,11 +96,14 @@ onUnmounted(() => {
 		<header class="flex items-center gap-2 border-0 border-b border-solid border-surface-5 pb-4">
 			<NewspaperIcon class="size-5 text-brand" />
 			<h2 class="m-0 text-base font-semibold text-contrast">{{ formatMessage(messages.title) }}</h2>
-			<span
+			<button
 				v-if="announcements.length"
-				class="ml-auto rounded-full bg-button-bg px-2 py-0.5 text-xs text-secondary"
-				>{{ announcements.length }}</span
+				type="button"
+				class="ml-auto cursor-pointer text-xs font-semibold text-brand hover:underline"
+				@click="openAnnouncement()"
 			>
+				{{ formatMessage(messages.viewAll) }}
+			</button>
 		</header>
 
 		<div v-if="loading" class="announcement-feedback" role="status">
@@ -109,7 +123,13 @@ onUnmounted(() => {
 			{{ formatMessage(messages.empty) }}
 		</p>
 		<div v-else class="flex flex-col">
-			<article v-for="item in announcements" :key="item.id" class="announcement-entry">
+			<button
+				v-for="item in visibleAnnouncements"
+				:key="item.id"
+				type="button"
+				class="announcement-entry"
+				@click="openAnnouncement(item)"
+			>
 				<div class="flex items-start gap-2">
 					<StarIcon v-if="item.star" class="mt-0.5 size-4 shrink-0 text-brand" />
 					<span class="min-w-0 flex-1 truncate text-sm font-semibold text-contrast">
@@ -117,10 +137,10 @@ onUnmounted(() => {
 					</span>
 					<span class="shrink-0 text-xs text-secondary">{{ formatDate(item.updateAt) }}</span>
 				</div>
-				<p v-if="item.subtitle" class="m-0 text-sm leading-relaxed text-secondary">
+				<p v-if="item.subtitle" class="m-0 line-clamp-2 text-sm leading-relaxed text-secondary">
 					{{ item.subtitle }}
 				</p>
-			</article>
+			</button>
 		</div>
 	</section>
 </template>
@@ -141,7 +161,21 @@ onUnmounted(() => {
 	flex-direction: column;
 	gap: 0.625rem;
 	padding: 1.25rem 0;
+	border: 0;
 	border-bottom: 1px solid var(--color-divider);
+	background: transparent;
+	text-align: left;
+	font: inherit;
+	cursor: pointer;
+	transition:
+		background 180ms,
+		transform 180ms;
+}
+.announcement-entry:hover {
+	background: var(--color-button-bg);
+}
+.announcement-entry:active {
+	transform: scale(0.99);
 }
 .announcement-entry:last-child {
 	border-bottom: 0;

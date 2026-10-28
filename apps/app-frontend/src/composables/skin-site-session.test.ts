@@ -250,7 +250,12 @@ test('player heads are cropped from one downloaded local texture rather than a c
 			return new Response(new Uint8Array([137, 80, 78, 71]), {
 				headers: { 'Content-Type': 'image/png' },
 			})
-		if (url.endsWith('/player/skin/player')) return ok({ skin: textureUrl, model: 'slim' })
+		if (url.endsWith('/player/skin/player'))
+			return ok({
+				skin: textureUrl,
+				cape: 'https://skin.starlight.cool/yggdrasil/textures/cape',
+				model: 'slim',
+			})
 		if (url.endsWith('/player')) return ok([{ uuid: 'player', name: 'Player', isMojang: false }])
 		return url.endsWith('/user') ? ok(user) : ok({ jwt: 'token' })
 	}
@@ -261,5 +266,6 @@ test('player heads are cropped from one downloaded local texture rather than a c
 	assert.equal(player.skinDataUrl, textureData)
 	assert.equal(player.headDataUrl, 'data:image/png;base64,local-head')
 	assert.equal(player.model, 'slim')
+	assert.equal(player.capeUrl, 'https://skin.starlight.cool/yggdrasil/textures/cape')
 	assert.equal(calls.filter((call) => call.path === '/yggdrasil/textures/test').length, 1)
 })

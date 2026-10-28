@@ -103,6 +103,21 @@ pub async fn edit(
     patch: EditInstance,
 ) -> crate::Result<InstanceMetadata> {
     let state = State::get().await?;
+    if let Some(environment_patch) =
+        patch.content_set_patch.as_ref().filter(|patch| {
+            patch.game_version.is_some()
+                || patch.loader.is_some()
+                || patch.loader_version.is_some()
+        })
+    {
+        let current = super::preview_version_change(instance_id, None).await?;
+        if super::version_change::patch_changes_environment(
+            &current.source,
+            environment_patch,
+        ) {
+            return Err(crate::ErrorKind::InputError("Version changes must use the confirmed version-change operation".into()).into());
+        }
+    }
     super::ensure_backup_eligible_edit(instance_id, &patch).await?;
     crate::state::edit_instance(instance_id, patch, &state.pool).await?;
 

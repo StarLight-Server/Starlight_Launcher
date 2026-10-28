@@ -198,16 +198,16 @@ test('failed replan preserves existing plan and authoritative target', async () 
 	assert.equal(authoritativeTarget, oldTarget)
 })
 
-test('Fabric loader choices exclude downgrades using numeric semantic comparison', () => {
-	assert.deepEqual(
-		fabricUpgradeLoaderVersions('0.18.4', ['0.18.6', '0.18.5', '0.18.4', '0.18.3']),
-		['0.18.6', '0.18.5', '0.18.4'],
-	)
-	assert.deepEqual(fabricUpgradeLoaderVersions('0.18.9', ['0.18.10', '0.18.9']), [
-		'0.18.10',
-		'0.18.9',
+test('Fabric loader choices include supported downgrades and versions with unknown ordering', () => {
+	assert.deepEqual(fabricUpgradeLoaderVersions(['0.18.6', '0.18.5', '0.18.4', '0.18.3']), [
+		'0.18.6',
+		'0.18.5',
+		'0.18.4',
+		'0.18.3',
 	])
-	assert.deepEqual(fabricUpgradeLoaderVersions('custom', ['0.19.0']), [])
+	assert.deepEqual(fabricUpgradeLoaderVersions(['0.18.10', '0.18.9']), ['0.18.10', '0.18.9'])
+	assert.deepEqual(fabricUpgradeLoaderVersions(['0.19.0-beta.1']), ['0.19.0-beta.1'])
+	assert.deepEqual(fabricUpgradeLoaderVersions(['0.19.5', '0.19.4']), ['0.19.5', '0.19.4'])
 })
 
 test('Fabric loader pending selection preserves valid exact values and maps target values', () => {
@@ -219,10 +219,9 @@ test('Fabric loader pending selection preserves valid exact values and maps targ
 	)
 	assert.equal(fabricLoaderVersionForTarget(AUTOMATIC_FABRIC_LOADER_VERSION), null)
 	assert.equal(fabricLoaderVersionForTarget('0.18.5'), '0.18.5')
-	assert.equal(automaticFabricLoaderTargetAvailable(true, true, []), false)
-	assert.equal(automaticFabricLoaderTargetAvailable(true, true, ['0.18.5']), true)
-	assert.equal(automaticFabricLoaderTargetAvailable(false, true, []), true)
-	assert.equal(automaticFabricLoaderTargetAvailable(true, false, []), true)
+	assert.equal(automaticFabricLoaderTargetAvailable(true, []), false)
+	assert.equal(automaticFabricLoaderTargetAvailable(true, ['0.18.5']), true)
+	assert.equal(automaticFabricLoaderTargetAvailable(false, []), true)
 })
 
 test('shared upgrade detection uses established link or external target metadata', () => {

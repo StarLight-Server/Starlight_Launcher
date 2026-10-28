@@ -28,6 +28,7 @@ export type SkinSitePlayer = {
 	skinState: 'ready' | 'empty' | 'error'
 	headDataUrl?: string
 	skinDataUrl?: string
+	capeUrl?: string
 	model?: 'default' | 'slim'
 }
 export type SkinSitePlayersStatus = 'idle' | 'checking' | 'ready' | 'error'
@@ -272,6 +273,7 @@ async function buildPlayer(entry: {
 	if (!skinResult.success) return { ...base, skinState: 'error' }
 
 	const texture: SkinSitePlayerSkin = skinResult.payload ?? {}
+	base.capeUrl = texture.cape
 	if (!texture.skin) return base
 
 	try {

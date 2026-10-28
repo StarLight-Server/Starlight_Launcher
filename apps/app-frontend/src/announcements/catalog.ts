@@ -33,6 +33,64 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.3-beta1',
+		version: '1.0.3-beta1',
+		publishedAt: '2026-10-28',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.3-beta1',
+			'zh-CN': 'Starlight Launcher 1.0.3-beta1',
+		},
+		changes: {
+			fixed: [
+				{
+					'en-US':
+						'Fixed download status labels wrapping between characters when file paths are long. Status labels now stay on one line, and the provider and status move together to the next row when space is limited.',
+					'zh-CN':
+						'修复下载卡片在文件路径较长时，“进行中”等状态文字异常换行的问题。状态标签保持单行，空间不足时来源和状态区域整体换到下一行。',
+				},
+			],
+		},
+	},
+	{
+		id: 'launcher-1.0.2-beta18',
+		version: '1.0.2-beta18',
+		publishedAt: '2026-10-28',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.2-beta18',
+			'zh-CN': 'Starlight Launcher 1.0.2-beta18',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'Linked instances from launchers such as PCL and HMCL can now change Mod Loader versions after confirming that the original launcher may no longer recognize or launch the instance correctly.',
+					'zh-CN':
+						'从 PCL、HMCL 等启动器关联的实例，现在可在确认原启动器可能无法正常识别或使用该实例后，修改 Mod Loader 版本。',
+				},
+				{
+					'en-US':
+						'Mod Loader downgrades are allowed after a separate warning about mod compatibility, startup failures, and possible world save damage. Both warnings support one-time approval or remembered permission for the same operation on this instance; saved permissions can be reset in instance settings.',
+					'zh-CN':
+						'Mod Loader 降级可在单独确认模组不兼容、启动失败或存档损坏风险后继续。两类警告均支持仅本次授权，或勾选“本实例相同操作后续均允许，不再提示”；已保存的授权可在实例设置中重置。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'Fixed missing loader versions on linked instances preventing manual Fabric selection, and restored older supported Fabric versions to the available choices.',
+					'zh-CN':
+						'修复关联实例未读取实际加载器版本，导致无法手动选择 Fabric 版本的问题，并恢复可用旧版 Fabric 的选择。',
+				},
+				{
+					'en-US':
+						'Linked-instance version changes now preserve the original launch configuration for recovery and use the selected runtime on subsequent launches.',
+					'zh-CN':
+						'关联实例修改版本时保留原启动配置以便失败恢复，并修复后续启动可能未使用所选运行组件的问题。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-1.0.2-beta17',
 		version: '1.0.2-beta17',
 		publishedAt: '2026-10-28',

@@ -14,8 +14,6 @@ import type {
 } from '@/helpers/instance-upgrade'
 import type { GameInstance } from '@/helpers/types'
 
-import { compareSemanticVersions } from '../../../helpers/version-compatibility.ts'
-
 export const AUTOMATIC_FABRIC_LOADER_VERSION = '__automatic__'
 
 export interface UpgradeVersionTargets {
@@ -153,15 +151,8 @@ export async function commitUpgradePlanSelection(
 	return result
 }
 
-export function fabricUpgradeLoaderVersions(
-	currentVersion: string | null | undefined,
-	availableVersions: readonly string[],
-): string[] {
-	if (!currentVersion || compareSemanticVersions(currentVersion, currentVersion) === null) return []
-	return availableVersions.filter((version) => {
-		const comparison = compareSemanticVersions(version, currentVersion)
-		return comparison !== null && comparison >= 0
-	})
+export function fabricUpgradeLoaderVersions(availableVersions: readonly string[]): string[] {
+	return [...new Set(availableVersions)]
 }
 
 export function preserveFabricLoaderSelection(
@@ -180,10 +171,9 @@ export function fabricLoaderVersionForTarget(selectedVersion: string): string | 
 
 export function automaticFabricLoaderTargetAvailable(
 	metadataLoaded: boolean,
-	currentVersionComparable: boolean,
 	availableVersions: readonly string[],
 ): boolean {
-	return !metadataLoaded || !currentVersionComparable || availableVersions.length > 0
+	return !metadataLoaded || availableVersions.length > 0
 }
 
 export function isSharedUpgradeInstance(instance: GameInstance): boolean {

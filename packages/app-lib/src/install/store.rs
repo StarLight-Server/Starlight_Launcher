@@ -701,6 +701,7 @@ mod tests {
             warnings: Vec::new(),
         };
         let execution = InstanceUpgradeExecution {
+            confirmation: None,
             source_revision: 1,
             source_files: Vec::new(),
             source_environment: source_environment.clone(),
@@ -822,6 +823,7 @@ mod tests {
             super::super::model::InstallRequest::InstallExistingInstance {
                 instance_id: instance_id.clone(),
                 force: false,
+                version_change: None,
             },
         );
         let job = insert_running_job(&job_state, &state).await;

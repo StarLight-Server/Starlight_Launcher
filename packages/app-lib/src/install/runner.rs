@@ -189,7 +189,40 @@ pub async fn install_existing_instance(
     instance_id: String,
     force: bool,
 ) -> crate::Result<InstallJobSnapshot> {
-    start(InstallRequest::InstallExistingInstance { instance_id, force }).await
+    start(InstallRequest::InstallExistingInstance {
+        instance_id,
+        force,
+        version_change: None,
+    })
+    .await
+}
+
+pub(crate) async fn change_instance_version(
+    instance_id: String,
+    request: crate::instance::VersionChangeRequest,
+) -> crate::Result<InstallJobSnapshot> {
+    let state = State::get().await?;
+    let _guard = state.lock_instance_content(&instance_id).await;
+    if store::list(false, &state).await?.iter().any(|job| {
+        !job.status.is_finished()
+            && job.instance_id.as_deref() == Some(instance_id.as_str())
+    }) {
+        return Err(ErrorKind::InputError(
+            "Instance already has an active install job".into(),
+        )
+        .into());
+    }
+    crate::api::instance::version_change::validate_version_change(
+        &instance_id,
+        &request,
+    )
+    .await?;
+    start(InstallRequest::InstallExistingInstance {
+        instance_id,
+        force: false,
+        version_change: Some(request),
+    })
+    .await
 }
 
 pub async fn upgrade_unmanaged_instance(
@@ -1650,8 +1683,50 @@ async fn run_request(
             .await?;
             Ok(InstallExecutionOutcome::Completed(Some(target_instance_id)))
         }
-        InstallRequest::InstallExistingInstance { instance_id, force } => {
+        InstallRequest::InstallExistingInstance {
+            instance_id,
+            force,
+            version_change,
+        } => {
+            let mutation_guard =
+                state.lock_instance_content(&instance_id).await;
+            if let Some(request) = &version_change {
+                crate::api::instance::version_change::validate_version_change(
+                    &instance_id,
+                    request,
+                )
+                .await?;
+            }
             prepare_existing_rollback(job_state, state, &instance_id).await?;
+            if let Some(request) = &version_change {
+                crate::launcher::linked_version_change::prepare(
+                    job_id,
+                    job_state,
+                    state,
+                    &instance_id,
+                )
+                .await?;
+                crate::state::edit_instance(
+                    &instance_id,
+                    crate::state::EditInstance {
+                        content_set_patch: Some(
+                            crate::state::AppliedContentSetPatch {
+                                game_version: Some(
+                                    request.target.game_version.clone(),
+                                ),
+                                loader: Some(request.target.mod_loader),
+                                loader_version: Some(
+                                    request.target.mod_loader_version.clone(),
+                                ),
+                                ..Default::default()
+                            },
+                        ),
+                        ..Default::default()
+                    },
+                    &state.pool,
+                )
+                .await?;
+            }
             update_progress(
                 job_id,
                 job_state,
@@ -1669,6 +1744,7 @@ async fn run_request(
                 .ok_or_else(|| {
                     crate::ErrorKind::InputError("Unknown instance".to_string())
                 })?;
+            drop(mutation_guard);
             crate::launcher::install_minecraft_with_reporter(
                 &context,
                 force,
@@ -2052,6 +2128,33 @@ async fn run_instance_upgrade(
 ) -> crate::Result<()> {
     let compatibility_warning_details =
         upgrade_compatibility_warning_details(&execution);
+    let preview = crate::instance::preview_version_change(
+        source_instance_id,
+        Some(crate::instance::VersionEnvironment::from(
+            &execution.target_environment,
+        )),
+    )
+    .await?;
+    if preview.source
+        != crate::instance::VersionEnvironment::from(
+            &execution.source_environment,
+        )
+    {
+        return Err(crate::ErrorKind::InputError("Instance environment changed since planning; create a new upgrade plan".into()).into());
+    }
+    crate::api::instance::version_change::validate_confirmation(
+        &preview,
+        execution.confirmation.as_ref(),
+    )?;
+    if shared_upgrade_mode == SharedUpgradeMode::Direct {
+        crate::launcher::linked_version_change::prepare(
+            job_id,
+            job_state,
+            state,
+            target_instance_id,
+        )
+        .await?;
+    }
     let (upgrade_source_files, upgrade_watch) = if shared_upgrade_mode
         == SharedUpgradeMode::CopyAndUpgrade
     {
@@ -2312,6 +2415,11 @@ async fn run_instance_upgrade(
         crate::launcher::InstanceCompletionPolicy::DeferToInstallJob,
     )
     .await?;
+    job_state.rollback =
+        InstallProgressReporter::new(job_id, job_state.clone())
+            .current_state()
+            .await?
+            .rollback;
 
     update_progress(
         job_id,
@@ -2550,11 +2658,45 @@ async fn create_upgrade_backup(
     source_instance_id: &str,
     backup_name: Option<&str>,
 ) -> crate::Result<String> {
-    let source = crate::state::get_instance(source_instance_id, &state.pool)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown upgrade source".to_string())
-        })?;
+    let mut source =
+        crate::state::get_instance(source_instance_id, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(
+                    "Unknown upgrade source".to_string(),
+                )
+            })?;
+    if let Some(observed) =
+        crate::api::instance::version_change::linked_environment(
+            &source.instance,
+            &source.applied_content_set.game_version,
+        )?
+    {
+        source.applied_content_set.game_version = observed.game_version;
+        source.applied_content_set.loader = observed.mod_loader;
+        source.applied_content_set.loader_version =
+            observed.mod_loader_version.clone();
+        let mut components =
+            crate::state::LoaderComponent::from_legacy_projection(
+                source_instance_id,
+                observed.mod_loader,
+                observed.mod_loader_version,
+            );
+        components.extend(
+            source
+                .loader_components
+                .iter()
+                .filter(|component| {
+                    component.role == crate::state::LoaderComponentRole::Adjunct
+                        && !components
+                            .iter()
+                            .any(|current| current.kind == component.kind)
+                })
+                .cloned()
+                .collect::<Vec<_>>(),
+        );
+        source.loader_components = components;
+    }
     let backup = crate::api::instance::create(
         backup_name.map(str::to_string).unwrap_or_else(|| {
             format!("{} (Upgrade Backup)", source.instance.name)
@@ -4250,6 +4392,7 @@ async fn prepare_existing_rollback(
         instance.instance.icon_path.clone(),
     );
     job_state.rollback = Some(InstallRollbackState {
+        linked_profile: None,
         instance,
         install_stage,
         content: None,
@@ -4750,7 +4893,7 @@ async fn install_adjunct_components(
     let metadata = crate::api::instance::get(instance_id)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
-    let instance_path = state.directories.instance_game_dir(&metadata.instance);
+    let instance_path = crate::launcher::instance_runtime::InstanceRuntimeAdapter::for_instance(&metadata.instance, &state.directories)?.game_dir();
     let mut components = metadata.loader_components.clone();
 
     for adjunct in adjuncts {
@@ -4977,6 +5120,7 @@ mod tests {
             shader_runtime: crate::state::ShaderRuntime::Iris,
         };
         InstanceUpgradeExecution {
+            confirmation: None,
             source_revision: 1,
             source_files: Vec::new(),
             source_environment: environment.clone(),
@@ -5071,6 +5215,7 @@ mod tests {
             shader_runtime: crate::state::ShaderRuntime::Iris,
         };
         let execution = InstanceUpgradeExecution {
+            confirmation: None,
             source_revision: 1,
             source_files: Vec::new(),
             source_environment: environment.clone(),
@@ -5151,6 +5296,7 @@ mod tests {
             }
         };
         let execution = InstanceUpgradeExecution {
+            confirmation: None,
             source_revision: 1,
             source_files: Vec::new(),
             source_environment: environment.clone(),
@@ -5204,6 +5350,7 @@ mod tests {
             instance_id: "instance".to_string(),
             plan_id: "plan".to_string(),
             execution: InstanceUpgradeExecution {
+                confirmation: None,
                 source_revision: 1,
                 source_files: Vec::new(),
                 source_environment: environment.clone(),

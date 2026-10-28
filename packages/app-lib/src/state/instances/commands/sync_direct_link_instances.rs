@@ -146,6 +146,11 @@ pub(crate) async fn sync_direct_link_instances(
 
             if let Some(metadata) = existing_instance {
                 let instance = &metadata.instance;
+                if instance.install_stage
+                    != crate::state::InstanceInstallStage::Installed
+                {
+                    continue;
+                }
                 let fields_changed = instance.linked_version_id.as_deref()
                     != Some(resolved.version_id.as_str())
                     || instance.linked_launcher.as_deref()
@@ -162,7 +167,9 @@ pub(crate) async fn sync_direct_link_instances(
                         != Some(mode.key());
                 let content_changed = metadata.applied_content_set.game_version
                     != resolved.game_version
-                    || metadata.applied_content_set.loader != resolved.loader;
+                    || metadata.applied_content_set.loader != resolved.loader
+                    || metadata.applied_content_set.loader_version
+                        != resolved.loader_version;
                 if fields_changed || content_changed {
                     if content_changed {
                         crate::state::edit_instance(
@@ -174,6 +181,9 @@ pub(crate) async fn sync_direct_link_instances(
                                             resolved.game_version.clone(),
                                         ),
                                         loader: Some(resolved.loader),
+                                        loader_version: Some(
+                                            resolved.loader_version.clone(),
+                                        ),
                                         ..AppliedContentSetPatch::default()
                                     },
                                 ),

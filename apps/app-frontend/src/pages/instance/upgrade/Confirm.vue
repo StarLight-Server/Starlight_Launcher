@@ -1,4 +1,5 @@
 <template>
+	<VersionChangeConfirmation ref="versionConfirmation" />
 	<section class="flex flex-col gap-6 py-2">
 		<header>
 			<h2 class="m-0 text-xl font-semibold text-contrast">{{ formatMessage(messages.title) }}</h2>
@@ -195,6 +196,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import VersionChangeConfirmation from '@/components/instance/VersionChangeConfirmation.vue'
 import type { InstanceContentSnapshotItem } from '@/helpers/instance'
 import {
 	type InstanceContentData,
@@ -217,6 +219,7 @@ import {
 	type UpgradeReleaseIdentity,
 	upgradeVersionDisplayLabel,
 } from '@/helpers/upgrade-version-metadata'
+import { previewVersionChange } from '@/helpers/version-change'
 
 import {
 	confirmSelectionReleaseSlots,
@@ -414,6 +417,7 @@ const { formatMessage } = useVIntl()
 const datapackPath = 'saves/<world>/datapacks'
 const submissionLock = ref(false)
 const executionError = ref<string | null>(null)
+const versionConfirmation = ref<InstanceType<typeof VersionChangeConfirmation>>()
 const plan = computed(() => flow.plan.value!)
 const solution = computed(() => plan.value.selectedSolution!)
 const sharedInstance = computed(() => isSharedUpgradeInstance(flow.instance.value))
@@ -777,6 +781,16 @@ async function startUpgrade() {
 	flow.busy.value = true
 	executionError.value = null
 	try {
+		const sourceInstance = { ...flow.instance.value }
+		const planId = flow.plan.value.id
+		const preview = await previewVersionChange(sourceInstance.id, flow.plan.value.targetEnvironment)
+		const confirmation = await versionConfirmation.value?.confirm(sourceInstance, preview)
+		if (
+			!confirmation ||
+			flow.instanceId.value !== sourceInstance.id ||
+			flow.plan.value?.id !== planId
+		)
+			return
 		const submitted = await submitInstanceUpgrade(
 			{
 				instanceId: flow.instanceId.value,
@@ -784,6 +798,7 @@ async function startUpgrade() {
 				createFullBackup: confirmOptions.value.createFullBackup,
 				sharedUpgradeMode: effectiveMode.value,
 				displayNames: displayNames.value,
+				confirmation,
 			},
 			submissionLock,
 		)

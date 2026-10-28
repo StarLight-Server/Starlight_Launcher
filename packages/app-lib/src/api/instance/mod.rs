@@ -18,6 +18,11 @@ mod screenshot_groups;
 mod screenshots;
 pub(crate) mod synced_options;
 mod upgrade;
+pub(crate) mod version_change;
+pub use version_change::{
+    VersionChangeConfirmation, VersionChangePreview, VersionChangeRequest,
+    VersionEnvironment, change_version, preview_version_change,
+};
 pub(crate) mod synced_packs {
     pub(crate) use super::synced_packs_axolotl::{
         capture_resource_pack_selection_change, detach,
@@ -180,3 +185,5 @@ pub use self::upgrade::{
 };
 pub use crate::state::{DailyPlaytime, DailyPlaytimeEntry};
 pub use crate::state::{InstanceSyncedOptions, SyncedOption};
+
+pub use upgrade::execute_instance_upgrade_with_confirmation;

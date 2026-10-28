@@ -348,8 +348,10 @@ mod tests {
             InstallJobState::new(InstallRequest::InstallExistingInstance {
                 instance_id: instance_id.clone(),
                 force: false,
+                version_change: None,
             });
         job.rollback = Some(InstallRollbackState {
+            linked_profile: None,
             instance: InstanceMetadata {
                 instance: Instance {
                     id: instance_id.clone(),
@@ -1006,6 +1008,7 @@ mod tests {
             shader_runtime: crate::state::ShaderRuntime::Iris,
         };
         InstanceUpgradeExecution {
+            confirmation: None,
             source_revision: 5,
             source_files: Vec::new(),
             source_environment: environment.clone(),
@@ -1436,6 +1439,8 @@ pub enum InstallRequest {
     InstallExistingInstance {
         instance_id: String,
         force: bool,
+        #[serde(default)]
+        version_change: Option<crate::instance::VersionChangeRequest>,
     },
     UpgradeUnmanagedInstance {
         instance_id: String,
@@ -1992,6 +1997,9 @@ pub struct InstallJobDisplay {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct InstallRollbackState {
+    #[serde(default)]
+    pub linked_profile:
+        Option<crate::launcher::linked_version_change::LinkedProfileRollback>,
     pub instance: InstanceMetadata,
     pub install_stage: InstanceInstallStage,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2078,6 +2086,8 @@ pub struct InstanceUpgradeDisplayNames {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct InstanceUpgradeExecution {
+    #[serde(default)]
+    pub confirmation: Option<crate::instance::VersionChangeConfirmation>,
     pub source_revision: u64,
     pub source_files: Vec<InstanceUpgradeSourceFile>,
     pub source_environment: InstanceUpgradeEnvironment,
