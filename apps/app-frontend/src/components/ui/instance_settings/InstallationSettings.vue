@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	Admonition,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	formatLoaderLabel,
@@ -21,7 +23,9 @@ import type { GameVersionTag } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
+import VersionChangeConfirmation from '@/components/instance/VersionChangeConfirmation.vue'
 import SymlinkInstanceWarning from '@/components/ui/SymlinkInstanceWarning.vue'
+import { useInstanceVersionEnvironment } from '@/composables/useInstanceVersionEnvironment'
 import { get_project_versions, get_version } from '@/helpers/cache'
 import { type CurseForgeFile, updateManagedCurseForgeModpack } from '@/helpers/curseforge'
 import {
@@ -40,10 +44,16 @@ import {
 } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions } from '@/helpers/tags'
+import { changeInstanceVersion, previewVersionChange } from '@/helpers/version-change'
+import {
+	hasVersionChangeConsent,
+	resetVersionChangeConsent,
+} from '@/helpers/version-change-consent'
+import { versionChangeMessages } from '@/helpers/version-change-messages'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 import { useTheming } from '@/store/state'
 
-import type { Manifest } from '../../../helpers/types'
+import type { InstanceLoader, Manifest } from '../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
 const filePicker = injectFilePicker()
@@ -53,6 +63,25 @@ const debug = useDebugLogger('AppInstallationSettings')
 const themeStore = useTheming()
 
 const { instance, offline, isMinecraftServer, onUnlinked, closeModal } = injectInstanceSettings()
+const { query: environmentQuery, environment: currentEnvironment } =
+	useInstanceVersionEnvironment(instance)
+const versionConfirmation = ref<InstanceType<typeof VersionChangeConfirmation>>()
+const changingVersion = ref(false)
+const consentRevision = ref(0)
+const consentStorage = {
+	getItem: (key: string) => window.localStorage.getItem(key),
+	setItem: (key: string, value: string) => window.localStorage.setItem(key, value),
+}
+const hasSavedConsent = computed(() => {
+	void consentRevision.value
+	return hasVersionChangeConsent(instance.value.id, consentStorage)
+})
+function resetSavedConsent() {
+	if (!resetVersionChangeConsent(instance.value.id, consentStorage)) {
+		handleError(new Error(formatMessage(versionChangeMessages.resetFailed)))
+	}
+	consentRevision.value++
+}
 const skipNonEssentialWarnings = computed(() =>
 	themeStore.getFeatureFlag('skip_non_essential_warnings'),
 )
@@ -175,16 +204,19 @@ provideAppBackup({
 
 provideInstallationSettings({
 	closeSettings: closeModal,
-	loading: computed(() => metadataLoading.value || modpackInfoQuery.isLoading.value),
+	loading: computed(
+		() =>
+			metadataLoading.value || modpackInfoQuery.isLoading.value || environmentQuery.isPending.value,
+	),
 	installationInfo: computed(() => {
 		const rows = [
 			{
 				label: formatMessage(commonMessages.platformLabel),
-				value: formatLoaderLabel(instance.value.loader),
+				value: formatLoaderLabel(currentEnvironment.value.modLoader),
 			},
 			{
 				label: formatMessage(commonMessages.gameVersionLabel),
-				value: instance.value.game_version,
+				value: currentEnvironment.value.gameVersion,
 			},
 		]
 		if ((instance.value.loader_components ?? []).length > 1) {
@@ -196,12 +228,15 @@ provideInstallationSettings({
 					value: component.version ?? formatLoaderLabel(component.kind),
 				})
 			}
-		} else if (instance.value.loader !== 'vanilla' && instance.value.loader_version) {
+		} else if (
+			currentEnvironment.value.modLoader !== 'vanilla' &&
+			currentEnvironment.value.modLoaderVersion
+		) {
 			rows.push({
 				label: formatMessage(messages.loaderVersion, {
-					loader: formatLoaderLabel(instance.value.loader),
+					loader: formatLoaderLabel(currentEnvironment.value.modLoader),
 				}),
-				value: instance.value.loader_version,
+				value: currentEnvironment.value.modLoaderVersion,
 			})
 		}
 		return rows
@@ -212,6 +247,8 @@ provideInstallationSettings({
 			instance.value.install_stage !== 'installed' ||
 			repairing.value ||
 			reinstalling.value ||
+			changingVersion.value ||
+			!environmentQuery.isSuccess.value ||
 			!!offline,
 	),
 	skipNonEssentialWarnings,
@@ -263,9 +300,9 @@ provideInstallationSettings({
 		}
 		return null
 	}),
-	currentPlatform: computed(() => instance.value.loader),
-	currentGameVersion: computed(() => instance.value.game_version),
-	currentLoaderVersion: computed(() => instance.value.loader_version ?? ''),
+	currentPlatform: computed(() => currentEnvironment.value.modLoader),
+	currentGameVersion: computed(() => currentEnvironment.value.gameVersion),
+	currentLoaderVersion: computed(() => currentEnvironment.value.modLoaderVersion ?? ''),
 	availablePlatforms: computed(() => [...instanceInstallablePlatforms]),
 	editingPlatformRef: editingPlatform,
 	editingGameVersionRef: editingGameVersion,
@@ -311,28 +348,34 @@ provideInstallationSettings({
 		return result
 	},
 
-	async save(platform, gameVersion, loaderVersionId) {
-		debug('save: called', {
-			instanceId: instance.value.id,
-			platform,
-			gameVersion,
-			loaderVersionId,
-		})
-		const editInstancePatch: Record<string, string | undefined> = {
-			loader: platform,
-			game_version: gameVersion,
+	async save(platform: string, gameVersion: string, loaderVersionId: string | null) {
+		const sourceInstance = { ...instance.value }
+		changingVersion.value = true
+		try {
+			const preview = await previewVersionChange(sourceInstance.id, {
+				gameVersion,
+				modLoader: platform as InstanceLoader,
+				modLoaderVersion: loaderVersionId,
+			}).catch((error) => {
+				handleError(error)
+				throw error
+			})
+			const confirmation = await versionConfirmation.value?.confirm(sourceInstance, preview)
+			if (!confirmation || instance.value.id !== sourceInstance.id) {
+				throw new Error('Version change canceled')
+			}
+			try {
+				const job = await changeInstanceVersion(sourceInstance.id, preview.target, confirmation)
+				await wait_for_install_job(job.job_id)
+				await environmentQuery.refetch()
+			} catch (error) {
+				handleError(error)
+				throw error
+			}
+		} finally {
+			changingVersion.value = false
+			consentRevision.value++
 		}
-		if (platform !== 'vanilla' && loaderVersionId) {
-			editInstancePatch.loader_version = loaderVersionId
-		}
-		await edit(instance.value.id, editInstancePatch).catch(handleError)
-		debug('save: edit complete', { editInstancePatch })
-	},
-
-	afterSave: async () => {
-		debug('afterSave: installing', { instanceId: instance.value.id })
-		await install_existing_instance(instance.value.id, false).catch(handleError)
-		debug('afterSave: done')
 	},
 
 	async repair() {
@@ -557,9 +600,26 @@ provideInstallationSettings({
 </script>
 
 <template>
+	<VersionChangeConfirmation ref="versionConfirmation" />
+	<Admonition
+		v-if="environmentQuery.isError.value"
+		type="critical"
+		:header="formatMessage(versionChangeMessages.readError)"
+	>
+		<ButtonStyled
+			><button type="button" @click="environmentQuery.refetch()">
+				{{ formatMessage(versionChangeMessages.retry) }}
+			</button></ButtonStyled
+		>
+	</Admonition>
 	<SymlinkInstanceWarning
 		v-if="instance?.symlink_target"
 		:symlink-target="instance.symlink_target"
 	/>
 	<InstallationSettingsLayout />
+	<ButtonStyled v-if="hasSavedConsent" class="mt-4">
+		<button type="button" :disabled="changingVersion" @click="resetSavedConsent">
+			{{ formatMessage(versionChangeMessages.reset) }}
+		</button>
+	</ButtonStyled>
 </template>

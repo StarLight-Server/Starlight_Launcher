@@ -479,6 +479,8 @@ fn main() {
                         "instance_select_upgrade_solution",
                         "instance_resolve_custom_upgrade_solution",
                         "instance_execute_upgrade",
+                        "instance_preview_version_change",
+                        "instance_change_version",
                         "instance_get_post_upgrade_notice",
                         "instance_dismiss_post_upgrade_notice",
                         "instance_get_dependencies_as_content_items",

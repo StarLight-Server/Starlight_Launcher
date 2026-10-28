@@ -417,7 +417,7 @@ fn extract_version_from_id(id: &str) -> Option<String> {
 }
 
 ///参考自PCL启动器
-fn detect_loader(
+pub(crate) fn detect_loader(
     content: &str,
     json: &Value,
 ) -> Option<(String, Option<String>)> {

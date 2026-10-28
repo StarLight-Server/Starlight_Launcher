@@ -221,6 +221,7 @@ mod tests {
             shader_runtime: ShaderRuntime::Iris,
         };
         InstanceUpgradeExecution {
+            confirmation: None,
             source_revision: 1,
             source_files: Vec::new(),
             source_environment: environment.clone(),

@@ -73,6 +73,7 @@ mod natives;
 pub mod download;
 pub mod jvm_args;
 pub mod language;
+pub(crate) mod linked_version_change;
 pub mod local_version;
 pub mod optifine;
 pub mod quick_play_version;
@@ -847,11 +848,26 @@ async fn install_minecraft_with_local_source(
     .await?;
     emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
-    let instance_path = get_instance_full_path(
-        &instance.path,
-        instance.game_dir_override.as_deref(),
-    )
-    .await?;
+    let instance_path =
+        if let Some(direct) = DirectLinkedLaunch::from_instance(instance)? {
+            io::canonicalize(direct.resolve()?.game_dir)?
+        } else {
+            get_instance_full_path(
+                &instance.path,
+                instance.game_dir_override.as_deref(),
+            )
+            .await?
+        };
+    let changing_linked_profile = if let Some(reporter) = &reporter {
+        reporter
+            .current_state()
+            .await?
+            .rollback
+            .as_ref()
+            .is_some_and(|rollback| rollback.linked_profile.is_some())
+    } else {
+        false
+    };
     if let Some(reporter) = &reporter {
         reporter
             .update(
@@ -1030,15 +1046,25 @@ async fn install_minecraft_with_local_source(
     )
     .await?;
 
-    materialize_external_version(instance, &version_jar, &version_info, &state)
+    if !changing_linked_profile {
+        materialize_external_version(
+            instance,
+            &version_jar,
+            &version_info,
+            &state,
+        )
         .await?;
+    }
 
     // Version-isolated external instances are direct-managed from creation.
     // Complete their external assets/libraries now so the first launch never
     // falls back to Axolotl's shared runtime directories.
     let runtime_adapter =
         InstanceRuntimeAdapter::for_instance(instance, &state.directories)?;
-    if let Some(direct) = runtime_adapter.direct_link() {
+    if let Some(direct) = runtime_adapter
+        .direct_link()
+        .filter(|_| !changing_linked_profile)
+    {
         let resolved = direct.resolve()?;
         direct_ensure::ensure_direct_launch_dependencies(
             &state,
@@ -1060,6 +1086,30 @@ async fn install_minecraft_with_local_source(
         .join(format!("{version_jar}.jar"));
 
     let Some(java_version) = java_version else {
+        if changing_linked_profile
+            && (version_info
+                .processors
+                .as_ref()
+                .is_some_and(|processors| !processors.is_empty())
+                || content_set.loader == ModLoader::OptiFine)
+        {
+            return Err(crate::ErrorKind::InputError(
+                "Java must be configured before changing this linked loader"
+                    .into(),
+            )
+            .into());
+        }
+        linked_version_change::finish(
+            instance,
+            &content_set.game_version,
+            &version_jar,
+            &version_info,
+            std::env::consts::ARCH,
+            minecraft_updated,
+            reporter.as_ref(),
+            &state,
+        )
+        .await?;
         let protocol_version =
             read_protocol_version_from_jar(client_path).await?;
         crate::state::instances::commands::set_applied_content_set_protocol_version(
@@ -1308,6 +1358,17 @@ async fn install_minecraft_with_local_source(
         }
     }
 
+    linked_version_change::finish(
+        instance,
+        &content_set.game_version,
+        &version_jar,
+        &version_info,
+        &java_version.architecture,
+        minecraft_updated,
+        reporter.as_ref(),
+        &state,
+    )
+    .await?;
     let protocol_version = read_protocol_version_from_jar(client_path).await?;
 
     crate::state::instances::commands::set_applied_content_set_protocol_version(

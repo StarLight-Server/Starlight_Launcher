@@ -208,11 +208,16 @@ fn linked_client_plan(
 ) -> Option<LinkedFilePlan> {
     let client = version_info.downloads.get(&DownloadType::Client)?;
     let url = non_empty(&client.url)?;
+    let jar_id = direct
+        .resolve()
+        .ok()
+        .and_then(|resolved| resolved.merged.jar)
+        .unwrap_or_else(|| direct.version_id.clone());
 
     Some(LinkedFilePlan {
         label: format!("Minecraft client {}", direct.version_id),
         urls: vec![url],
-        destination: direct.client_jar(&direct.version_id),
+        destination: direct.client_jar(&jar_id),
         sha1: non_empty(&client.sha1),
         size: (client.size > 0).then_some(client.size as u64),
         validation: ContentValidation::Jar,
@@ -731,6 +736,32 @@ mod tests {
             "type": "release"
         }))
         .unwrap()
+    }
+
+    #[test]
+    fn linked_client_completion_uses_published_jar_override() {
+        let root = tempdir().unwrap();
+        let direct = direct_for(root.path());
+        let profile = root.path().join("versions/demo");
+        let runtime = root.path().join("versions/starlight-runtime-test");
+        std::fs::create_dir_all(&profile).unwrap();
+        std::fs::create_dir_all(&runtime).unwrap();
+        std::fs::write(profile.join("demo.json"), serde_json::to_vec(&json!({
+			"id":"demo", "jar":"starlight-runtime-test", "mainClass":"net.minecraft.client.main.Main", "libraries":[]
+		})).unwrap()).unwrap();
+        let runtime_jar = runtime.join("starlight-runtime-test.jar");
+        std::fs::write(&runtime_jar, b"target").unwrap();
+        std::fs::write(profile.join("demo.jar"), b"original").unwrap();
+        let mut version = minimal_version_info();
+        version.downloads.insert(DownloadType::Client, serde_json::from_value(json!({"url":"https://example.invalid/client.jar", "sha1":"", "size":6})).unwrap());
+        assert_eq!(
+            linked_client_plan(&direct, &version).unwrap().destination,
+            runtime_jar
+        );
+        assert_eq!(
+            std::fs::read(profile.join("demo.jar")).unwrap(),
+            b"original"
+        );
     }
 
     async fn ensure_test_state() -> (TempDir, Arc<State>) {

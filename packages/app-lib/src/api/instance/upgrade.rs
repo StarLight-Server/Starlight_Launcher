@@ -32,9 +32,15 @@ static INSTANCE_UPGRADE_PLANS: LazyLock<DashMap<String, StoredUpgradePlan>> =
 #[tracing::instrument]
 pub async fn plan_instance_upgrade(
     instance_id: &str,
-    target_environment: crate::state::InstanceUpgradeEnvironment,
+    mut target_environment: crate::state::InstanceUpgradeEnvironment,
 ) -> crate::Result<InstanceUpgradePlan> {
     ensure_local_version_management(instance_id).await?;
+    let preview = super::preview_version_change(
+        instance_id,
+        Some(super::VersionEnvironment::from(&target_environment)),
+    )
+    .await?;
+    target_environment.mod_loader_version = preview.target.mod_loader_version;
     let state = State::get().await?;
     let creation_watch =
         state.file_watcher.content_watch_snapshot(instance_id).await;
@@ -371,12 +377,29 @@ pub async fn resolve_custom_instance_upgrade_solution(
     Ok(plan)
 }
 
-#[tracing::instrument]
 pub async fn execute_instance_upgrade(
     plan_id: &str,
     create_full_backup: bool,
     shared_upgrade_mode: SharedUpgradeMode,
     display_names: crate::install::InstanceUpgradeDisplayNames,
+) -> crate::Result<InstallJobSnapshot> {
+    execute_instance_upgrade_with_confirmation(
+        plan_id,
+        create_full_backup,
+        shared_upgrade_mode,
+        display_names,
+        None,
+    )
+    .await
+}
+
+#[tracing::instrument]
+pub async fn execute_instance_upgrade_with_confirmation(
+    plan_id: &str,
+    create_full_backup: bool,
+    shared_upgrade_mode: SharedUpgradeMode,
+    display_names: crate::install::InstanceUpgradeDisplayNames,
+    confirmation: Option<super::VersionChangeConfirmation>,
 ) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let handle = stored_plan_handle(plan_id)?;
@@ -467,12 +490,23 @@ pub async fn execute_instance_upgrade(
         shared_upgrade_mode,
         &state,
     )?;
-    ensure_upgrade_target_writable(
-        &state
-            .directories
-            .instances_dir()
-            .join(&metadata.instance.path),
+    let preview = super::preview_version_change(
+        &stored.plan.instance_id,
+        Some(super::VersionEnvironment::from(
+            &stored.plan.target_environment,
+        )),
     )
+    .await?;
+    if preview.source
+        != super::VersionEnvironment::from(&stored.plan.source_environment)
+    {
+        return Err(crate::ErrorKind::InputError("Instance environment changed since planning; create a new upgrade plan".into()).into());
+    }
+    super::version_change::validate_confirmation(
+        &preview,
+        confirmation.as_ref(),
+    )?;
+    ensure_upgrade_target_writable(&crate::launcher::instance_runtime::InstanceRuntimeAdapter::for_instance(&metadata.instance, &state.directories)?.game_dir())
     .await?;
     crate::state::instances::commands::validate_instance_upgrade_plan_source(
         &stored.plan,
@@ -514,6 +548,7 @@ pub async fn execute_instance_upgrade(
         }
     }
     let execution = InstanceUpgradeExecution {
+        confirmation,
         source_revision: stored.plan.source_revision,
         source_files: stored.plan.source_files.clone(),
         source_environment: stored.plan.source_environment.clone(),
@@ -568,10 +603,7 @@ fn ensure_upgrade_disk_space(
     shared_upgrade_mode: SharedUpgradeMode,
     state: &State,
 ) -> crate::Result<()> {
-    let instance_path = state
-        .directories
-        .instances_dir()
-        .join(&metadata.instance.path);
+    let instance_path = crate::launcher::instance_runtime::InstanceRuntimeAdapter::for_instance(&metadata.instance, &state.directories)?.game_dir();
     let canonical = crate::util::io::canonicalize(&instance_path)?;
     let disks = sysinfo::Disks::new_with_refreshed_list();
     let available = disks

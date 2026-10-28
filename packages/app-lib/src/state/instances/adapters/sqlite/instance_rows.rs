@@ -455,14 +455,7 @@ impl InstanceMetadataRow {
                 self.content_set_loader,
                 "instance_content_sets.loader",
             )?)?,
-            // Directly associated instances keep their loader managed by the
-            // external launcher; the parsed version is not a reliable display
-            // value, so it stays null for them.
-            loader_version: if self.linked_launcher.is_some() {
-                None
-            } else {
-                self.content_set_loader_version
-            },
+            loader_version: self.content_set_loader_version,
             revision: unsigned(
                 required_i64(
                     self.content_set_revision,

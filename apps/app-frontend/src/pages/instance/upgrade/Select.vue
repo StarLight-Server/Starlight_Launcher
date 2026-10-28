@@ -15,9 +15,25 @@
 					{{ formatMessage(messages.current) }}
 				</h3>
 				<p class="mb-1 mt-3 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.minecraftVersion, { version: instance.game_version }) }}
+					{{
+						formatMessage(messages.minecraftVersion, { version: currentEnvironment.gameVersion })
+					}}
 				</p>
 				<p class="m-0 text-secondary">{{ currentLoaderLabel }}</p>
+				<p v-if="environmentQuery.isPending.value" class="mb-0 mt-2 text-sm text-secondary">
+					{{ formatMessage(versionChangeMessages.loading) }}
+				</p>
+				<div
+					v-else-if="environmentQuery.isError.value"
+					class="mt-2 flex flex-col gap-2 text-sm text-orange"
+				>
+					<span>{{ formatMessage(versionChangeMessages.readError) }}</span>
+					<ButtonStyled
+						><button type="button" @click="environmentQuery.refetch()">
+							{{ formatMessage(versionChangeMessages.retry) }}
+						</button></ButtonStyled
+					>
+				</div>
 			</Card>
 
 			<Card class="!m-0 p-4">
@@ -69,15 +85,12 @@
 					>
 						{{ formatMessage(messages.fabricVersionsError) }}
 					</p>
-					<p v-else-if="manualFabricSelectionUnavailable" class="mb-0 mt-2 text-sm text-secondary">
-						{{ formatMessage(messages.manualFabricVersionUnavailable) }}
-					</p>
-					<p v-else-if="noNonDowngradeFabricVersion" class="mb-0 mt-2 text-sm text-orange">
-						{{ formatMessage(messages.noNonDowngradeFabricVersion) }}
+					<p v-else-if="noFabricVersion" class="mb-0 mt-2 text-sm text-orange">
+						{{ formatMessage(messages.noFabricVersion) }}
 					</p>
 				</template>
 				<p v-else-if="!isFabric" class="mb-0 mt-3 text-secondary">
-					{{ formatLoaderLabel(instance.loader) }}
+					{{ formatLoaderLabel(currentEnvironment.modLoader) }}
 				</p>
 			</Card>
 		</div>
@@ -115,6 +128,7 @@
 import { SpinnerIcon } from '@modrinth/assets'
 import {
 	Admonition,
+	ButtonStyled,
 	Card,
 	defineMessages,
 	DropdownSelect,
@@ -128,12 +142,13 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { useInstanceVersionEnvironment } from '@/composables/useInstanceVersionEnvironment'
 import { loadInstanceContentData } from '@/helpers/instance-content'
 import { plan_instance_upgrade } from '@/helpers/instance-upgrade'
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions } from '@/helpers/tags'
 import type { Manifest } from '@/helpers/types'
-import { compareSemanticVersions } from '@/helpers/version-compatibility'
+import { versionChangeMessages } from '@/helpers/version-change-messages'
 
 import {
 	AUTOMATIC_FABRIC_LOADER_VERSION,
@@ -183,13 +198,9 @@ const messages = defineMessages({
 		id: 'instance.upgrade.select.fabric-versions-error',
 		defaultMessage: 'Fabric versions could not be loaded. Automatic remains available.',
 	},
-	manualFabricVersionUnavailable: {
-		id: 'instance.upgrade.select.manual-fabric-version-unavailable',
-		defaultMessage: 'Manual Fabric version selection is unavailable.',
-	},
-	noNonDowngradeFabricVersion: {
-		id: 'instance.upgrade.select.no-non-downgrade-fabric-version',
-		defaultMessage: 'No Fabric version that avoids downgrading is available for this target.',
+	noFabricVersion: {
+		id: 'instance.upgrade.select.no-fabric-version',
+		defaultMessage: 'No Fabric version is available for this target Minecraft version.',
 	},
 	noNewerRelease: {
 		id: 'instance.upgrade.select.no-newer-release',
@@ -234,11 +245,13 @@ const route = useRoute()
 const router = useRouter()
 const { formatMessage } = useVIntl()
 const instance = computed(() => flow.instance.value)
+const { query: environmentQuery, environment: currentEnvironment } =
+	useInstanceVersionEnvironment(instance)
 const selectedGameVersion = ref<string | null>(flow.targetEnvironment.value?.gameVersion ?? null)
 const selectedFabricVersion = ref(
 	flow.targetEnvironment.value?.modLoaderVersion ?? AUTOMATIC_FABRIC_LOADER_VERSION,
 )
-const isFabric = computed(() => instance.value.loader === 'fabric')
+const isFabric = computed(() => currentEnvironment.value.modLoader === 'fabric')
 
 const gameVersionsQuery = useQuery({
 	queryKey: ['instance-upgrade', 'game-versions'],
@@ -259,32 +272,21 @@ const fabricLoaderVersionsQuery = useQuery({
 
 const versionTargets = computed(() => {
 	if (!gameVersionsQuery.data.value) return null
-	return newerStableGameVersions(gameVersionsQuery.data.value, instance.value.game_version)
+	return newerStableGameVersions(gameVersionsQuery.data.value, currentEnvironment.value.gameVersion)
 })
 const targetVersions = computed(() => versionTargets.value?.versions ?? [])
-const currentFabricVersionComparable = computed(
-	() =>
-		Boolean(instance.value.loader_version) &&
-		compareSemanticVersions(instance.value.loader_version!, instance.value.loader_version!) !==
-			null,
-)
 const availableFabricLoaderVersions = computed(() =>
 	fabricUpgradeLoaderVersions(
-		instance.value.loader_version,
 		loaderVersionsForGameVersion(
 			fabricLoaderVersionsQuery.data.value,
 			selectedGameVersion.value ?? '',
 		).map((version) => version.id),
 	),
 )
-const manualFabricSelectionUnavailable = computed(
-	() => isFabric.value && !currentFabricVersionComparable.value,
-)
-const noNonDowngradeFabricVersion = computed(
+const noFabricVersion = computed(
 	() =>
 		isFabric.value &&
 		fabricLoaderVersionsQuery.isSuccess.value &&
-		currentFabricVersionComparable.value &&
 		availableFabricLoaderVersions.value.length === 0,
 )
 const fabricLoaderOptions = computed(() => {
@@ -296,8 +298,9 @@ const fabricLoaderOptions = computed(() => {
 	return [AUTOMATIC_FABRIC_LOADER_VERSION, ...exactVersions]
 })
 const currentLoaderLabel = computed(() => {
-	const loader = formatLoaderLabel(instance.value.loader)
-	return instance.value.loader_version ? `${loader} ${instance.value.loader_version}` : loader
+	const loader = formatLoaderLabel(currentEnvironment.value.modLoader)
+	const version = currentEnvironment.value.modLoaderVersion
+	return version ? `${loader} ${version}` : loader
 })
 const snapshotItemCount = computed(() => contentDataQuery.data.value?.snapshot.items.length ?? 0)
 const canPlan = computed(
@@ -306,11 +309,11 @@ const canPlan = computed(
 		targetVersions.value.includes(selectedGameVersion.value) &&
 		!flow.busy.value &&
 		!gameVersionsQuery.isError.value &&
+		environmentQuery.isSuccess.value &&
 		(!isFabric.value ||
 			(selectedFabricVersion.value === AUTOMATIC_FABRIC_LOADER_VERSION &&
 				automaticFabricLoaderTargetAvailable(
 					fabricLoaderVersionsQuery.isSuccess.value,
-					currentFabricVersionComparable.value,
 					availableFabricLoaderVersions.value,
 				)) ||
 			availableFabricLoaderVersions.value.includes(selectedFabricVersion.value)),
@@ -349,7 +352,7 @@ const requestedTargetEnvironment = computed(() =>
 	selectedGameVersion.value
 		? {
 				gameVersion: selectedGameVersion.value,
-				modLoader: instance.value.loader,
+				modLoader: currentEnvironment.value.modLoader,
 				modLoaderVersion: isFabric.value
 					? fabricLoaderVersionForTarget(selectedFabricVersion.value)
 					: null,

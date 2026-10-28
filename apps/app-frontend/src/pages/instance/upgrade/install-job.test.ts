@@ -3,6 +3,7 @@ import test from 'node:test'
 
 import type { InstallJobSnapshot, InstallJobStatus } from '@/helpers/install'
 import type { InstanceUpgradeResult } from '@/helpers/instance-upgrade'
+import type { VersionChangeConfirmation } from '@/helpers/version-change-consent'
 
 import {
 	isInstanceUpgradeJobWith,
@@ -139,6 +140,35 @@ const displayNames = {
 	upgradedTarget: 'Target',
 	shouldAutoRename: false,
 }
+
+test('upgrade submission forwards the confirmed source and both risk decisions to execution', async () => {
+	const confirmation: VersionChangeConfirmation = {
+		source: { gameVersion: '26.1.2', modLoader: 'fabric', modLoaderVersion: '0.19.5' },
+		linkedInstance: true,
+		loaderDowngrade: true,
+	}
+	let received: VersionChangeConfirmation | undefined
+	await submitInstanceUpgradeWith(
+		{
+			instanceId: 'instance-a',
+			planId: 'consented',
+			createFullBackup: true,
+			sharedUpgradeMode: 'direct',
+			displayNames,
+			confirmation,
+		},
+		{ value: false },
+		{
+			listJobs: async () => [],
+			instanceIdOf,
+			execute: async (_plan, _backup, _mode, _names, consent) => {
+				received = consent
+				return job('consented-job', 'queued')
+			},
+		},
+	)
+	assert.deepEqual(received, confirmation)
+})
 
 test('normal, shared direct, and copy submissions pass exact execution parameters', async () => {
 	const calls: unknown[][] = []

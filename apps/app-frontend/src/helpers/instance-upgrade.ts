@@ -2,6 +2,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { InstallJobSnapshot } from './install'
 import type { InstanceLoader } from './types'
+import type { VersionChangeConfirmation } from './version-change-consent'
 
 export type ContentProvider = 'modrinth' | 'curseforge' | 'local'
 export type InstanceUpgradeProjectType =
@@ -265,11 +266,13 @@ export async function execute_instance_upgrade(
 	createFullBackup: boolean,
 	sharedUpgradeMode: SharedUpgradeMode,
 	displayNames: InstanceUpgradeDisplayNames,
+	confirmation?: VersionChangeConfirmation,
 ): Promise<InstallJobSnapshot> {
 	return await invoke('plugin:instance|instance_execute_upgrade', {
 		planId,
 		createFullBackup,
 		sharedUpgradeMode,
 		displayNames,
+		confirmation,
 	})
 }

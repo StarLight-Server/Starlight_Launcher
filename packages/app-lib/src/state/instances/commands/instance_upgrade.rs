@@ -280,10 +280,27 @@ pub(crate) async fn create_instance_upgrade_plan_with_source(
         )
         .into());
     }
+    let observed = crate::api::instance::version_change::linked_environment(
+        &metadata.instance,
+        &metadata.applied_content_set.game_version,
+    )?;
     let source_environment = InstanceUpgradeEnvironment {
-        game_version: metadata.applied_content_set.game_version.clone(),
-        mod_loader: metadata.applied_content_set.loader,
-        mod_loader_version: metadata.applied_content_set.loader_version.clone(),
+        game_version: observed
+            .as_ref()
+            .map(|value| value.game_version.clone())
+            .unwrap_or_else(|| {
+                metadata.applied_content_set.game_version.clone()
+            }),
+        mod_loader: observed
+            .as_ref()
+            .map(|value| value.mod_loader)
+            .unwrap_or(metadata.applied_content_set.loader),
+        mod_loader_version: observed
+            .as_ref()
+            .map(|value| value.mod_loader_version.clone())
+            .unwrap_or_else(|| {
+                metadata.applied_content_set.loader_version.clone()
+            }),
         shader_runtime: source_shader_runtime(
             &metadata.loader_components,
             &snapshot,
@@ -386,7 +403,7 @@ async fn read_only_upgrade_source(
     .ok_or_else(|| crate::ErrorKind::InputError("Unknown instance".to_string()))?;
     let scanned =
         crate::state::instances::adapters::filesystem::scan_content_files_from(
-            &state.directories.instance_game_dir(&instance),
+            &crate::launcher::instance_runtime::InstanceRuntimeAdapter::for_instance(&instance, &state.directories)?.game_dir(),
             &instance.path,
         )?;
     let file_states = scanned
@@ -398,7 +415,7 @@ async fn read_only_upgrade_source(
             modified: file.modified,
         })
         .collect();
-    let instance_dir = state.directories.instance_game_dir(&instance);
+    let instance_dir = crate::launcher::instance_runtime::InstanceRuntimeAdapter::for_instance(&instance, &state.directories)?.game_dir();
     let mut scanned_by_path = HashMap::new();
     let mut source_files = Vec::new();
     for file in scanned {

@@ -66,6 +66,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_select_upgrade_solution,
             instance_resolve_custom_upgrade_solution,
             instance_execute_upgrade,
+            instance_preview_version_change,
+            instance_change_version,
             instance_get_post_upgrade_notice,
             instance_dismiss_post_upgrade_notice,
             instance_get_dependencies_as_content_items,
@@ -892,14 +894,18 @@ pub async fn instance_execute_upgrade(
     create_full_backup: bool,
     shared_upgrade_mode: theseus::install::SharedUpgradeMode,
     display_names: Option<theseus::install::InstanceUpgradeDisplayNames>,
+    confirmation: Option<theseus::instance::VersionChangeConfirmation>,
 ) -> Result<theseus::install::InstallJobSnapshot> {
-    Ok(theseus::instance::execute_instance_upgrade(
-        plan_id,
-        create_full_backup,
-        shared_upgrade_mode,
-        display_names.unwrap_or_default(),
+    Ok(
+        theseus::instance::execute_instance_upgrade_with_confirmation(
+            plan_id,
+            create_full_backup,
+            shared_upgrade_mode,
+            display_names.unwrap_or_default(),
+            confirmation,
+        )
+        .await?,
     )
-    .await?)
 }
 
 #[tauri::command]
@@ -2152,4 +2158,24 @@ pub async fn instance_update_synced_server(
 pub async fn instance_remove_synced_server(id: String) -> Result<()> {
     theseus::instance::remove_synced_server(&id).await?;
     Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_preview_version_change(
+    instance_id: &str,
+    target: Option<theseus::instance::VersionEnvironment>,
+) -> Result<theseus::instance::VersionChangePreview> {
+    Ok(theseus::instance::preview_version_change(instance_id, target).await?)
+}
+
+#[tauri::command]
+pub async fn instance_change_version(
+    instance_id: String,
+    target: theseus::instance::VersionEnvironment,
+    confirmation: theseus::instance::VersionChangeConfirmation,
+) -> Result<theseus::install::InstallJobSnapshot> {
+    Ok(
+        theseus::instance::change_version(instance_id, target, confirmation)
+            .await?,
+    )
 }

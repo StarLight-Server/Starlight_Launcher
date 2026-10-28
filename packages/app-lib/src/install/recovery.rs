@@ -280,9 +280,7 @@ async fn prepare_existing_content_rollback_with_scope(
     })?;
     let instance_id = rollback.instance.instance.id.clone();
     let content_set_id = rollback.instance.applied_content_set.id.clone();
-    let instance_base = state
-        .directories
-        .instance_game_dir(&rollback.instance.instance);
+    let instance_base = crate::launcher::instance_runtime::InstanceRuntimeAdapter::for_instance(&rollback.instance.instance, &state.directories)?.game_dir();
     let _instance_lock = state.lock_instance_content(&instance_id).await;
 
     let all_entries =
@@ -509,10 +507,14 @@ async fn restore_existing_instance(
         )
         .into());
     }
-    let instance_base = state
-        .directories
-        .instance_game_dir(&rollback.instance.instance);
+    let instance_base = crate::launcher::instance_runtime::InstanceRuntimeAdapter::for_instance(&rollback.instance.instance, &state.directories)?.game_dir();
     let _instance_lock = state.lock_instance_content(instance_id).await;
+
+    let profile_result = rollback
+        .linked_profile
+        .as_ref()
+        .map(crate::launcher::linked_version_change::restore_profile)
+        .transpose();
 
     if rollback.content.is_some() {
         clean_replacement_files(job_state, &instance_base, state).await?;
@@ -521,6 +523,7 @@ async fn restore_existing_instance(
     }
     let metadata = job_state.rollback.as_ref().unwrap().instance.clone();
     crate::state::restore_instance_metadata(&metadata, &state.pool).await?;
+    profile_result?;
     verify_restored_snapshot(job_state, &instance_base, state).await?;
     discard_content_rollback(job_state, state).await?;
     Ok(())
@@ -1146,6 +1149,7 @@ mod tests {
         };
         let mut job_state = InstallJobState::new(request);
         job_state.rollback = Some(InstallRollbackState {
+            linked_profile: None,
             instance: original.clone(),
             install_stage: InstanceInstallStage::Installed,
             content: None,
