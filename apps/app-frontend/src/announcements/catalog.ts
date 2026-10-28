@@ -33,6 +33,45 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.2-beta17',
+		version: '1.0.2-beta17',
+		publishedAt: '2026-10-28',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.2-beta17',
+			'zh-CN': 'Starlight Launcher 1.0.2-beta17',
+		},
+		changes: {
+			changed: [
+				{
+					'en-US':
+						'StarLight Mod downloads now use mod-download.starlight.cool. External CurseForge and Modrinth files, including redirected downloads, follow their respective download source settings; StarLight-hosted files continue using the original server.',
+					'zh-CN':
+						'StarLight Mod 下载切换至 mod-download.starlight.cool；CurseForge、Modrinth 外链及跳转下载遵循各自的下载源设置，StarLight 自托管文件继续使用原站。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'Reuse Mods already synchronized by AutoModSync after verifying their contents, preserving existing filenames and avoiding repeated downloads when the launcher cache is missing.',
+					'zh-CN':
+						'校验并复用 AutoModSync 已同步的 Mod，保留现有文件名，避免因文件名不同或启动器缓存缺失而重复下载。',
+				},
+				{
+					'en-US':
+						'Fixed cleanup mistakenly deleting AutoModSync-managed files sharing the .starlight.jar suffix. Borrowed files retain their ownership, and conflicting versions are reported before modifying the instance.',
+					'zh-CN':
+						'修复清理时误删共用 .starlight.jar 后缀的 AutoModSync 文件；保留借用文件归属，并在修改实例前提示版本冲突。',
+				},
+			],
+		},
+		notes: {
+			'en-US':
+				'Test release focused on StarLight downloads and AutoModSync compatibility. Files with different contents still require an update or conflict resolution. AutoModSync itself is unchanged.',
+			'zh-CN':
+				'本测试版重点验证 StarLight 下载和 AutoModSync 兼容性；内容确实不同时仍需更新或处理冲突，AutoModSync 本身未改动。',
+		},
+	},
+	{
 		id: 'launcher-1.0.2',
 		version: '1.0.2',
 		publishedAt: '2026-10-25',
@@ -82,8 +121,7 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 					'zh-CN': '公告中心：可在启动器内浏览版本更新日志与社区公告。',
 				},
 				{
-					'en-US':
-						'Anniversary easter egg on October 4th, with extra hidden triggers to discover.',
+					'en-US': 'Anniversary easter egg on October 4th, with extra hidden triggers to discover.',
 					'zh-CN': '每年 10 月 4 日的周年庆彩蛋，另藏有其他触发方式等你发现。',
 				},
 			],
@@ -94,13 +132,11 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 					'zh-CN': '皮肤站不再依赖内嵌网页，全部界面改为启动器原生实现。',
 				},
 				{
-					'en-US':
-						'Modpack downloads are served from a dedicated download domain.',
+					'en-US': 'Modpack downloads are served from a dedicated download domain.',
 					'zh-CN': '整合包下载改由独立下载域名提供。',
 				},
 				{
-					'en-US':
-						'The launcher repository was renamed to Starlight_Launcher.',
+					'en-US': 'The launcher repository was renamed to Starlight_Launcher.',
 					'zh-CN': '启动器仓库更名为 Starlight_Launcher。',
 				},
 			],
@@ -108,14 +144,12 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 				{
 					'en-US':
 						'Security fixes backported from upstream: modpack path traversal patches now protect installs from unsafe paths.',
-					'zh-CN':
-						'合入上游安全修复：整合包路径穿越补丁现已保护安装过程免受不安全路径影响。',
+					'zh-CN': '合入上游安全修复：整合包路径穿越补丁现已保护安装过程免受不安全路径影响。',
 				},
 				{
 					'en-US':
 						'Fixed live logs falling behind and crash-log uploads failing; LogShare collection was switched to a lightweight collector.',
-					'zh-CN':
-						'修复实时日志积压与崩溃日志上传失败；LogShare 采集改用轻量日志收集器。',
+					'zh-CN': '修复实时日志积压与崩溃日志上传失败；LogShare 采集改用轻量日志收集器。',
 				},
 				{
 					'en-US':
@@ -182,8 +216,7 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 					'zh-CN': '修复切换玩家后皮肤预览出现纹理错乱的问题。',
 				},
 				{
-					'en-US':
-						'Fixed instance group changes only showing up after refreshing the page.',
+					'en-US': 'Fixed instance group changes only showing up after refreshing the page.',
 					'zh-CN': '修复实例分组修改后需要刷新页面才能生效的问题。',
 				},
 				{
@@ -236,7 +269,8 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 			],
 			fixed: [
 				{
-					'en-US': 'Fixed the downloads page reporting a sign-in error even when already signed in.',
+					'en-US':
+						'Fixed the downloads page reporting a sign-in error even when already signed in.',
 					'zh-CN': '修复资源下载页在已登录状态下仍提示未登录的问题。',
 				},
 				{
@@ -246,7 +280,8 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 						'修复管理面板不显示用户权限组、公告发布人显示为 UUID、审核作答显示选项 ID 的问题。',
 				},
 				{
-					'en-US': 'Fixed the wiki opening a blank page and internal links not navigating correctly.',
+					'en-US':
+						'Fixed the wiki opening a blank page and internal links not navigating correctly.',
 					'zh-CN': '修复维基首次打开为空白、内部链接跳转异常的问题。',
 				},
 				{
@@ -270,7 +305,8 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 					'zh-CN': '修复验证码图片被裁切、缺少旋转提示的问题。',
 				},
 				{
-					'en-US': 'The skin-site player list now retries automatically and shows an error state after failures.',
+					'en-US':
+						'The skin-site player list now retries automatically and shows an error state after failures.',
 					'zh-CN': '皮肤站玩家列表加载失败后自动重试，并显示错误状态。',
 				},
 			],

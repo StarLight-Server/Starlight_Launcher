@@ -27,10 +27,6 @@ impl TaggedManifest {
         self.files.iter().any(|tagged| tagged.sha256 == file.sha256)
     }
 
-    pub fn contains(&self, path: &str) -> bool {
-        self.files.iter().any(|file| file.path == path)
-    }
-
     pub fn validate(&self) -> crate::Result<()> {
         if self.files.len() > 8192 {
             return Err(invalid("标签 Mod 数量过多"));
@@ -122,7 +118,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn removes_orphaned_managed_mods_even_when_no_tags_are_selected() {
+    async fn untracked_auto_mod_sync_files_survive_without_selected_tags() {
         let root = tempfile::tempdir().unwrap();
         let stale = write_mod(root.path(), "example.starlight.jar", "example");
         let personal = write_mod(root.path(), "personal.jar", "personal");
@@ -138,26 +134,71 @@ mod tests {
         )
         .await
         .unwrap();
-        assert_eq!(actions.len(), 1);
-        assert_eq!(actions[0].path, "mods/example.starlight.jar");
-        assert!(actions[0].next_hash.is_none());
-        // Planning must not touch the files; application uses the normal backup transaction.
+        assert!(actions.is_empty());
         assert!(stale.is_file());
         assert!(personal.is_file());
-        let backup = ".starlight-pack-backup-orphan-test";
-        apply_files(root.path(), &root.path().join("cache"), backup, &actions)
+    }
+
+    #[tokio::test]
+    async fn untracked_auto_mod_sync_files_survive_unrelated_tag_updates() {
+        let root = tempfile::tempdir().unwrap();
+        let local = write_mod(
+            root.path(),
+            "Server Addon.starlight.jar",
+            "server_addon",
+        );
+        let actions = merge(
+            root.path(),
+            &root.path().join("cache"),
+            &mut vec![],
+            &mut BTreeMap::new(),
+            &manifest(),
+        )
+        .await
+        .unwrap();
+        assert!(actions.is_empty());
+        assert!(local.is_file());
+    }
+
+    #[tokio::test]
+    async fn verified_auto_mod_sync_filename_is_kept_through_staged_reconciliation()
+     {
+        let root = tempfile::tempdir().unwrap();
+        let local =
+            write_mod(root.path(), "Example 1.0.starlight.jar", "example");
+        let mut tagged = manifest();
+        tagged.files[0].sha256 = hash(&local).await.unwrap().unwrap();
+        tagged.files[0].size = std::fs::metadata(&local).unwrap().len();
+        let cache = root.path().join("cache");
+        let mut files = vec![];
+        let mut sources = BTreeMap::new();
+        merge(root.path(), &cache, &mut files, &mut sources, &tagged)
             .await
             .unwrap();
-        assert!(!stale.exists());
-        assert!(
-            root.path()
-                .join(backup)
-                .join("mods/example.starlight.jar")
-                .is_file()
-        );
-        assert!(personal.is_file());
-        restore_files(root.path(), backup, &actions).await.unwrap();
-        assert!(stale.is_file());
+        let borrowed = local_mods::LocalMods::new(root.path())
+            .adopt_paths(&mut files, &mut sources, None)
+            .await
+            .unwrap();
+        let mut actions = vec![];
+        let duplicates = reconcile_staged(
+            root.path(),
+            &cache,
+            &mut files,
+            &mut sources,
+            &tagged,
+            &mut actions,
+        )
+        .await
+        .unwrap();
+        assert!(actions.is_empty());
+        assert!(duplicates.is_empty());
+        assert_eq!(files[0].path, "mods/Example 1.0.starlight.jar");
+        assert!(borrowed.contains(&files[0].path));
+        assert!(tagged.includes_content(&files[0]));
+        assert!(sources[&files[0].path].contains("/tagged-files/"));
+        assert!(local.is_file());
+        assert!(!cache.exists());
+        assert!(!root.path().join("mods/example.starlight.jar").exists());
     }
 
     #[tokio::test]
@@ -433,10 +474,6 @@ mod tests {
 
     #[test]
     fn multi_mod_jar_cannot_be_partially_replaced() {
-        assert!(is_managed_file(&manifest().files[0].pack_file()));
-        let mut custom = manifest().files[0].pack_file();
-        custom.path = "mods/personal.jar".into();
-        assert!(!is_managed_file(&custom));
         let declared = vec!["example".into(), "companion".into()];
         assert!(replaces_ids(&declared, &HashSet::from(["example"])).is_err());
         assert!(
@@ -464,18 +501,10 @@ impl TaggedFile {
     }
 }
 
-fn is_mod_path(path: &str) -> bool {
+pub(super) fn is_mod_path(path: &str) -> bool {
     path.starts_with("mods/")
         && path.to_ascii_lowercase().ends_with(".jar")
         && path.split('/').count() == 2
-}
-
-pub(super) fn is_managed_file(file: &PackFile) -> bool {
-    file.external.is_none()
-        && file
-            .mod_ids
-            .iter()
-            .any(|id| file.path == format!("mods/{id}.starlight.jar"))
 }
 
 fn replaces_ids(
@@ -607,13 +636,11 @@ pub(super) async fn merge(
                 continue;
             }
             let local = target(root, &path)?;
-            // This suffix is the launcher's managed namespace. Clean orphaned
-            // tagged JARs even if the user no longer has any selected tags or
-            // the old binding did not record them. Ordinary user JARs require
-            // a confirmed identity overlap and retain the multi-Mod guard.
-            if path.to_ascii_lowercase().ends_with(".starlight.jar")
-                || (!ids.is_empty()
-                    && replaces_ids(&mod_ids(local.clone()).await?, &ids)?)
+            // AutoModSync shares the suffix. Only a confirmed identity
+            // conflict with desired tags authorizes duplicate replacement;
+            // obsolete launcher-owned files are handled by the saved binding.
+            if !ids.is_empty()
+                && replaces_ids(&mod_ids(local.clone()).await?, &ids)?
             {
                 duplicate_actions.push(Action {
                     path,

@@ -1,5 +1,6 @@
 //! Administrator-approved skin-site packs. Only content-addressed changed files cross the network.
 mod control;
+mod local_mods;
 mod progress;
 pub use control::{HostedTaskState, cancel, pause, resume};
 mod tagged;
@@ -33,7 +34,7 @@ use tokio::{
     sync::{Mutex, OwnedMutexGuard},
 };
 
-const API: &str = "https://download.starlight.cool:20443/starlight/mod/packs";
+const API: &str = "https://mod-download.starlight.cool/starlight/mod/packs";
 const STARLIGHT_YGGDRASIL_API_ROOT: &str =
     "https://skin.starlight.cool/yggdrasil";
 const ACCOUNT_REQUIRED_MESSAGE: &str = "您需要登录正版或皮肤站账号后才能操作";
@@ -143,6 +144,9 @@ pub struct Binding {
     pub sync_marker: Option<String>,
     #[serde(default)]
     pub resolved_external: Vec<PackFile>,
+    /// Verified pre-existing Mods borrowed from AutoModSync or the user.
+    #[serde(default)]
+    pub borrowed_files: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -321,6 +325,21 @@ async fn hash(path: &Path) -> crate::Result<Option<String>> {
         digest.update(&buffer[..n]);
     }
     Ok(Some(format!("{:x}", digest.finalize())))
+}
+
+fn obsolete_file_action(
+    prior: &PackFile,
+    local_hash: String,
+    borrowed: bool,
+) -> Option<Action> {
+    if borrowed || prior.preserve || local_hash != prior.sha256 {
+        return None;
+    }
+    Some(Action {
+        path: prior.path.clone(),
+        old_hash: Some(local_hash),
+        next_hash: None,
+    })
 }
 async fn read_json<T: serde::de::DeserializeOwned>(
     root: &Path,
@@ -904,6 +923,18 @@ async fn running_pack_matches(
 ) -> crate::Result<bool> {
     let mut desired = previous.publication.manifest.files.clone();
     desired.extend(previous.resolved_external.iter().cloned());
+    tagged::merge(
+        root,
+        &target(root, ".starlight-pack-cache")?,
+        &mut desired,
+        &mut BTreeMap::new(),
+        tagged,
+    )
+    .await?;
+    let mut local_mods = local_mods::LocalMods::new(root);
+    local_mods
+        .adopt_paths(&mut desired, &mut BTreeMap::new(), Some(previous))
+        .await?;
     let duplicates = tagged::merge(
         root,
         &target(root, ".starlight-pack-cache")?,
@@ -912,6 +943,10 @@ async fn running_pack_matches(
         tagged,
     )
     .await?;
+    let mut previous_files = previous.files.clone();
+    local_mods
+        .adopt_paths(&mut previous_files, &mut BTreeMap::new(), Some(previous))
+        .await?;
     validate(&desired)?;
     let inventory = |files: &[PackFile]| {
         files
@@ -920,7 +955,7 @@ async fn running_pack_matches(
             .collect::<BTreeMap<_, _>>()
     };
     if !duplicates.is_empty()
-        || inventory(&desired) != inventory(&previous.files)
+        || inventory(&desired) != inventory(&previous_files)
     {
         return Ok(false);
     }
@@ -1031,6 +1066,7 @@ async fn synchronize_with_progress(
     let cache = target(&root, ".starlight-pack-cache")?;
     tokio::fs::create_dir_all(&cache).await?;
     let state = State::get().await?;
+    let mut local_mods = local_mods::LocalMods::new(&root);
     let mut files = manifest.files.clone();
     let tagged_manifest = request_authorized::<tagged::TaggedManifest>(
         &format!("/tagged-mods/{}", publication.release_id),
@@ -1094,13 +1130,13 @@ async fn synchronize_with_progress(
             &cache,
             &format!("cf-{}-{}", external.project_id, external.file_id),
         )?;
-        let local = target(&root, &path)?;
-        if !staged.exists()
-            && local.is_file()
-            && crate::util::fetch::sha1_file_async(&local).await?
-                == (cf.file_length, sha1.clone())
-        {
-            tokio::fs::copy(&local, &staged).await?;
+        if !staged.exists() {
+            local_mods
+                .stage(
+                    &staged,
+                    &Integrity::sha1(sha1.clone()).with_size(cf.file_length),
+                )
+                .await?;
         }
         if !staged.exists() {
             let url = match cf.download_url {
@@ -1166,6 +1202,9 @@ async fn synchronize_with_progress(
     }
     tagged::merge(&root, &cache, &mut files, &mut sources, &tagged_manifest)
         .await?;
+    let mut borrowed_files = local_mods
+        .adopt_paths(&mut files, &mut sources, previous.as_ref())
+        .await?;
     validate(&files)?;
     if let Some(old) = &previous {
         validate(&old.files)?;
@@ -1193,7 +1232,7 @@ async fn synchronize_with_progress(
     }
     for (index, f) in files.iter().enumerate() {
         if pack_unchanged
-            && !tagged_manifest.contains(&f.path)
+            && !tagged_manifest.includes_content(f)
             && old
                 .get(f.path.as_str())
                 .is_some_and(|prior| prior.sha256 == f.sha256)
@@ -1228,7 +1267,18 @@ async fn synchronize_with_progress(
             )));
         }
         let object = target(&cache, &f.sha256)?;
-        if hash(&object).await?.as_deref() != Some(&f.sha256) {
+        if hash(&object).await?.as_deref() != Some(&f.sha256)
+            && !local_mods
+                .stage(
+                    &object,
+                    &Integrity {
+                        size: Some(f.size),
+                        sha256: Some(f.sha256.clone()),
+                        ..Default::default()
+                    },
+                )
+                .await?
+        {
             let url = sources
                 .get(&f.path)
                 .ok_or_else(|| invalid("Missing modpack download source"))?;
@@ -1248,22 +1298,21 @@ async fn synchronize_with_progress(
             if local.is_none() {
                 continue;
             }
-            if !tagged::is_managed_file(prior)
-                && (prior.preserve || local.as_deref() != Some(&prior.sha256))
-            {
-                preserved.push(prior.path.clone());
-                continue;
-            }
-            actions.push(Action {
-                path: prior.path.clone(),
-                old_hash: local,
-                next_hash: None,
+            let borrowed = previous.as_ref().is_some_and(|binding| {
+                binding.borrowed_files.contains(&prior.path)
             });
+            if let Some(action) =
+                obsolete_file_action(prior, local.unwrap(), borrowed)
+            {
+                actions.push(action);
+            } else {
+                preserved.push(prior.path.clone());
+            }
         }
     }
     let mut tagged_downloads = Vec::new();
     pending_downloads.retain(|_, (file, url, object)| {
-        if tagged_manifest.contains(&file.path) {
+        if tagged_manifest.includes_content(file) {
             tagged_downloads.push((file.clone(), url.clone(), object.clone()));
             false
         } else {
@@ -1405,12 +1454,16 @@ async fn synchronize_with_progress(
         &mut actions,
     )
     .await?;
+    borrowed_files.retain(|path| files.iter().any(|file| &file.path == path));
+    let borrowed_files = borrowed_files.into_iter().collect::<Vec<_>>();
     for action in duplicate_mods {
         preserved.retain(|path| path != &action.path);
         if !actions.iter().any(|existing| existing.path == action.path) {
             actions.push(action);
         }
     }
+    local_mods::ensure_preserved_compatible(&root, &cache, &files, &preserved)
+        .await?;
     if actions.is_empty()
         && !runtime_changed
         && metadata.instance.install_stage == InstanceInstallStage::Installed
@@ -1418,6 +1471,7 @@ async fn synchronize_with_progress(
             b.sync_marker.as_deref() == Some(sync_marker.as_str())
                 && b.files == files
                 && b.resolved_external == resolved_external
+                && b.borrowed_files == borrowed_files
         })
     {
         return Ok(SyncResult {
@@ -1485,7 +1539,7 @@ async fn synchronize_with_progress(
                 root.display()
             )))?;
         progress.update(0, 0, "正在完成安装", true);
-        write_json(&root, BINDING, &Binding { publication: publication.clone(), files, sync_marker: Some(sync_marker), resolved_external })
+        write_json(&root, BINDING, &Binding { publication: publication.clone(), files, sync_marker: Some(sync_marker), resolved_external, borrowed_files })
             .map_err(|error| error.with_context(format!(
                 "写入 StarLight 整合包绑定信息失败；实例目录：{}",
                 root.display()
@@ -1627,6 +1681,85 @@ mod tests {
         state.pack_id = "pack".into();
         state.marker = "pack:4".into();
         assert!(!marker_matches(&binding, &state));
+    }
+
+    #[tokio::test]
+    async fn running_pack_accepts_verified_auto_mod_sync_renames() {
+        use std::io::Write;
+        let root = tempfile::tempdir().unwrap();
+        let mods = root.path().join("mods");
+        std::fs::create_dir(&mods).unwrap();
+        let original = mods.join("example.starlight.jar");
+        let mut zip =
+            zip::ZipWriter::new(std::fs::File::create(&original).unwrap());
+        zip.start_file(
+            "fabric.mod.json",
+            zip::write::SimpleFileOptions::default(),
+        )
+        .unwrap();
+        zip.write_all(br#"{"schemaVersion":1,"id":"example","version":"1"}"#)
+            .unwrap();
+        zip.finish().unwrap();
+        let sha = hash(&original).await.unwrap().unwrap();
+        let size = std::fs::metadata(&original).unwrap().len();
+        let previous: Binding = serde_json::from_value(serde_json::json!({
+            "publication":{"packId":"pack","releaseId":1,"manifest":{
+                "schemaVersion":1,"name":"Pack","version":"1","format":"multimc",
+                "runtime":{"gameVersion":"1.21.1","loader":"vanilla"},"files":[]}},
+            "files":[{"path":"mods/example.starlight.jar","sha256":sha,"size":size,"modIds":["example"],"force":true}]
+        })).unwrap();
+        let tagged: tagged::TaggedManifest = serde_json::from_value(serde_json::json!({
+            "files":[{"modId":"example","modIds":["example"],"path":"mods/example.starlight.jar","sha256":sha,"size":size}],
+            "replaces":[]
+        })).unwrap();
+        let renamed = mods.join("Example 1.0.starlight.jar");
+        tokio::fs::rename(&original, &renamed).await.unwrap();
+        assert!(
+            running_pack_matches(root.path(), &previous, &tagged)
+                .await
+                .unwrap()
+        );
+        assert!(renamed.is_file());
+        assert!(!original.exists());
+        assert!(!root.path().join(JOURNAL).exists());
+        assert!(!root.path().join(".starlight-pack-cache").exists());
+    }
+
+    #[tokio::test]
+    async fn obsolete_cleanup_preserves_borrowed_or_changed_files_and_remains_recoverable()
+     {
+        let root = tempfile::tempdir().unwrap();
+        let mods = root.path().join("mods");
+        tokio::fs::create_dir(&mods).await.unwrap();
+        let local = mods.join("example.starlight.jar");
+        tokio::fs::write(&local, b"installed").await.unwrap();
+        let sha = hash(&local).await.unwrap().unwrap();
+        let mut prior = PackFile {
+            path: "mods/example.starlight.jar".into(),
+            sha256: sha.clone(),
+            size: 9,
+            mod_ids: vec!["example".into()],
+            external: None,
+            force: true,
+            preserve: false,
+        };
+        assert!(obsolete_file_action(&prior, sha.clone(), true).is_none());
+        assert!(
+            obsolete_file_action(&prior, "different".into(), false).is_none()
+        );
+        prior.preserve = true;
+        assert!(obsolete_file_action(&prior, sha.clone(), false).is_none());
+        prior.preserve = false;
+        let action = obsolete_file_action(&prior, sha, false).unwrap();
+        let actions = [action];
+        let backup = ".starlight-pack-backup-owned-test";
+        apply_files(root.path(), &root.path().join("cache"), backup, &actions)
+            .await
+            .unwrap();
+        assert!(!local.exists());
+        assert!(root.path().join(backup).join(&prior.path).is_file());
+        restore_files(root.path(), backup, &actions).await.unwrap();
+        assert_eq!(tokio::fs::read(local).await.unwrap(), b"installed");
     }
     #[test]
     fn download_session_uses_site_token_without_a_game_profile() {
