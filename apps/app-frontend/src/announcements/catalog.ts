@@ -33,6 +33,25 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.3-beta1',
+		version: '1.0.3-beta1',
+		publishedAt: '2026-10-28',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.3-beta1',
+			'zh-CN': 'Starlight Launcher 1.0.3-beta1',
+		},
+		changes: {
+			fixed: [
+				{
+					'en-US':
+						'Fixed download status labels wrapping between characters when file paths are long. Status labels now stay on one line, and the provider and status move together to the next row when space is limited.',
+					'zh-CN':
+						'修复下载卡片在文件路径较长时，“进行中”等状态文字异常换行的问题。状态标签保持单行，空间不足时来源和状态区域整体换到下一行。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-1.0.2-beta18',
 		version: '1.0.2-beta18',
 		publishedAt: '2026-10-28',

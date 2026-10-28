@@ -1,5 +1,5 @@
 <template>
-	<span :class="'version-badge ' + color + ' type--' + type">
+	<span class="shrink-0 whitespace-nowrap" :class="'version-badge ' + color + ' type--' + type">
 		<template v-if="color"> <span class="circle" /> {{ capitalizeString(type) }}</template>
 
 		<!-- User roles -->
