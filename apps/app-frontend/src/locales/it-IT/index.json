@@ -14378,9 +14378,6 @@
   "instance.upgrade.select.loading-versions": {
     "message": "Loading Minecraft versions…"
   },
-  "instance.upgrade.select.manual-fabric-version-unavailable": {
-    "message": "Manual Fabric version selection is unavailable."
-  },
   "instance.upgrade.select.metadata-error-body": {
     "message": "Check your connection and try again."
   },
@@ -14395,9 +14392,6 @@
   },
   "instance.upgrade.select.no-newer-release": {
     "message": "This instance already uses the latest stable Minecraft version."
-  },
-  "instance.upgrade.select.no-non-downgrade-fabric-version": {
-    "message": "No Fabric version that avoids downgrading is available for this target."
   },
   "instance.upgrade.select.planning-error-title": {
     "message": "Compatibility analysis failed"
@@ -14719,5 +14713,71 @@
   },
   "unknown-pack-warning-modal.warning.title": {
     "message": "Tipo di file sconosciuto"
+  },
+  "app.skin-site.home.preview.skin-failed": {
+    "message": "Could not load this skin."
+  },
+  "app.skin-site.home.preview.cape-failed": {
+    "message": "Could not load this cape."
+  },
+  "app.skin-site.home.preview.manage": {
+    "message": "Manage skin"
+  },
+  "app.skin-site.home.preview.choose": {
+    "message": "Select a player"
+  },
+  "app.skin-site.home.preview.choose-hint": {
+    "message": "Choose a player on the left to preview their skin."
+  },
+  "app.skin-site.home.preview.skin-loading": {
+    "message": "Loading skin…"
+  },
+  "app.skin-site.home.announcements.view-all": {
+    "message": "View all"
+  },
+  "instance.version-change.linked-title": {
+    "message": "Allow changes to this linked instance?"
+  },
+  "instance.version-change.linked-body": {
+    "message": "Starlight will modify the launch configuration and components of this linked instance. After these changes, the original launcher (such as PCL or HMCL) may no longer recognize or launch it correctly."
+  },
+  "instance.version-change.downgrade-title": {
+    "message": "Allow Mod Loader downgrade?"
+  },
+  "instance.version-change.downgrade-body": {
+    "message": "Downgrading the Mod Loader may make mods incompatible, prevent the game from starting, or damage world saves when they are loaded. Back up your saves before continuing."
+  },
+  "instance.version-change.unknown-title": {
+    "message": "Confirm Mod Loader compatibility risk"
+  },
+  "instance.version-change.unknown-body": {
+    "message": "The current and target Mod Loader versions could not be reliably compared. This change may be a downgrade and may cause incompatible mods, startup failure, or damaged world saves when loaded. Back up your saves before continuing."
+  },
+  "instance.version-change.remember": {
+    "message": "Always allow this operation for this instance without asking again"
+  },
+  "instance.version-change.allow": {
+    "message": "I understand, allow this change"
+  },
+  "instance.version-change.unknown-version": {
+    "message": "Unknown version"
+  },
+  "instance.version-change.read-error": {
+    "message": "Unable to read the current installation. Check that its files are accessible and try again."
+  },
+  "instance.version-change.loading": {
+    "message": "Reading current version…"
+  },
+  "instance.version-change.retry": {
+    "message": "Retry"
+  },
+  "instance.upgrade.select.no-fabric-version": {
+    "message": "No Fabric version is available for this target Minecraft version."
+  },
+  "instance.version-change.reset": {
+    "message": "Show version change warnings again for this instance"
+  },
+  "instance.version-change.reset-failed": {
+    "message": "Unable to reset saved permissions. Please try again."
   }
 }
