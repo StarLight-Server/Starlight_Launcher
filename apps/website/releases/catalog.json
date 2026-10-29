@@ -1,6 +1,85 @@
 {
-  "updated_at": "2026-10-25T06:32:38.047Z",
+  "updated_at": "2026-10-29T09:32:16.242Z",
   "announcements": [
+    {
+      "id": "launcher-1.0.3-beta1",
+      "version": "1.0.3-beta1",
+      "publishedAt": "2026-10-28",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.3-beta1",
+        "zh-CN": "Starlight Launcher 1.0.3-beta1"
+      },
+      "changes": {
+        "fixed": [
+          {
+            "en-US": "Fixed download status labels wrapping between characters when file paths are long. Status labels now stay on one line, and the provider and status move together to the next row when space is limited.",
+            "zh-CN": "修复下载卡片在文件路径较长时，“进行中”等状态文字异常换行的问题。状态标签保持单行，空间不足时来源和状态区域整体换到下一行。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta18",
+      "version": "1.0.2-beta18",
+      "publishedAt": "2026-10-28",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta18",
+        "zh-CN": "Starlight Launcher 1.0.2-beta18"
+      },
+      "changes": {
+        "added": [
+          {
+            "en-US": "Linked instances from launchers such as PCL and HMCL can now change Mod Loader versions after confirming that the original launcher may no longer recognize or launch the instance correctly.",
+            "zh-CN": "从 PCL、HMCL 等启动器关联的实例，现在可在确认原启动器可能无法正常识别或使用该实例后，修改 Mod Loader 版本。"
+          },
+          {
+            "en-US": "Mod Loader downgrades are allowed after a separate warning about mod compatibility, startup failures, and possible world save damage. Both warnings support one-time approval or remembered permission for the same operation on this instance; saved permissions can be reset in instance settings.",
+            "zh-CN": "Mod Loader 降级可在单独确认模组不兼容、启动失败或存档损坏风险后继续。两类警告均支持仅本次授权，或勾选“本实例相同操作后续均允许，不再提示”；已保存的授权可在实例设置中重置。"
+          }
+        ],
+        "fixed": [
+          {
+            "en-US": "Fixed missing loader versions on linked instances preventing manual Fabric selection, and restored older supported Fabric versions to the available choices.",
+            "zh-CN": "修复关联实例未读取实际加载器版本，导致无法手动选择 Fabric 版本的问题，并恢复可用旧版 Fabric 的选择。"
+          },
+          {
+            "en-US": "Linked-instance version changes now preserve the original launch configuration for recovery and use the selected runtime on subsequent launches.",
+            "zh-CN": "关联实例修改版本时保留原启动配置以便失败恢复，并修复后续启动可能未使用所选运行组件的问题。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "launcher-1.0.2-beta17",
+      "version": "1.0.2-beta17",
+      "publishedAt": "2026-10-28",
+      "title": {
+        "en-US": "Starlight Launcher 1.0.2-beta17",
+        "zh-CN": "Starlight Launcher 1.0.2-beta17"
+      },
+      "changes": {
+        "changed": [
+          {
+            "en-US": "StarLight Mod downloads now use mod-download.starlight.cool. External CurseForge and Modrinth files, including redirected downloads, follow their respective download source settings; StarLight-hosted files continue using the original server.",
+            "zh-CN": "StarLight Mod 下载切换至 mod-download.starlight.cool；CurseForge、Modrinth 外链及跳转下载遵循各自的下载源设置，StarLight 自托管文件继续使用原站。"
+          }
+        ],
+        "fixed": [
+          {
+            "en-US": "Reuse Mods already synchronized by AutoModSync after verifying their contents, preserving existing filenames and avoiding repeated downloads when the launcher cache is missing.",
+            "zh-CN": "校验并复用 AutoModSync 已同步的 Mod，保留现有文件名，避免因文件名不同或启动器缓存缺失而重复下载。"
+          },
+          {
+            "en-US": "Fixed cleanup mistakenly deleting AutoModSync-managed files sharing the .starlight.jar suffix. Borrowed files retain their ownership, and conflicting versions are reported before modifying the instance.",
+            "zh-CN": "修复清理时误删共用 .starlight.jar 后缀的 AutoModSync 文件；保留借用文件归属，并在修改实例前提示版本冲突。"
+          }
+        ]
+      },
+      "notes": {
+        "en-US": "Test release focused on StarLight downloads and AutoModSync compatibility. Files with different contents still require an update or conflict resolution. AutoModSync itself is unchanged.",
+        "zh-CN": "本测试版重点验证 StarLight 下载和 AutoModSync 兼容性；内容确实不同时仍需更新或处理冲突，AutoModSync 本身未改动。"
+      }
+    },
     {
       "id": "launcher-1.0.2",
       "version": "1.0.2",
