@@ -41,20 +41,83 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 			'zh-CN': 'Starlight Launcher 1.0.3 — 紧急 Bug 修复',
 		},
 		changes: {
+			added: [
+				{
+					'en-US':
+						'Linked instances from launchers such as PCL and HMCL can now change Mod Loader versions after confirming that the original launcher may no longer recognize or launch the instance correctly.',
+					'zh-CN':
+						'从 PCL、HMCL 等启动器关联的实例，现在可在确认原启动器可能无法正常识别或使用该实例后，修改 Mod Loader 版本。',
+				},
+				{
+					'en-US':
+						'Mod Loader downgrades are allowed after a separate warning about mod compatibility, startup failures, and possible world save damage. Both warnings support one-time approval or remembered permission for the same operation on this instance; saved permissions can be reset in instance settings.',
+					'zh-CN':
+						'Mod Loader 降级可在单独确认模组不兼容、启动失败或存档损坏风险后继续。两类警告均支持仅本次授权，或勾选“本实例相同操作后续均允许，不再提示”；已保存的授权可在实例设置中重置。',
+				},
+				{
+					'en-US':
+						'Instance navigation tabs can now be reordered directly from the instance page, with save, cancel, and restore-default actions. The saved order applies to all instances on this device.',
+					'zh-CN':
+						'实例页面可直接拖拽调整导航标签顺序，支持保存、取消与恢复默认；保存后的顺序适用于此设备上的所有实例。',
+				},
+			],
+			changed: [
+				{
+					'en-US':
+						'StarLight Mod downloads now use mod-download.starlight.cool. External CurseForge and Modrinth files, including redirected downloads, follow their respective download source settings; StarLight-hosted files continue using the original server.',
+					'zh-CN':
+						'StarLight Mod 下载切换至 mod-download.starlight.cool；CurseForge、Modrinth 外链及跳转下载遵循各自的下载源设置，StarLight 自托管文件继续使用原站。',
+				},
+			],
 			fixed: [
 				{
 					'en-US':
-						'Fixed download status labels wrapping between characters when file paths are long. Status labels stay on one line, and the provider and status move together to the next row when space is limited.',
+						'Reuse Mods already synchronized by AutoModSync after verifying their contents, preserving existing filenames and avoiding repeated downloads when the launcher cache is missing.',
 					'zh-CN':
-						'紧急修复下载卡片在文件路径较长时，“进行中”等状态文字异常换行的问题。状态标签保持单行，空间不足时来源和状态区域整体换到下一行。',
+						'校验并复用 AutoModSync 已同步的 Mod，保留现有文件名，避免因文件名不同或启动器缓存缺失而重复下载。',
+				},
+				{
+					'en-US':
+						'Fixed cleanup mistakenly deleting AutoModSync-managed files sharing the .starlight.jar suffix. Borrowed files retain their ownership, and conflicting versions are reported before modifying the instance.',
+					'zh-CN':
+						'修复清理时误删共用 .starlight.jar 后缀的 AutoModSync 文件；保留借用文件归属，并在修改实例前提示版本冲突。',
+				},
+				{
+					'en-US':
+						'Fixed missing loader versions on linked instances preventing manual Fabric selection, and restored older supported Fabric versions to the available choices.',
+					'zh-CN':
+						'修复关联实例未读取实际加载器版本，导致无法手动选择 Fabric 版本的问题，并恢复可用旧版 Fabric 的选择。',
+				},
+				{
+					'en-US':
+						'Linked-instance version changes now preserve the original launch configuration for recovery and use the selected runtime on subsequent launches.',
+					'zh-CN':
+						'关联实例修改版本时保留原启动配置以便失败恢复，并修复后续启动可能未使用所选运行组件的问题。',
+				},
+				{
+					'en-US':
+						'Fixed download status labels wrapping between characters when file paths are long. Status labels now stay on one line, and the provider and status move together to the next row when space is limited.',
+					'zh-CN':
+						'修复下载卡片在文件路径较长时，“进行中”等状态文字异常换行的问题。状态标签保持单行，空间不足时来源和状态区域整体换到下一行。',
+				},
+				{
+					'en-US':
+						'Improved hosted modpack network diagnostics with underlying error causes, request stages and timing, original and final addresses, connection details, and CDN request IDs. Credentials and signed URL parameters are redacted.',
+					'zh-CN':
+						'完善整合包网络错误日志，记录底层原因、失败阶段与耗时、原始及最终地址、连接信息和 CDN 请求编号，并隐藏登录凭据及链接中的敏感参数。',
+				},
+				{
+					'en-US':
+						'Fixed active-tab selection after reordering instance tabs. Nested pages now select their closest matching parent tab.',
+					'zh-CN': '修复调整实例标签顺序后的选中状态，子页面正确选中最匹配的父级标签。',
 				},
 			],
 		},
 		notes: {
 			'en-US':
-				'This is an emergency bug-fix release. Version 1.0.3 promotes 1.0.3-beta1 to a stable release with the same features and fixes.',
+				'This is an emergency bug-fix release combining all changes from 1.0.2-beta17, 1.0.2-beta18, and 1.0.3-beta1, plus the current instance navigation and network diagnostics improvements.',
 			'zh-CN':
-				'这是一次紧急 Bug 修复版本。将 1.0.3-beta1 作为 1.0.3 正式版发布，功能与修复保持不变。',
+				'这是一次紧急 Bug 修复版本，完整整合 1.0.2-beta17、1.0.2-beta18 与 1.0.3-beta1 的更新，并纳入当前实例标签排序和网络诊断改进。',
 		},
 	},
 	{
@@ -116,6 +179,45 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 		},
 	},
 	{
+		id: 'launcher-1.0.2-beta17',
+		version: '1.0.2-beta17',
+		publishedAt: '2026-10-28',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.2-beta17',
+			'zh-CN': 'Starlight Launcher 1.0.2-beta17',
+		},
+		changes: {
+			changed: [
+				{
+					'en-US':
+						'StarLight Mod downloads now use mod-download.starlight.cool. External CurseForge and Modrinth files, including redirected downloads, follow their respective download source settings; StarLight-hosted files continue using the original server.',
+					'zh-CN':
+						'StarLight Mod 下载切换至 mod-download.starlight.cool；CurseForge、Modrinth 外链及跳转下载遵循各自的下载源设置，StarLight 自托管文件继续使用原站。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'Reuse Mods already synchronized by AutoModSync after verifying their contents, preserving existing filenames and avoiding repeated downloads when the launcher cache is missing.',
+					'zh-CN':
+						'校验并复用 AutoModSync 已同步的 Mod，保留现有文件名，避免因文件名不同或启动器缓存缺失而重复下载。',
+				},
+				{
+					'en-US':
+						'Fixed cleanup mistakenly deleting AutoModSync-managed files sharing the .starlight.jar suffix. Borrowed files retain their ownership, and conflicting versions are reported before modifying the instance.',
+					'zh-CN':
+						'修复清理时误删共用 .starlight.jar 后缀的 AutoModSync 文件；保留借用文件归属，并在修改实例前提示版本冲突。',
+				},
+			],
+		},
+		notes: {
+			'en-US':
+				'Test release focused on StarLight downloads and AutoModSync compatibility. Files with different contents still require an update or conflict resolution. AutoModSync itself is unchanged.',
+			'zh-CN':
+				'本测试版重点验证 StarLight 下载和 AutoModSync 兼容性；内容确实不同时仍需更新或处理冲突，AutoModSync 本身未改动。',
+		},
+	},
+	{
 		id: 'launcher-1.0.2',
 		version: '1.0.2',
 		publishedAt: '2026-10-25',
@@ -165,8 +267,7 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 					'zh-CN': '公告中心：可在启动器内浏览版本更新日志与社区公告。',
 				},
 				{
-					'en-US':
-						'Anniversary easter egg on October 4th, with extra hidden triggers to discover.',
+					'en-US': 'Anniversary easter egg on October 4th, with extra hidden triggers to discover.',
 					'zh-CN': '每年 10 月 4 日的周年庆彩蛋，另藏有其他触发方式等你发现。',
 				},
 			],
@@ -177,13 +278,11 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 					'zh-CN': '皮肤站不再依赖内嵌网页，全部界面改为启动器原生实现。',
 				},
 				{
-					'en-US':
-						'Modpack downloads are served from a dedicated download domain.',
+					'en-US': 'Modpack downloads are served from a dedicated download domain.',
 					'zh-CN': '整合包下载改由独立下载域名提供。',
 				},
 				{
-					'en-US':
-						'The launcher repository was renamed to Starlight_Launcher.',
+					'en-US': 'The launcher repository was renamed to Starlight_Launcher.',
 					'zh-CN': '启动器仓库更名为 Starlight_Launcher。',
 				},
 			],
@@ -191,14 +290,12 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 				{
 					'en-US':
 						'Security fixes backported from upstream: modpack path traversal patches now protect installs from unsafe paths.',
-					'zh-CN':
-						'合入上游安全修复：整合包路径穿越补丁现已保护安装过程免受不安全路径影响。',
+					'zh-CN': '合入上游安全修复：整合包路径穿越补丁现已保护安装过程免受不安全路径影响。',
 				},
 				{
 					'en-US':
 						'Fixed live logs falling behind and crash-log uploads failing; LogShare collection was switched to a lightweight collector.',
-					'zh-CN':
-						'修复实时日志积压与崩溃日志上传失败；LogShare 采集改用轻量日志收集器。',
+					'zh-CN': '修复实时日志积压与崩溃日志上传失败；LogShare 采集改用轻量日志收集器。',
 				},
 				{
 					'en-US':
@@ -265,8 +362,7 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 					'zh-CN': '修复切换玩家后皮肤预览出现纹理错乱的问题。',
 				},
 				{
-					'en-US':
-						'Fixed instance group changes only showing up after refreshing the page.',
+					'en-US': 'Fixed instance group changes only showing up after refreshing the page.',
 					'zh-CN': '修复实例分组修改后需要刷新页面才能生效的问题。',
 				},
 				{
@@ -319,7 +415,8 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 			],
 			fixed: [
 				{
-					'en-US': 'Fixed the downloads page reporting a sign-in error even when already signed in.',
+					'en-US':
+						'Fixed the downloads page reporting a sign-in error even when already signed in.',
 					'zh-CN': '修复资源下载页在已登录状态下仍提示未登录的问题。',
 				},
 				{
@@ -329,7 +426,8 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 						'修复管理面板不显示用户权限组、公告发布人显示为 UUID、审核作答显示选项 ID 的问题。',
 				},
 				{
-					'en-US': 'Fixed the wiki opening a blank page and internal links not navigating correctly.',
+					'en-US':
+						'Fixed the wiki opening a blank page and internal links not navigating correctly.',
 					'zh-CN': '修复维基首次打开为空白、内部链接跳转异常的问题。',
 				},
 				{
@@ -353,7 +451,8 @@ export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 					'zh-CN': '修复验证码图片被裁切、缺少旋转提示的问题。',
 				},
 				{
-					'en-US': 'The skin-site player list now retries automatically and shows an error state after failures.',
+					'en-US':
+						'The skin-site player list now retries automatically and shows an error state after failures.',
 					'zh-CN': '皮肤站玩家列表加载失败后自动重试，并显示错误状态。',
 				},
 			],

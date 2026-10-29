@@ -1,4 +1,6 @@
 //! Functions for fetching information from the Internet
+mod content_source;
+
 use super::download::modrinth_redirect::{
     is_official_redirect as is_official_modrinth_cdn_redirect,
     repair_official_redirect as repair_official_cdn_redirect,
@@ -282,8 +284,10 @@ pub(crate) struct DownloadInstallTracking {
 
 impl DownloadRequest {
     pub fn new(url: impl Into<String>, resource: ResourceClass) -> Self {
+        let url = url.into();
+        let resource = content_source::resource_for_url(&url, resource);
         Self {
-            url: url.into(),
+            url,
             resource,
             integrity: Integrity::default(),
             header: None,
@@ -689,7 +693,7 @@ fn bounded_diagnostic_text(value: impl AsRef<str>, max_chars: usize) -> String {
     value.as_ref().chars().take(max_chars).collect()
 }
 
-fn sanitize_download_error_text(value: &str) -> String {
+pub(crate) fn sanitize_download_error_text(value: &str) -> String {
     static URLS: LazyLock<regex::Regex> = LazyLock::new(|| {
         regex::Regex::new(r"(?i)\b(?:https?|socks4a?|socks5h?)://[^\s]+")
             .expect("download diagnostic URL pattern should be valid")
@@ -729,7 +733,7 @@ fn download_transport_error_detail(source: &reqwest::Error) -> String {
     }
 }
 
-fn download_error_category(error: &crate::Error) -> &'static str {
+pub(crate) fn download_error_category(error: &crate::Error) -> &'static str {
     match error.raw.as_ref() {
         ErrorKind::FetchError(source) => {
             let detail = format!("{source:?}").to_ascii_lowercase();
@@ -977,12 +981,9 @@ fn add_starlight_direct_recovery_route(routes: &mut Vec<DownloadRoute>) {
         .iter()
         .filter(|route| {
             route.proxy == ProxyPolicy::System
-                && Url::parse(&route.url).ok().is_some_and(|url| {
-                    matches!(
-                        url.host_str(),
-                        Some("skin.starlight.cool" | "download.starlight.cool")
-                    ) && url.path().starts_with("/starlight/mod/packs/files/")
-                })
+                && Url::parse(&route.url)
+                    .ok()
+                    .is_some_and(|url| content_source::is_starlight_file(&url))
         })
         .cloned()
         .map(|mut route| {
@@ -1155,12 +1156,16 @@ fn explicit_mirror_routes(
             format!("/curseforge{path}"),
             DownloadRouteSource::Mcim,
         ),
-        "edge.forgecdn.net" if path.starts_with("/files/") => push_mirror(
-            &mut routes,
-            TIANPAO_BASE_URL,
-            path.to_string(),
-            DownloadRouteSource::Tianpao,
-        ),
+        "edge.forgecdn.net" | "mediafilez.forgecdn.net"
+            if path.starts_with("/files/") =>
+        {
+            push_mirror(
+                &mut routes,
+                TIANPAO_BASE_URL,
+                path.to_string(),
+                DownloadRouteSource::Tianpao,
+            )
+        }
         "media.forgecdn.net" => push_mirror(
             &mut routes,
             TIANPAO_BASE_URL,
@@ -3481,6 +3486,12 @@ fn apply_file_transport_headers(
     request
 }
 
+#[derive(Clone, Copy, Eq, PartialEq)]
+enum FileRedirectPolicy {
+    Follow,
+    StopAtContentPlatform,
+}
+
 async fn send_path_request_with_clients(
     route: &DownloadRoute,
     custom_header: Option<&(String, String)>,
@@ -3490,6 +3501,31 @@ async fn send_path_request_with_clients(
     system_client: &reqwest::Client,
     direct_client: &reqwest::Client,
     redirect_target: Option<&AsyncMutex<Option<Url>>>,
+) -> crate::Result<(reqwest::Response, String)> {
+    send_path_request_with_redirect_policy(
+        route,
+        custom_header,
+        credentials,
+        range_start,
+        range_end,
+        system_client,
+        direct_client,
+        redirect_target,
+        FileRedirectPolicy::Follow,
+    )
+    .await
+}
+
+async fn send_path_request_with_redirect_policy(
+    route: &DownloadRoute,
+    custom_header: Option<&(String, String)>,
+    credentials: Option<&crate::state::ModrinthCredentials>,
+    range_start: Option<u64>,
+    range_end: Option<u64>,
+    system_client: &reqwest::Client,
+    direct_client: &reqwest::Client,
+    redirect_target: Option<&AsyncMutex<Option<Url>>>,
+    redirect_policy: FileRedirectPolicy,
 ) -> crate::Result<(reqwest::Response, String)> {
     let original = Url::parse(&route.url)?;
     let mut current = match redirect_target {
@@ -3626,6 +3662,14 @@ async fn send_path_request_with_clients(
                 "Refusing insecure redirect from {current} to {next}"
             ))
             .into());
+        }
+        if redirect_policy == FileRedirectPolicy::StopAtContentPlatform
+            && matches!(
+                infer_resource_class(next.as_str()),
+                ResourceClass::CurseForge | ResourceClass::Modrinth
+            )
+        {
+            return Ok((response, next.into()));
         }
         current = repair_official_cdn_redirect(&original, &next, &location)
             .unwrap_or(next);
@@ -5702,6 +5746,25 @@ async fn download_to_path_inner(
         wait_ms = lock_started.elapsed().as_millis(),
         "Acquired destination download lock"
     );
+    let part_path = suffixed_path(destination, ".part");
+    if !request.integrity.is_empty()
+        && tokio::fs::try_exists(destination)
+            .await
+            .map_err(|error| IOError::with_path(error, destination))?
+        && let Ok(size) = verify_file(destination, &request.integrity).await
+    {
+        remove_if_exists(&part_path).await?;
+        let route = official_route(&request.url, request.resource);
+        return Ok(DownloadResult {
+            path: destination.to_path_buf(),
+            url: route.url,
+            source: route.source,
+            size,
+            attempts: 0,
+            fallback_count: 0,
+        });
+    }
+    let request = content_source::resolve_request(request, semaphore).await?;
     let mode = source_mode_for_resource(request.resource);
     let mut routes = {
         let mut urls = Vec::with_capacity(request.candidate_urls.len() + 1);
@@ -5749,28 +5812,6 @@ async fn download_to_path_inner(
     // send_path_request_with_clients.
     add_starlight_direct_recovery_route(&mut routes);
     order_auto_routes(&mut routes, request.resource, false);
-    let part_path = suffixed_path(destination, ".part");
-
-    if !request.integrity.is_empty()
-        && tokio::fs::try_exists(destination)
-            .await
-            .map_err(|error| IOError::with_path(error, destination))?
-        && let Ok(size) = verify_file(destination, &request.integrity).await
-    {
-        let route = routes
-            .first()
-            .cloned()
-            .unwrap_or_else(|| official_route(&request.url, request.resource));
-        remove_if_exists(&part_path).await?;
-        return Ok(DownloadResult {
-            path: destination.to_path_buf(),
-            url: route.url,
-            source: route.source,
-            size,
-            attempts: 0,
-            fallback_count: 0,
-        });
-    }
     let dns_hosts =
         routes.iter().filter_map(route_host).collect::<HashSet<_>>();
     let dns_hosts = dns_hosts.iter().map(String::as_str).collect::<Vec<_>>();
@@ -7253,7 +7294,7 @@ mod tests {
         LazyLock::new(|| AsyncMutex::new(()));
     static AUTO_SOURCE_TEST_LOCK: LazyLock<std::sync::Mutex<()>> =
         LazyLock::new(|| std::sync::Mutex::new(()));
-    static H2_FALLBACK_TEST_LOCK: LazyLock<std::sync::Mutex<()>> =
+    pub(super) static H2_FALLBACK_TEST_LOCK: LazyLock<std::sync::Mutex<()>> =
         LazyLock::new(|| std::sync::Mutex::new(()));
 
     #[tokio::test]
@@ -8909,10 +8950,77 @@ mod tests {
     }
 
     #[test]
+    fn pack_downloads_use_the_actual_content_platform() {
+        for (url, expected) in [
+            (
+                "https://edge.forgecdn.net/files/1/2/mod.jar",
+                ResourceClass::CurseForge,
+            ),
+            (
+                "https://mediafilez.forgecdn.net/files/1/2/mod.jar",
+                ResourceClass::CurseForge,
+            ),
+            (
+                "https://cdn.modrinth.com/data/project/versions/version/mod.jar",
+                ResourceClass::Modrinth,
+            ),
+            (
+                "https://cdn-alt.modrinth.com/data/project/versions/version/mod.jar",
+                ResourceClass::Modrinth,
+            ),
+            (
+                "https://mod-download.starlight.cool/starlight/mod/packs/files/4/hash",
+                ResourceClass::Other,
+            ),
+            (
+                "https://mod-download.starlight.cool/starlight/mod/packs/tagged-files/hash",
+                ResourceClass::Other,
+            ),
+            (
+                "https://skin.starlight.cool/starlight/mod/packs/files/4/hash",
+                ResourceClass::Other,
+            ),
+            (
+                "https://cdn.modrinth.com.evil.example/mod.jar",
+                ResourceClass::Modpack,
+            ),
+        ] {
+            assert_eq!(
+                DownloadRequest::new(url, ResourceClass::Modpack).resource,
+                expected,
+                "{url}"
+            );
+        }
+    }
+
+    #[test]
+    fn curseforge_mediafilez_downloads_follow_source_modes() {
+        use crate::state::DownloadSourceMode;
+        let url = "https://mediafilez.forgecdn.net/files/1/2/mod.jar";
+        for (mode, first, count) in [
+            (DownloadSourceMode::OfficialOnly, url, 1),
+            (DownloadSourceMode::OfficialPreferred, url, 2),
+            (
+                DownloadSourceMode::MirrorPreferred,
+                "https://mod.tianpao.top/files/1/2/mod.jar",
+                2,
+            ),
+        ] {
+            let routes = resolve_download_routes_for(
+                url,
+                ResourceClass::CurseForge,
+                mode,
+            );
+            assert_eq!(routes.len(), count);
+            assert_eq!(routes[0].url, first);
+        }
+    }
+
+    #[test]
     fn starlight_hosted_files_have_a_direct_recovery_route() {
         for url in [
             "https://skin.starlight.cool/starlight/mod/packs/files/release/hash",
-            "https://download.starlight.cool:20443/starlight/mod/packs/files/4/hash",
+            "https://mod-download.starlight.cool/starlight/mod/packs/files/4/hash",
         ] {
             let mut routes = vec![official_route(url, ResourceClass::Modpack)];
             add_starlight_direct_recovery_route(&mut routes);
@@ -8929,8 +9037,8 @@ mod tests {
     #[test]
     fn starlight_direct_recovery_excludes_other_paths_and_lookalike_hosts() {
         for url in [
-            "https://download.starlight.cool:20443/starlight/mod/packs",
-            "https://download.starlight.cool.evil.example/starlight/mod/packs/files/4/hash",
+            "https://mod-download.starlight.cool/starlight/mod/packs",
+            "https://mod-download.starlight.cool.evil.example/starlight/mod/packs/files/4/hash",
             "https://evil.example/starlight/mod/packs/files/4/hash",
             "https://skin.starlight.cool/yggdrasil",
         ] {

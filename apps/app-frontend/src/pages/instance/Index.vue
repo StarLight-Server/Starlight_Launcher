@@ -274,7 +274,12 @@
 				class="mb-3"
 				dismissible
 			/>
-			<NavTabs v-if="!hideInstanceTabs" :links="tabs" />
+			<InstanceNavTabs
+				v-if="!hideInstanceTabs"
+				:links="tabs"
+				:default-order="defaultInstanceTabs"
+				:save-order="saveInstanceTabOrder"
+			/>
 		</div>
 		<div :class="['p-6 pt-4', { 'flex min-h-0 flex-1 flex-col overflow-hidden': isFixedRender }]">
 			<RouterView v-slot="{ Component }" :key="instance.id" :route="displayedInstanceRoute">
@@ -373,7 +378,6 @@ import {
 	ContentPageHeader,
 	defineMessages,
 	injectNotificationManager,
-	NavTabs,
 	OverflowMenu,
 	ServerOnlinePlayers,
 	ServerPing,
@@ -390,6 +394,7 @@ import type { Component as ComponentType } from 'vue'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import InstanceNavTabs from '@/components/instance/InstanceNavTabs.vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceIcon from '@/components/ui/InstanceIcon.vue'
@@ -424,7 +429,7 @@ import {
 import { getDisplayInstanceIcon } from '@/helpers/instance-icons'
 import { isInstanceLaunching } from '@/helpers/instance-launch-state'
 import { get_by_instance_id } from '@/helpers/process'
-import { get as getSettings } from '@/helpers/settings.ts'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
 import { refreshWorlds, type ServerStatus } from '@/helpers/worlds'
@@ -689,14 +694,25 @@ const isStudioMode = computed(() => displayedInstanceRoute.value.name === 'FileS
 const defaultInstanceTabs = ['content', 'files', 'screenshots', 'worlds', 'logs'] as const
 type InstanceTabId = (typeof defaultInstanceTabs)[number]
 
-const instanceTabOrder = ref<InstanceTabId[]>([])
-void getSettings().then((settings) => {
-	const known = settings.instance_tab_order.filter((id): id is InstanceTabId =>
+function normalizeInstanceTabOrder(order: string[]): InstanceTabId[] {
+	const known = [...new Set(order)].filter((id): id is InstanceTabId =>
 		(defaultInstanceTabs as readonly string[]).includes(id),
 	)
-	const missing = defaultInstanceTabs.filter((id) => !known.includes(id))
-	instanceTabOrder.value = [...known, ...missing]
+	return [...known, ...defaultInstanceTabs.filter((id) => !known.includes(id))]
+}
+
+const instanceTabOrder = ref<InstanceTabId[]>([...defaultInstanceTabs])
+void getSettings().then((settings) => {
+	instanceTabOrder.value = normalizeInstanceTabOrder(settings.instance_tab_order)
 })
+
+async function saveInstanceTabOrder(order: string[]) {
+	const settings = await getSettings()
+	const nextOrder = normalizeInstanceTabOrder(order)
+	settings.instance_tab_order = nextOrder
+	await setSettings(settings)
+	instanceTabOrder.value = nextOrder
+}
 
 const tabs = computed(() => {
 	const tabById: Record<

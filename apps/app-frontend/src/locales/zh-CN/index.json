@@ -14852,6 +14852,18 @@
   "app.skin-site.home.announcements.view-all": {
     "message": "查看全部"
   },
+  "app.instance.tabs.edit-order": {
+    "message": "编辑导航顺序"
+  },
+  "app.instance.tabs.reorder-hint": {
+    "message": "拖动按钮调整顺序，将应用于本机所有实例。"
+  },
+  "app.instance.tabs.restore-order": {
+    "message": "恢复默认顺序"
+  },
+  "app.instance.tabs.save-order-failed": {
+    "message": "无法保存导航顺序，已保留当前调整，请重试。"
+  },
   "instance.version-change.linked-title": {
     "message": "允许修改此关联实例？"
   },

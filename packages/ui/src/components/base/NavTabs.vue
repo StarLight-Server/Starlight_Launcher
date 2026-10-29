@@ -185,6 +185,8 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 		}
 	}
 
+	let subpageIndex = -1
+	let subpagePathLength = -1
 	for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
 		const link = filteredLinks.value[i]
 		const decodedPath = decodeURIComponent(route.path)
@@ -207,11 +209,13 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 				(decodedPath.length === decodedHref.length || decodedPath[decodedHref.length] === '/')) ||
 			link.subpages?.some((subpage) => decodedPath.includes(subpage))
 
-		if (isSubpageMatch) {
-			return { index: i, isSubpage: true }
+		if (isSubpageMatch && decodedHref.length > subpagePathLength) {
+			subpageIndex = i
+			subpagePathLength = decodedHref.length
 		}
 	}
 
+	if (subpageIndex !== -1) return { index: subpageIndex, isSubpage: true }
 	return { index: -1, isSubpage: false }
 }
 

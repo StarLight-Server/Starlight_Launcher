@@ -14735,6 +14735,18 @@
   "app.skin-site.home.announcements.view-all": {
     "message": "View all"
   },
+  "app.instance.tabs.edit-order": {
+    "message": "Edit navigation order"
+  },
+  "app.instance.tabs.reorder-hint": {
+    "message": "Drag to reorder. This order applies to all instances on this device."
+  },
+  "app.instance.tabs.restore-order": {
+    "message": "Restore default order"
+  },
+  "app.instance.tabs.save-order-failed": {
+    "message": "Could not save the navigation order. Your changes are still here; try again."
+  },
   "instance.version-change.linked-title": {
     "message": "Allow changes to this linked instance?"
   },
