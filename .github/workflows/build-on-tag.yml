@@ -40,10 +40,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Blockbench skin editor dependencies
-        run: npm ci
-        working-directory: third-party/blockbench
-
       - name: Run release guardrails
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -241,7 +237,10 @@ jobs:
           }
           gh release delete-asset "${{ github.ref_name }}" $modernInstallers[0].Name --yes
 
-          pnpm --filter @modrinth/app tauri build --config tauri-release.conf.json --config tauri-native.conf.json
+          pnpm --filter @modrinth/app tauri bundle --config tauri-release.conf.json --config tauri-native.conf.json
+          if ($LASTEXITCODE -ne 0) {
+            throw "Native NSIS bundling failed with exit code $LASTEXITCODE"
+          }
 
           $nativeInstallers = @(Get-ChildItem $outDir -Filter '*-setup.exe' -File)
           if ($nativeInstallers.Count -ne 1) {
@@ -392,7 +391,7 @@ jobs:
 
           (
             cd "${bundle_root}"
-            zip -r -9 "../${bundle_name}" latest.json update-server-catalog.json release.json files
+            zip -r -0 "../${bundle_name}" latest.json update-server-catalog.json release.json files
           )
           gh release upload "${GITHUB_REF_NAME}" "release-check/${bundle_name}" --clobber
 

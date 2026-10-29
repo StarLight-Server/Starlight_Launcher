@@ -33,6 +33,31 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.3',
+		version: '1.0.3',
+		publishedAt: '2026-10-29',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.3 — Emergency Bug Fix',
+			'zh-CN': 'Starlight Launcher 1.0.3 — 紧急 Bug 修复',
+		},
+		changes: {
+			fixed: [
+				{
+					'en-US':
+						'Fixed download status labels wrapping between characters when file paths are long. Status labels stay on one line, and the provider and status move together to the next row when space is limited.',
+					'zh-CN':
+						'紧急修复下载卡片在文件路径较长时，“进行中”等状态文字异常换行的问题。状态标签保持单行，空间不足时来源和状态区域整体换到下一行。',
+				},
+			],
+		},
+		notes: {
+			'en-US':
+				'This is an emergency bug-fix release. Version 1.0.3 promotes 1.0.3-beta1 to a stable release with the same features and fixes.',
+			'zh-CN':
+				'这是一次紧急 Bug 修复版本。将 1.0.3-beta1 作为 1.0.3 正式版发布，功能与修复保持不变。',
+		},
+	},
+	{
 		id: 'launcher-1.0.3-beta1',
 		version: '1.0.3-beta1',
 		publishedAt: '2026-10-28',
