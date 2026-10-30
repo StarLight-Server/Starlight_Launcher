@@ -7628,6 +7628,9 @@
   "app.settings.updates.channel.restart-now": {
     "message": "立即重启"
   },
+  "app.settings.updates.restart-to-update": {
+    "message": "重启并更新"
+  },
   "app.settings.updates.channel.restart-title": {
     "message": "需要重启"
   },

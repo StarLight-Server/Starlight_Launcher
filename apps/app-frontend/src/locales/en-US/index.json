@@ -8882,6 +8882,9 @@
   "app.settings.updates.channel.restart-now": {
     "message": "Restart now"
   },
+  "app.settings.updates.restart-to-update": {
+    "message": "Restart to update"
+  },
   "app.settings.updates.channel.restart-title": {
     "message": "Restart required"
   },

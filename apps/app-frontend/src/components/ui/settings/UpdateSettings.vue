@@ -27,7 +27,7 @@ import {
 	type UpdateChannel,
 } from '@/helpers/settings.ts'
 import { isDev, restartApp } from '@/helpers/utils.js'
-import { type AppUpdateCheckResult, checkForAppUpdate } from '@/providers/app-update.ts'
+import { type AppUpdateCheckResult, appUpdateState, checkForAppUpdate, installAvailableAppUpdate } from '@/providers/app-update.ts'
 
 import SettingsRow from './SettingsRow.vue'
 import SettingsSection from './SettingsSection.vue'
@@ -180,6 +180,10 @@ const messages = defineMessages({
 	restartLater: {
 		id: 'app.settings.updates.channel.restart-later',
 		defaultMessage: 'Restart manually later',
+	},
+	restartToUpdate: {
+		id: 'app.settings.updates.restart-to-update',
+		defaultMessage: 'Restart to update',
 	},
 	immediateFetch: {
 		id: 'app.settings.updates.immediate-fetch',
@@ -636,6 +640,14 @@ function cancelDatabaseOperation() {
 					<Button type="colored" color="brand" :disabled="checking" @click="checkForUpdates">
 						<RefreshCwIcon :class="{ 'animate-spin': checking }" />
 						{{ formatMessage(checking ? messages.checking : messages.check) }}
+					</Button>
+					<Button
+						v-if="checkResult === 'available' && appUpdateState.finishedDownloading.value"
+						color="brand"
+						@click="installAvailableAppUpdate()"
+					>
+						<RefreshCwIcon />
+						{{ formatMessage(messages.restartToUpdate) }}
 					</Button>
 				</div>
 				<p
