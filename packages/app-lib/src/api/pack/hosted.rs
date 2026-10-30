@@ -416,12 +416,22 @@ async fn request<T: serde::de::DeserializeOwned>(
     request_authorized(suffix, &auth).await
 }
 
+#[tracing::instrument(skip_all, fields(endpoint = suffix, proxy_mode = tracing::field::Empty))]
 async fn request_authorized<T: serde::de::DeserializeOwned>(
     suffix: &str,
     auth: &str,
 ) -> crate::Result<T> {
     ensure_session(auth).await?;
     let client = configured_client().await?;
+    // This is the configured policy, not proof that a particular connection
+    // used a proxy. Never record the proxy URL or its credentials.
+    let proxy_mode = State::get()
+        .await?
+        .proxy_config()
+        .await
+        .map(|config| config.mode.as_str())
+        .unwrap_or("unknown");
+    tracing::Span::current().record("proxy_mode", proxy_mode);
     let response =
         transport::metadata_request(&client, &format!("{API}{suffix}"), auth)
             .await?;
@@ -438,7 +448,7 @@ async fn request_authorized<T: serde::de::DeserializeOwned>(
         tracing::warn!("{message}");
         return Err(invalid(message));
     }
-    let data: Response<T> = response.error_for_status()?.json().await?;
+    let data: Response<T> = transport::response_json(response, auth).await?;
     ensure_session(auth).await?;
     Ok(data.payload)
 }

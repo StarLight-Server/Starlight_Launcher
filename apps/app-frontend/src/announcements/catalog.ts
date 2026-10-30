@@ -33,6 +33,94 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.3',
+		version: '1.0.3',
+		publishedAt: '2026-10-29',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.3 — Emergency Bug Fix',
+			'zh-CN': 'Starlight Launcher 1.0.3 — 紧急 Bug 修复',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'Linked instances from launchers such as PCL and HMCL can now change Mod Loader versions after confirming that the original launcher may no longer recognize or launch the instance correctly.',
+					'zh-CN':
+						'从 PCL、HMCL 等启动器关联的实例，现在可在确认原启动器可能无法正常识别或使用该实例后，修改 Mod Loader 版本。',
+				},
+				{
+					'en-US':
+						'Mod Loader downgrades are allowed after a separate warning about mod compatibility, startup failures, and possible world save damage. Both warnings support one-time approval or remembered permission for the same operation on this instance; saved permissions can be reset in instance settings.',
+					'zh-CN':
+						'Mod Loader 降级可在单独确认模组不兼容、启动失败或存档损坏风险后继续。两类警告均支持仅本次授权，或勾选“本实例相同操作后续均允许，不再提示”；已保存的授权可在实例设置中重置。',
+				},
+				{
+					'en-US':
+						'Instance navigation tabs can now be reordered directly from the instance page, with save, cancel, and restore-default actions. The saved order applies to all instances on this device.',
+					'zh-CN':
+						'实例页面可直接拖拽调整导航标签顺序，支持保存、取消与恢复默认；保存后的顺序适用于此设备上的所有实例。',
+				},
+			],
+			changed: [
+				{
+					'en-US':
+						'StarLight Mod downloads now use mod-download.starlight.cool. External CurseForge and Modrinth files, including redirected downloads, follow their respective download source settings; StarLight-hosted files continue using the original server.',
+					'zh-CN':
+						'StarLight Mod 下载切换至 mod-download.starlight.cool；CurseForge、Modrinth 外链及跳转下载遵循各自的下载源设置，StarLight 自托管文件继续使用原站。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'Reuse Mods already synchronized by AutoModSync after verifying their contents, preserving existing filenames and avoiding repeated downloads when the launcher cache is missing.',
+					'zh-CN':
+						'校验并复用 AutoModSync 已同步的 Mod，保留现有文件名，避免因文件名不同或启动器缓存缺失而重复下载。',
+				},
+				{
+					'en-US':
+						'Fixed cleanup mistakenly deleting AutoModSync-managed files sharing the .starlight.jar suffix. Borrowed files retain their ownership, and conflicting versions are reported before modifying the instance.',
+					'zh-CN':
+						'修复清理时误删共用 .starlight.jar 后缀的 AutoModSync 文件；保留借用文件归属，并在修改实例前提示版本冲突。',
+				},
+				{
+					'en-US':
+						'Fixed missing loader versions on linked instances preventing manual Fabric selection, and restored older supported Fabric versions to the available choices.',
+					'zh-CN':
+						'修复关联实例未读取实际加载器版本，导致无法手动选择 Fabric 版本的问题，并恢复可用旧版 Fabric 的选择。',
+				},
+				{
+					'en-US':
+						'Linked-instance version changes now preserve the original launch configuration for recovery and use the selected runtime on subsequent launches.',
+					'zh-CN':
+						'关联实例修改版本时保留原启动配置以便失败恢复，并修复后续启动可能未使用所选运行组件的问题。',
+				},
+				{
+					'en-US':
+						'Fixed download status labels wrapping between characters when file paths are long. Status labels now stay on one line, and the provider and status move together to the next row when space is limited.',
+					'zh-CN':
+						'修复下载卡片在文件路径较长时，“进行中”等状态文字异常换行的问题。状态标签保持单行，空间不足时来源和状态区域整体换到下一行。',
+				},
+				{
+					'en-US':
+						'Improved hosted modpack network diagnostics with underlying error causes, request stages and timing, original and final addresses, connection details, and CDN request IDs. Credentials and signed URL parameters are redacted.',
+					'zh-CN':
+						'完善整合包网络错误日志，记录底层原因、失败阶段与耗时、原始及最终地址、连接信息和 CDN 请求编号，并隐藏登录凭据及链接中的敏感参数。',
+				},
+				{
+					'en-US':
+						'Fixed active-tab selection after reordering instance tabs. Nested pages now select their closest matching parent tab.',
+					'zh-CN': '修复调整实例标签顺序后的选中状态，子页面正确选中最匹配的父级标签。',
+				},
+			],
+		},
+		notes: {
+			'en-US':
+				'This is an emergency bug-fix release combining all changes from 1.0.2-beta17, 1.0.2-beta18, and 1.0.3-beta1, plus the current instance navigation and network diagnostics improvements.',
+			'zh-CN':
+				'这是一次紧急 Bug 修复版本，完整整合 1.0.2-beta17、1.0.2-beta18 与 1.0.3-beta1 的更新，并纳入当前实例标签排序和网络诊断改进。',
+		},
+	},
+	{
 		id: 'launcher-1.0.3-beta1',
 		version: '1.0.3-beta1',
 		publishedAt: '2026-10-28',

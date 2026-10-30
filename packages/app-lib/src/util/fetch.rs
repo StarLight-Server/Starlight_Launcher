@@ -693,7 +693,7 @@ fn bounded_diagnostic_text(value: impl AsRef<str>, max_chars: usize) -> String {
     value.as_ref().chars().take(max_chars).collect()
 }
 
-fn sanitize_download_error_text(value: &str) -> String {
+pub(crate) fn sanitize_download_error_text(value: &str) -> String {
     static URLS: LazyLock<regex::Regex> = LazyLock::new(|| {
         regex::Regex::new(r"(?i)\b(?:https?|socks4a?|socks5h?)://[^\s]+")
             .expect("download diagnostic URL pattern should be valid")
@@ -733,7 +733,7 @@ fn download_transport_error_detail(source: &reqwest::Error) -> String {
     }
 }
 
-fn download_error_category(error: &crate::Error) -> &'static str {
+pub(crate) fn download_error_category(error: &crate::Error) -> &'static str {
     match error.raw.as_ref() {
         ErrorKind::FetchError(source) => {
             let detail = format!("{source:?}").to_ascii_lowercase();
