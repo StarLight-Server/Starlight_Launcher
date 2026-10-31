@@ -1,4 +1,4 @@
-import { BlocksIcon, BoxIcon, LanguagesIcon, PaletteIcon, PencilIcon, WorldIcon } from '@modrinth/assets'
+import { BlocksIcon, BoxIcon, FlaskConicalIcon, LanguagesIcon, PaintbrushIcon, PaletteIcon, PencilIcon, WorldIcon } from '@modrinth/assets'
 import type { Component } from 'vue'
 
 export type LabToolDefinition = {
@@ -59,8 +59,22 @@ export const labTools: readonly LabToolDefinition[] = [
 		title: 'Recipe generator',
 		description: 'Create Minecraft Java data pack recipes from local item and tag data.',
 	},
-]
-
+	{
+		id: 'command-generator',
+		category: 'creation',
+		route: '/lab/command-generator',
+		icon: FlaskConicalIcon,
+		title: 'Command generator',
+		description: 'Generate Minecraft Java Edition commands with visual NBT editing.',
+	},
+	{
+		id: 'banner-designer',
+		category: 'creation',
+		route: '/lab/banner-designer',
+		icon: PaintbrushIcon,
+		title: 'Banner designer',
+		description: 'Design Minecraft banners with every Java Edition pattern and dye.',
+	},
 export function getLabTool(id: string): LabToolDefinition | undefined {
 	return labTools.find((tool) => tool.id === id)
 }

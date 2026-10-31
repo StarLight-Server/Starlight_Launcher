@@ -50,6 +50,7 @@ import {
 } from '@/composables/skin-site-session'
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
 import { check_reachable, get_default_user, users } from '@/helpers/auth'
+import { DEFAULT_UI_FONT_STACK, resolveFontFamily } from '@/helpers/font-family.ts'
 import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
 import { skinBlobUrlMap } from '@/helpers/rendering/batch-skin-renderer.ts'
 import { loadSkinArmorPreview, saveSkinArmorPreview } from '@/helpers/skin-armor-preview'
@@ -385,6 +386,13 @@ const skinTexture = computedAsync(async () => {
 const capeTexture = computed(() => currentCape.value?.texture)
 const skinVariant = computed(() => selectedSkin.value?.variant)
 const skinNametag = computed(() => (themeStore.hideNametagSkinsPage ? undefined : username.value))
+// Uses the interface's custom font when the setting is on; without one it falls
+// back to the default UI font stack. Undefined keeps the pixel font.
+const nametagFontFamily = computed(() =>
+	themeStore.nametagUsesAppFont
+		? resolveFontFamily(themeStore.uiFont, DEFAULT_UI_FONT_STACK)
+		: undefined,
+)
 const isSkinManagementReadOnly = computed(
 	() => {
 		if (isSkinSiteProfile.value) {
@@ -1336,6 +1344,7 @@ await loadSkins()
 					:texture-src="skinTexture || ''"
 					:variant="skinVariant"
 					:nametag="skinNametag"
+					:nametag-font-family="nametagFontFamily"
 					:initial-rotation="Math.PI / 8"
 				>
 					<template v-if="hasPendingSkinChange" #nametag-badge>

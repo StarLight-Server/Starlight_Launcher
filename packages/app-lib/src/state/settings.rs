@@ -132,6 +132,8 @@ pub struct Settings {
     pub default_page: DefaultPage,
     pub collapsed_navigation: bool,
     pub hide_nametag_skins_page: bool,
+    #[serde(default)]
+    pub nametag_uses_app_font: bool,
     pub advanced_rendering: bool,
     pub native_decorations: bool,
     pub toggle_sidebar: bool,
@@ -280,7 +282,7 @@ fn filter_known_feature_flags(
 }
 
 impl Settings {
-    const CURRENT_VERSION: usize = 4;
+    const CURRENT_VERSION: usize = 5;
 
     pub async fn get<'a, E>(exec: E) -> crate::Result<Self>
     where
@@ -363,6 +365,11 @@ impl Settings {
         )
         .fetch_one(exec)
         .await?;
+        let nametag_uses_app_font: bool = sqlx::query_scalar(
+            "SELECT nametag_uses_app_font FROM settings WHERE id = 0",
+        )
+        .fetch_one(exec)
+        .await?;
         let default_window_title: String = sqlx::query_scalar(
             "SELECT default_window_title FROM settings WHERE id = 0",
         )
@@ -399,6 +406,7 @@ impl Settings {
             default_page: DefaultPage::from_string(&res.default_page),
             collapsed_navigation: res.collapsed_navigation == 1,
             hide_nametag_skins_page: res.hide_nametag_skins_page == 1,
+            nametag_uses_app_font,
             advanced_rendering: res.advanced_rendering == 1,
             native_decorations: res.native_decorations == 1,
             toggle_sidebar: res.toggle_sidebar == 1,
@@ -614,7 +622,8 @@ impl Settings {
                  home_widgets = jsonb($58),
                  mojang_auth_source = $59,
 				terracotta_public_nodes = jsonb($60),
-				telemetry_consent_version = $61
+				telemetry_consent_version = $61,
+				nametag_uses_app_font = $62
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -677,6 +686,7 @@ impl Settings {
             mojang_auth_source,
             terracotta_public_nodes,
             0_i64,
+            self.nametag_uses_app_font,
         )
         .execute(exec)
         .await?;
@@ -887,6 +897,11 @@ impl Settings {
                 self.skin_site_nav_order = vec![];
                 self.instance_tab_order = vec![];
                 self.version = 4;
+            }
+            4 => {
+                // nametag_uses_app_font defaults to false (keeps the in-game pixel font)
+                self.nametag_uses_app_font = false;
+                self.version = 5;
             }
             version => {
                 return Err(crate::ErrorKind::OtherError(format!(

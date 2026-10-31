@@ -6,9 +6,12 @@ import { Cull, type Identifier, Mesh, Quad, Vector } from 'deepslate'
 import {
 	applySeamlessSchematicGlassUvs,
 	extractSchematicNeighborFace,
+	getSchematicFluidCull,
 	getSchematicMeshOcclusionFaces,
 	getSchematicSpecialBlockMesh,
+	getSchematicWaterloggedFluidMesh,
 	isSchematicOccluding,
+	isSchematicWaterlogged,
 	isSeamlessSchematicGlassPair,
 	schematicBlockAt,
 	shouldCullSchematicFace,
@@ -235,4 +238,123 @@ test('ender chests remain single even with an invalid double-chest type', () => 
 
 	assert.ok(requestedTextures.has('minecraft:entity/chest/ender'))
 	assert.ok(!requestedTextures.has('minecraft:entity/chest/ender_left'))
+})
+
+function trackingAtlas(requested: Set<string>) {
+	return {
+		getTextureAtlas: () => ({}) as ImageData,
+		getTextureUV: (id: Identifier) => {
+			requested.add(id.toString())
+			return [0, 0, 1, 1] as [number, number, number, number]
+		},
+	}
+}
+
+test('waterlogged blocks mesh their fluid inside the block bounds', () => {
+	const requested = new Set<string>()
+	const fluid = getSchematicWaterloggedFluidMesh(
+		{ name: 'minecraft:oak_leaves', properties: { waterlogged: 'true' } },
+		trackingAtlas(requested),
+		Cull.none(),
+	)
+	assert.deepEqual(
+		requested,
+		new Set(['minecraft:block/water_still', 'minecraft:block/water_flow']),
+	)
+	const vertices = fluid?.quads.flatMap((quad) => quad.vertices()) ?? []
+	assert.equal(vertices.length, 24)
+	assert.ok(Math.abs(Math.max(...vertices.map((vertex) => vertex.pos.y)) - 0.8875) < 1e-4)
+	for (const vertex of vertices) {
+		for (const coordinate of [vertex.pos.x, vertex.pos.y, vertex.pos.z]) {
+			assert.ok(coordinate > 0 && coordinate < 1)
+		}
+	}
+	assert.ok(vertices[0].color[2] > 0.8)
+	assert.ok(vertices[0].color[0] < 0.3)
+})
+
+test('waterlogged fluid follows the neighbor cull', () => {
+	const heights = (cull: Cull) =>
+		(
+			getSchematicWaterloggedFluidMesh(
+				{ name: 'minecraft:oak_leaves', properties: { waterlogged: 'true' } },
+				trackingAtlas(new Set()),
+				cull,
+			)?.quads ?? []
+		).map((quad) => quad.vertices().map((vertex) => vertex.pos.y))
+	const surface = 0.8875
+	const bottom = 1 / 64
+	const culled = Cull.none()
+	culled.up = true
+	const remaining = heights(culled)
+	const flat = (value: number, quad: number[]) =>
+		quad.every((height) => Math.abs(height - value) < 1e-6)
+
+	// Deepslate drops the top surface and raises the fluid to a full cell when the cell above is
+	// culled, so the remaining faces are the floor plus the four sides reaching the top boundary.
+	assert.equal(heights(Cull.none()).filter((quad) => flat(surface, quad)).length, 1)
+	assert.equal(remaining.length, 5)
+	assert.equal(remaining.filter((quad) => flat(surface, quad)).length, 0)
+	assert.equal(
+		remaining.filter((quad) => flat(1 - bottom, quad)).length,
+		0,
+		'the up face must be culled',
+	)
+	assert.equal(
+		remaining.filter((quad) => flat(bottom, quad)).length,
+		1,
+		'the down face must remain',
+	)
+	assert.equal(
+		remaining.filter((quad) => quad.some((height) => Math.abs(height - (1 - bottom)) < 1e-6))
+			.length,
+		4,
+		'the four side faces must remain',
+	)
+})
+
+test('blocks without waterlogged fluid mesh no fluid at all', () => {
+	const requested = new Set<string>()
+	const atlas = trackingAtlas(requested)
+	assert.equal(
+		getSchematicWaterloggedFluidMesh(
+			{ name: 'minecraft:oak_leaves', properties: { waterlogged: 'false' } },
+			atlas,
+			Cull.none(),
+		),
+		undefined,
+	)
+	assert.equal(
+		getSchematicWaterloggedFluidMesh(
+			{ name: 'minecraft:stone', properties: {} },
+			atlas,
+			Cull.none(),
+		),
+		undefined,
+	)
+	assert.equal(requested.size, 0)
+	assert.equal(
+		isSchematicWaterlogged({
+			name: 'minecraft:oak_leaves',
+			properties: { waterlogged: 'true' },
+		}),
+		true,
+	)
+})
+
+test('fluid cull treats adjacent water cells as one body', () => {
+	const palette = [
+		{ name: 'minecraft:water', properties: { level: '0' } },
+		{ name: 'minecraft:oak_leaves', properties: { waterlogged: 'true' } },
+	]
+	const blocks = new Uint32Array(16 * 16 * 16)
+	blocks.fill(1)
+	const neighborFaces = {}
+	const cull = getSchematicFluidCull([0, 0, 0], blocks, neighborFaces, palette, Cull.none())
+	assert.equal(cull.up, true)
+	assert.equal(cull.down, true)
+	assert.equal(cull.west, true)
+	assert.equal(cull.east, true)
+	assert.equal(cull.north, true)
+	assert.equal(cull.south, true)
 })

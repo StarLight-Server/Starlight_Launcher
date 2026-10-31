@@ -159,6 +159,7 @@ export type AppSettings = {
 	default_page: 'Home' | 'DiscoverContent' | 'Library'
 	collapsed_navigation: boolean
 	hide_nametag_skins_page: boolean
+	nametag_uses_app_font: boolean
 	advanced_rendering: boolean
 	native_decorations: boolean
 	toggle_sidebar: boolean
@@ -252,6 +253,8 @@ function normalizeDownloadSettings(settings: AppSettings & LegacyMirrorSettings)
 	settings.terracotta_public_nodes ??= ['wss://center.node.1tmc.top']
 	settings.skin_site_nav_order ??= []
 	settings.instance_tab_order ??= []
+	settings.hide_nametag_skins_page ??= false
+	settings.nametag_uses_app_font ??= false
 	settings.feature_flags ??= { ...DEFAULT_FEATURE_FLAGS }
 	for (const [key, value] of Object.entries(DEFAULT_FEATURE_FLAGS)) {
 		settings.feature_flags[key as FeatureFlag] ??= value
