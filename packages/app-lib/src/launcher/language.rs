@@ -1,4 +1,4 @@
-//! Applies the launcher display language to the game's `options.txt`.
+//! Applies the default game language to the game's `options.txt`.
 //!
 //! Minecraft language codes are version-dependent:
 //! - 1.0 and earlier have no in-game language option
@@ -15,23 +15,22 @@ enum LanguageCodeStyle {
     Lowercase,
 }
 
-/// Computes the `options.txt` entries needed to keep the game language in
-/// sync with the launcher language, mirroring the behaviour popularized by
-/// Plain Craft Launcher.
+/// Computes the `options.txt` entries needed to set the game language,
+/// mirroring the behaviour popularized by Plain Craft Launcher.
 ///
-/// The launcher language is only applied to instances that are effectively
-/// new: the `lang` key is absent, or the instance has never created a saves
-/// directory (e.g. modpacks that ship a preconfigured `options.txt`). For
-/// instances the player already uses, their in-game choice is kept and only
-/// its casing is normalized for the game version to avoid resets or crashes.
-/// The font preference is initialized independently of the language, only
-/// when a fresh instance has no explicit font choice in its options file.
+/// The configured default game language is used when set. Otherwise the
+/// launcher language is used. Either is only applied to instances that are
+/// effectively new: the `lang` key is absent, or the instance has never
+/// created a saves directory (e.g. modpacks that ship a preconfigured
+/// `options.txt`). For instances the player already uses, their in-game choice
+/// is kept and only its casing is normalized for the game version to avoid
+/// resets or crashes.
 pub fn game_language_options(
+    default_game_language: &str,
     launcher_locale: &str,
     game_release_time: DateTime<Utc>,
     options_txt: &str,
     has_saves: bool,
-    force_unicode_font: bool,
 ) -> Vec<(String, String)> {
     let style = match language_code_style(game_release_time) {
         LanguageCodeStyle::Unsupported => return Vec::new(),
@@ -42,29 +41,45 @@ pub fn game_language_options(
 
     let current = current_language(options_txt);
     let fresh = current.is_none() || !has_saves;
+    let default_game_language = default_game_language.trim();
+    let preferred_language = if default_game_language.is_empty() {
+        launcher_locale
+    } else {
+        default_game_language
+    };
 
     let desired = if fresh {
-        normalize_language_code(launcher_locale, legacy_region_case)
+        normalize_language_code(preferred_language, legacy_region_case)
     } else {
         current
             .as_deref()
             .and_then(|code| normalize_language_code(code, legacy_region_case))
     };
+    let Some(desired) = desired else {
+        return Vec::new();
+    };
+    let desired_unicode_font = if needs_unicode_font(preferred_language) {
+        "true"
+    } else {
+        "false"
+    };
+
     let mut options = Vec::new();
-    if let Some(desired) = desired
-        && current.as_deref() != Some(desired.as_str())
-    {
+    if current.as_deref() != Some(desired.as_str()) {
         options.push(("lang".to_string(), desired));
     }
-    if fresh
-        && !options_txt
-            .lines()
-            .any(|line| line.starts_with("forceUnicodeFont:"))
-    {
-        options.push((
-            "forceUnicodeFont".to_string(),
-            force_unicode_font.to_string(),
-        ));
+    if fresh {
+        let current_unicode_font =
+            current_option(options_txt, "forceUnicodeFont");
+        if current_unicode_font != Some(desired_unicode_font)
+            && (current_unicode_font.is_some()
+                || desired_unicode_font == "true")
+        {
+            options.push((
+                "forceUnicodeFont".to_string(),
+                desired_unicode_font.to_string(),
+            ));
+        }
     }
     options
 }
@@ -84,6 +99,14 @@ fn current_language(options_txt: &str) -> Option<String> {
     options_txt.lines().find_map(|line| {
         line.strip_prefix("lang:")
             .map(|value| value.trim().to_string())
+    })
+}
+
+fn current_option<'a>(options_txt: &'a str, key: &str) -> Option<&'a str> {
+    options_txt.lines().find_map(|line| {
+        line.strip_prefix(key)
+            .and_then(|rest| rest.strip_prefix(':'))
+            .map(str::trim)
     })
 }
 
@@ -113,6 +136,20 @@ fn normalize_language_code(
     }
 }
 
+/// CJK glyphs are not covered by the game's default bitmap font in older
+/// versions, so first-time setups for these languages also force the
+/// unicode font.
+fn needs_unicode_font(launcher_locale: &str) -> bool {
+    launcher_locale
+        .split(['-', '_'])
+        .next()
+        .is_some_and(|language| {
+            language.eq_ignore_ascii_case("zh")
+                || language.eq_ignore_ascii_case("ja")
+                || language.eq_ignore_ascii_case("ko")
+        })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -136,10 +173,10 @@ mod tests {
     #[test]
     fn fresh_instance_follows_launcher_language() {
         assert_eq!(
-            game_language_options("zh-CN", modern(), "", false, false),
+            game_language_options("", "zh-CN", modern(), "", false),
             vec![
                 ("lang".to_string(), "zh_cn".to_string()),
-                ("forceUnicodeFont".to_string(), "false".to_string()),
+                ("forceUnicodeFont".to_string(), "true".to_string()),
             ]
         );
     }
@@ -147,37 +184,25 @@ mod tests {
     #[test]
     fn legacy_versions_use_uppercase_region() {
         assert_eq!(
-            game_language_options("zh-CN", legacy(), "", false, false),
+            game_language_options("", "zh-CN", legacy(), "", false),
             vec![
                 ("lang".to_string(), "zh_CN".to_string()),
-                ("forceUnicodeFont".to_string(), "false".to_string()),
+                ("forceUnicodeFont".to_string(), "true".to_string()),
             ]
         );
     }
 
     #[test]
-    fn unicode_font_can_be_enabled_for_any_language() {
-        for locale in ["zh-CN", "zh-TW", "ja-JP", "ko-KR", "en-US", ""] {
-            let options =
-                game_language_options(locale, modern(), "", false, true);
-            assert!(
-                options.contains(&(
-                    "forceUnicodeFont".to_string(),
-                    "true".to_string()
-                )),
-                "{locale}"
-            );
-        }
-    }
-
-    #[test]
-    fn non_cjk_languages_also_use_the_font_default() {
+    fn non_cjk_languages_skip_unicode_font() {
         assert_eq!(
-            game_language_options("en-US", modern(), "", false, false),
-            vec![
-                ("lang".to_string(), "en_us".to_string()),
-                ("forceUnicodeFont".to_string(), "false".to_string()),
-            ]
+            game_language_options(
+                "",
+                "en-US",
+                modern(),
+                "forceUnicodeFont:false\n",
+                false
+            ),
+            vec![("lang".to_string(), "en_us".to_string())]
         );
     }
 
@@ -185,11 +210,11 @@ mod tests {
     fn versions_before_1_1_are_left_alone() {
         assert_eq!(
             game_language_options(
+                "",
                 "zh-CN",
                 release(2011, 11, 17),
                 "",
-                false,
-                true
+                false
             ),
             Vec::new()
         );
@@ -199,10 +224,10 @@ mod tests {
     fn played_instances_keep_the_players_language() {
         assert_eq!(
             game_language_options(
+                "",
                 "zh-CN",
                 modern(),
                 "fullscreen:false\nlang:ja_jp\n",
-                true,
                 true
             ),
             Vec::new()
@@ -212,13 +237,7 @@ mod tests {
     #[test]
     fn played_instances_get_their_casing_normalized() {
         assert_eq!(
-            game_language_options(
-                "en-US",
-                modern(),
-                "lang:zh_CN\n",
-                true,
-                true
-            ),
+            game_language_options("", "en-US", modern(), "lang:zh_CN\n", true),
             vec![("lang".to_string(), "zh_cn".to_string())]
         );
     }
@@ -226,16 +245,10 @@ mod tests {
     #[test]
     fn preconfigured_language_without_saves_is_overridden() {
         assert_eq!(
-            game_language_options(
-                "zh-TW",
-                modern(),
-                "lang:en_us\n",
-                false,
-                false
-            ),
+            game_language_options("", "zh-TW", modern(), "lang:en_us\n", false),
             vec![
                 ("lang".to_string(), "zh_tw".to_string()),
-                ("forceUnicodeFont".to_string(), "false".to_string()),
+                ("forceUnicodeFont".to_string(), "true".to_string()),
             ]
         );
     }
@@ -243,25 +256,19 @@ mod tests {
     #[test]
     fn matching_language_needs_no_update() {
         assert_eq!(
-            game_language_options(
-                "ja-JP",
-                modern(),
-                "lang:ja_jp\n",
-                true,
-                false
-            ),
+            game_language_options("", "ja-JP", modern(), "lang:ja_jp\n", true),
             Vec::new()
         );
     }
 
     #[test]
-    fn empty_locale_only_initializes_the_font_default() {
+    fn empty_locale_makes_no_changes() {
         assert_eq!(
-            game_language_options("", modern(), "", false, false),
-            vec![("forceUnicodeFont".to_string(), "false".to_string())]
+            game_language_options("", "", modern(), "", false),
+            Vec::new()
         );
         assert_eq!(
-            game_language_options("", modern(), "lang:zh_cn\n", true, false),
+            game_language_options("", "", modern(), "lang:zh_cn\n", true),
             Vec::new()
         );
     }
@@ -270,38 +277,63 @@ mod tests {
     fn crlf_options_files_are_parsed() {
         assert_eq!(
             game_language_options(
+                "",
                 "ko-KR",
                 modern(),
                 "lang:ko_kr\r\n",
-                true,
-                false
+                true
             ),
             Vec::new()
         );
     }
 
     #[test]
-    fn existing_font_choices_are_preserved_even_without_saves_or_language() {
-        for has_saves in [false, true] {
-            for enabled in [false, true] {
-                for language in ["", "lang:zh_cn\r\n"] {
-                    let options_txt = format!(
-                        "{language}forceUnicodeFont:{enabled}\r\nfullscreen:false\r\n"
-                    );
-                    let options = game_language_options(
-                        "zh-CN",
-                        modern(),
-                        &options_txt,
-                        has_saves,
-                        !enabled,
-                    );
-                    assert!(
-                        options
-                            .iter()
-                            .all(|(key, _)| key != "forceUnicodeFont")
-                    );
-                }
-            }
-        }
+    fn default_game_language_overrides_the_launcher_language() {
+        assert_eq!(
+            game_language_options("en-US", "zh-CN", modern(), "", false),
+            vec![("lang".to_string(), "en_us".to_string())]
+        );
+    }
+
+    #[test]
+    fn default_game_language_controls_the_unicode_font() {
+        assert_eq!(
+            game_language_options("zh-CN", "en-US", modern(), "", false),
+            vec![
+                ("lang".to_string(), "zh_cn".to_string()),
+                ("forceUnicodeFont".to_string(), "true".to_string()),
+            ]
+        );
+    }
+
+    #[test]
+    fn played_instances_ignore_the_default_game_language() {
+        assert_eq!(
+            game_language_options(
+                "en-US",
+                "zh-CN",
+                modern(),
+                "lang:ja_jp\n",
+                true
+            ),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn switching_to_a_non_cjk_default_disables_the_unicode_font() {
+        assert_eq!(
+            game_language_options(
+                "en-US",
+                "zh-CN",
+                modern(),
+                "forceUnicodeFont:true\n",
+                false
+            ),
+            vec![
+                ("lang".to_string(), "en_us".to_string()),
+                ("forceUnicodeFont".to_string(), "false".to_string()),
+            ]
+        );
     }
 }
