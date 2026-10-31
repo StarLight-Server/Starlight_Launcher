@@ -1087,6 +1087,7 @@ async function setupApp() {
 		locale,
 		collapsed_navigation,
 		hide_nametag_skins_page,
+		nametag_uses_app_font,
 		advanced_rendering,
 		onboarded,
 		default_page,
@@ -1142,6 +1143,7 @@ async function setupApp() {
 	themeStore.collapsedNavigation = collapsed_navigation
 	themeStore.advancedRendering = advanced_rendering
 	themeStore.hideNametagSkinsPage = hide_nametag_skins_page
+	themeStore.nametagUsesAppFont = nametag_uses_app_font
 	themeStore.toggleSidebar = toggle_sidebar
 	themeStore.customBackgroundPath = custom_background_path
 	themeStore.customBackgroundBlur = custom_background_blur

@@ -41,7 +41,12 @@
 			>
 				<slot name="nametag-badge" />
 			</div>
-			<div v-if="nametag" class="px-3 py-1 rounded-md font-minecraft text-gray nametag-bg">
+			<div
+				v-if="nametag"
+				class="px-3 py-1 rounded-md text-gray nametag-bg"
+				:class="{ 'font-minecraft': !nametagFontFamily }"
+				:style="nametagFontFamily ? { fontFamily: nametagFontFamily } : undefined"
+			>
 				{{ nametagText }}
 			</div>
 		</div>
@@ -155,6 +160,11 @@ const props = withDefaults(
 		capeSrc?: string
 		variant?: 'SLIM' | 'CLASSIC' | 'UNKNOWN'
 		nametag?: string
+		/**
+		 * CSS font-family for the nametag. Omit to keep the Minecraft pixel font
+		 * that previews how the name renders in-game.
+		 */
+		nametagFontFamily?: string
 		fit?: boolean
 		lockFit?: boolean
 		framing?: SkinPreviewFraming
@@ -178,6 +188,7 @@ const props = withDefaults(
 		capeSrc: undefined,
 		initialRotation: 15.75,
 		nametag: undefined,
+		nametagFontFamily: undefined,
 		fit: undefined,
 		lockFit: true,
 		framing: 'page',
