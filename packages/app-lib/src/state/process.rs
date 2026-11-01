@@ -580,9 +580,9 @@ impl ProcessManager {
     /// Whether the given instance was stopped by the user recently enough
     /// that crash-report files written during shutdown should be ignored.
     pub fn instance_was_manually_killed(&self, instance_id: &str) -> bool {
-        self.manual_kills
-            .get(instance_id)
-            .is_some_and(|killed| killed.elapsed() < std::time::Duration::from_secs(120))
+        self.manual_kills.get(instance_id).is_some_and(|killed| {
+            killed.elapsed() < std::time::Duration::from_secs(120)
+        })
     }
 
     fn remove(&self, id: Uuid) -> Option<Process> {

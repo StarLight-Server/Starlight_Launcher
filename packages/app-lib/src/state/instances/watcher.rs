@@ -538,7 +538,10 @@ fn crash_task(instance_id: String) {
     tokio::task::spawn(async move {
         let res = async {
             let state = State::get().await?;
-            if state.process_manager.instance_was_manually_killed(&instance_id) {
+            if state
+                .process_manager
+                .instance_was_manually_killed(&instance_id)
+            {
                 return Ok(());
             }
             let Some(instance) =
