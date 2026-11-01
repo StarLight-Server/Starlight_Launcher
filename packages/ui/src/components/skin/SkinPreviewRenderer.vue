@@ -209,7 +209,7 @@ let themeObserver: MutationObserver | undefined
 const previewThemeRevision = ref(0)
 
 const isDarkPreviewTheme = computed(() => {
-	previewThemeRevision.value
+	void previewThemeRevision.value
 	if (typeof document === 'undefined') return false
 	const classList = document.documentElement.classList
 	return classList.contains('dark-mode') || classList.contains('oled-mode')
