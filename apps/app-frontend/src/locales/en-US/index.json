@@ -3365,11 +3365,23 @@
   "app.instance.tabs.content": {
     "message": "Content"
   },
+  "app.instance.tabs.edit-order": {
+    "message": "Edit navigation order"
+  },
   "app.instance.tabs.files": {
     "message": "Files"
   },
   "app.instance.tabs.logs": {
     "message": "Logs"
+  },
+  "app.instance.tabs.reorder-hint": {
+    "message": "Drag to reorder. This order applies to all instances on this device."
+  },
+  "app.instance.tabs.restore-order": {
+    "message": "Restore default order"
+  },
+  "app.instance.tabs.save-order-failed": {
+    "message": "Could not save the navigation order. Your changes are still here; try again."
   },
   "app.instance.tabs.screenshots": {
     "message": "Screenshots"
@@ -8882,9 +8894,6 @@
   "app.settings.updates.channel.restart-now": {
     "message": "Restart now"
   },
-  "app.settings.updates.restart-to-update": {
-    "message": "Restart to update"
-  },
   "app.settings.updates.channel.restart-title": {
     "message": "Restart required"
   },
@@ -8995,6 +9004,9 @@
   },
   "app.settings.updates.preferences.title": {
     "message": "Update behavior"
+  },
+  "app.settings.updates.restart-to-update": {
+    "message": "Restart to update"
   },
   "app.settings.updates.security": {
     "message": "Updates are installed only when their cryptographic signature is valid."
@@ -11258,6 +11270,9 @@
   "app.skin-site.home.announcements.title": {
     "message": "Announcements"
   },
+  "app.skin-site.home.announcements.view-all": {
+    "message": "View all"
+  },
   "app.skin-site.home.donation.donors": {
     "message": "{count} donors"
   },
@@ -11345,6 +11360,15 @@
   "app.skin-site.home.players": {
     "message": "Your players"
   },
+  "app.skin-site.home.preview.cape-failed": {
+    "message": "Could not load this cape."
+  },
+  "app.skin-site.home.preview.choose": {
+    "message": "Select a player"
+  },
+  "app.skin-site.home.preview.choose-hint": {
+    "message": "Choose a player on the left to preview their skin."
+  },
   "app.skin-site.home.preview.empty": {
     "message": "No players yet"
   },
@@ -11357,8 +11381,17 @@
   "app.skin-site.home.preview.loading": {
     "message": "Loading players…"
   },
+  "app.skin-site.home.preview.manage": {
+    "message": "Manage skin"
+  },
   "app.skin-site.home.preview.players": {
     "message": "Players"
+  },
+  "app.skin-site.home.preview.skin-failed": {
+    "message": "Could not load this skin."
+  },
+  "app.skin-site.home.preview.skin-loading": {
+    "message": "Loading skin…"
   },
   "app.skin-site.home.preview.unavailable": {
     "message": "This player has no skin to preview."
@@ -14393,6 +14426,9 @@
   "instance.upgrade.select.minecraft-version": {
     "message": "Minecraft {version}"
   },
+  "instance.upgrade.select.no-fabric-version": {
+    "message": "No Fabric version is available for this target Minecraft version."
+  },
   "instance.upgrade.select.no-newer-release": {
     "message": "This instance already uses the latest stable Minecraft version."
   },
@@ -14449,6 +14485,48 @@
   },
   "instance.upgrade.warning.unsupported-content-type": {
     "message": "{path} uses a content type that cannot be upgraded automatically."
+  },
+  "instance.version-change.allow": {
+    "message": "I understand, allow this change"
+  },
+  "instance.version-change.downgrade-body": {
+    "message": "Downgrading the Mod Loader may make mods incompatible, prevent the game from starting, or damage world saves when they are loaded. Back up your saves before continuing."
+  },
+  "instance.version-change.downgrade-title": {
+    "message": "Allow Mod Loader downgrade?"
+  },
+  "instance.version-change.linked-body": {
+    "message": "Starlight will modify the launch configuration and components of this linked instance. After these changes, the original launcher (such as PCL or HMCL) may no longer recognize or launch it correctly."
+  },
+  "instance.version-change.linked-title": {
+    "message": "Allow changes to this linked instance?"
+  },
+  "instance.version-change.loading": {
+    "message": "Reading current version…"
+  },
+  "instance.version-change.read-error": {
+    "message": "Unable to read the current installation. Check that its files are accessible and try again."
+  },
+  "instance.version-change.remember": {
+    "message": "Always allow this operation for this instance without asking again"
+  },
+  "instance.version-change.reset": {
+    "message": "Show version change warnings again for this instance"
+  },
+  "instance.version-change.reset-failed": {
+    "message": "Unable to reset saved permissions. Please try again."
+  },
+  "instance.version-change.retry": {
+    "message": "Retry"
+  },
+  "instance.version-change.unknown-body": {
+    "message": "The current and target Mod Loader versions could not be reliably compared. This change may be a downgrade and may cause incompatible mods, startup failure, or damaged world saves when loaded. Back up your saves before continuing."
+  },
+  "instance.version-change.unknown-title": {
+    "message": "Confirm Mod Loader compatibility risk"
+  },
+  "instance.version-change.unknown-version": {
+    "message": "Unknown version"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "A Minecraft Server"
@@ -14716,83 +14794,5 @@
   },
   "unknown-pack-warning-modal.warning.title": {
     "message": "Unknown file warning"
-  },
-  "app.skin-site.home.preview.skin-failed": {
-    "message": "Could not load this skin."
-  },
-  "app.skin-site.home.preview.cape-failed": {
-    "message": "Could not load this cape."
-  },
-  "app.skin-site.home.preview.manage": {
-    "message": "Manage skin"
-  },
-  "app.skin-site.home.preview.choose": {
-    "message": "Select a player"
-  },
-  "app.skin-site.home.preview.choose-hint": {
-    "message": "Choose a player on the left to preview their skin."
-  },
-  "app.skin-site.home.preview.skin-loading": {
-    "message": "Loading skin…"
-  },
-  "app.skin-site.home.announcements.view-all": {
-    "message": "View all"
-  },
-  "app.instance.tabs.edit-order": {
-    "message": "Edit navigation order"
-  },
-  "app.instance.tabs.reorder-hint": {
-    "message": "Drag to reorder. This order applies to all instances on this device."
-  },
-  "app.instance.tabs.restore-order": {
-    "message": "Restore default order"
-  },
-  "app.instance.tabs.save-order-failed": {
-    "message": "Could not save the navigation order. Your changes are still here; try again."
-  },
-  "instance.version-change.linked-title": {
-    "message": "Allow changes to this linked instance?"
-  },
-  "instance.version-change.linked-body": {
-    "message": "Starlight will modify the launch configuration and components of this linked instance. After these changes, the original launcher (such as PCL or HMCL) may no longer recognize or launch it correctly."
-  },
-  "instance.version-change.downgrade-title": {
-    "message": "Allow Mod Loader downgrade?"
-  },
-  "instance.version-change.downgrade-body": {
-    "message": "Downgrading the Mod Loader may make mods incompatible, prevent the game from starting, or damage world saves when they are loaded. Back up your saves before continuing."
-  },
-  "instance.version-change.unknown-title": {
-    "message": "Confirm Mod Loader compatibility risk"
-  },
-  "instance.version-change.unknown-body": {
-    "message": "The current and target Mod Loader versions could not be reliably compared. This change may be a downgrade and may cause incompatible mods, startup failure, or damaged world saves when loaded. Back up your saves before continuing."
-  },
-  "instance.version-change.remember": {
-    "message": "Always allow this operation for this instance without asking again"
-  },
-  "instance.version-change.allow": {
-    "message": "I understand, allow this change"
-  },
-  "instance.version-change.unknown-version": {
-    "message": "Unknown version"
-  },
-  "instance.version-change.read-error": {
-    "message": "Unable to read the current installation. Check that its files are accessible and try again."
-  },
-  "instance.version-change.loading": {
-    "message": "Reading current version…"
-  },
-  "instance.version-change.retry": {
-    "message": "Retry"
-  },
-  "instance.upgrade.select.no-fabric-version": {
-    "message": "No Fabric version is available for this target Minecraft version."
-  },
-  "instance.version-change.reset": {
-    "message": "Show version change warnings again for this instance"
-  },
-  "instance.version-change.reset-failed": {
-    "message": "Unable to reset saved permissions. Please try again."
   }
 }
