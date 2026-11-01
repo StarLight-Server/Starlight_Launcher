@@ -20,7 +20,7 @@ import { setLastGcLaunchReport } from '@/helpers/gc-notice'
 import { getInstanceMode, prepareHostedSession } from '@/helpers/hosted-packs'
 import { launchOnce } from '@/helpers/instance-launch-state'
 import { prepareInstancePlayer } from '@/helpers/instance-player'
-import { AUTO_GC_PRESET_ARG } from '@/helpers/java-arguments'
+import { AUTO_GC_PRESET_ARG, removeFallenAuthProxyArgs } from '@/helpers/java-arguments'
 import { get_jre, get_memory_status } from '@/helpers/jre.js'
 import { get as getSettings } from '@/helpers/settings'
 
@@ -1184,11 +1184,21 @@ async function launchInstance(
 	await prepareInstancePlayer(instanceId)
 	if ((await getInstanceMode(instanceId)) === 'starlight') await prepareHostedSession()
 	const { args, gcIntent } = await resolveGcLaunchIntent(instanceId)
+	// Skin-site (Yggdrasil) accounts must talk to their own api_root verbatim;
+	// the Fallen-Breath Mojang mirror proxy must only be applied to genuine
+	// Mojang (正版) flows, otherwise the client is redirected to Mojang hosts.
+	const player = await getInstancePlayer(instanceId)
+	const isYggdrasil =
+		player?.account_type === 'yggdrasil' || !!player?.skin_site_user
+	let launchArgs = args
+	if (isYggdrasil) {
+		launchArgs = removeFallenAuthProxyArgs(launchArgs)
+	}
 	const result = await invoke<InstanceRunResult>('plugin:instance|instance_run', {
 		instanceId,
 		serverAddress,
 		offlineMode: isOfflineMode(),
-		extraLaunchArgs: args,
+		extraLaunchArgs: launchArgs,
 		gcIntent,
 	})
 	setLastGcLaunchReport(result.gc_notice)

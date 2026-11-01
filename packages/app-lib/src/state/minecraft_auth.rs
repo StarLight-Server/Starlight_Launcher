@@ -525,10 +525,10 @@ impl Credentials {
             return refresh_yggdrasil_credentials(self, exec).await;
         }
 
-        // Use a margin of 5 minutes to give e.g. Minecraft and potentially
-        // other operations that depend on a fresh token 5 minutes to complete
-        // from now, and deal with some classes of clock skew
-        if self.expires > Utc::now() + Duration::minutes(5) {
+        // Use a margin of 15 minutes (was 5) to give Minecraft and any
+        // mod/resource-pack loading enough headroom, and to absorb clock skew
+        // between the local machine and Mojang's auth servers.
+        if self.expires > Utc::now() + Duration::minutes(15) {
             return Ok(());
         }
 
@@ -859,7 +859,9 @@ impl Credentials {
             Some(x) => {
                 let mut credentials = Self::from_stored(x);
                 if refresh {
-                    credentials.refresh(exec).await.ok();
+                    if let Err(err) = credentials.refresh(exec).await {
+                        tracing::warn!(%err, "failed to refresh minecraft credentials during bulk load");
+                    }
                 }
                 Some(credentials)
             }
@@ -900,7 +902,9 @@ impl Credentials {
 
             async move {
                 if refresh {
-                    credentials.refresh(exec).await.ok();
+                    if let Err(err) = credentials.refresh(exec).await {
+                        tracing::warn!(%err, "failed to refresh minecraft credentials during bulk load");
+                    }
                 }
                 acc.insert(uuid, credentials);
 

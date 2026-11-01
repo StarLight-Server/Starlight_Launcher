@@ -9170,9 +9170,6 @@
   "instance.upgrade.select.loading-versions": {
     "message": "正在載入 Minecraft 版本..."
   },
-  "instance.upgrade.select.manual-fabric-version-unavailable": {
-    "message": "無法手動選擇 Fabric 版本。"
-  },
   "instance.upgrade.select.metadata-error-body": {
     "message": "請檢查網路連線後再試一次。"
   },
@@ -9187,9 +9184,6 @@
   },
   "instance.upgrade.select.no-newer-release": {
     "message": "沒有更新的 Minecraft 穩定版。"
-  },
-  "instance.upgrade.select.no-non-downgrade-fabric-version": {
-    "message": "此目標沒有可避免降級的 Fabric 版本。"
   },
   "instance.upgrade.select.planning-error-title": {
     "message": "相容性分析失敗"

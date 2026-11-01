@@ -1454,12 +1454,6 @@
   "app.appearance-settings.skin-site-nav-order.description": {
     "message": "调整皮肤站首页导航标签的显示顺序。"
   },
-  "app.appearance-settings.skin-site-nav-order.move-down": {
-    "message": "将{name}下移"
-  },
-  "app.appearance-settings.skin-site-nav-order.move-up": {
-    "message": "将{name}上移"
-  },
   "app.appearance-settings.skin-site-nav-order.title": {
     "message": "皮肤站导航顺序"
   },
