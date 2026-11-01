@@ -288,6 +288,7 @@ pub fn remove_log_buffer(instance_id: &str) {
 
 pub struct ProcessManager {
     processes: DashMap<Uuid, Process>,
+    manual_kills: DashMap<String, Instant>,
 }
 
 impl Default for ProcessManager {
@@ -300,6 +301,7 @@ impl ProcessManager {
     pub fn new() -> Self {
         Self {
             processes: DashMap::new(),
+            manual_kills: DashMap::new(),
         }
     }
 
@@ -568,9 +570,19 @@ impl ProcessManager {
                 process.manually_killed = false;
                 return Err(error.into());
             }
+            self.manual_kills
+                .insert(process.metadata.instance_id.clone(), Instant::now());
         }
 
         Ok(())
+    }
+
+    /// Whether the given instance was stopped by the user recently enough
+    /// that crash-report files written during shutdown should be ignored.
+    pub fn instance_was_manually_killed(&self, instance_id: &str) -> bool {
+        self.manual_kills
+            .get(instance_id)
+            .is_some_and(|killed| killed.elapsed() < std::time::Duration::from_secs(120))
     }
 
     fn remove(&self, id: Uuid) -> Option<Process> {
