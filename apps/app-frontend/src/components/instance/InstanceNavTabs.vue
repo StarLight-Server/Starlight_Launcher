@@ -51,7 +51,7 @@ function orderLinks(value: unknown): InstanceTab[] {
 	return [...result, ...remaining.values()]
 }
 
-const orderedLinks = computed(() => props.links)
+const orderedLinks = computed(() => orderLinks(props.links))
 
 function startEditing() {
 	if (saving.value) return
