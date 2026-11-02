@@ -13,7 +13,7 @@ use crate::state::instances::{
 };
 use crate::state::{
     CacheBehaviour, CachedEntry, ContentProviderRef, CurseForgeFileId,
-    CurseForgeProjectId, Dependency, DependencyType, KnownModrinthFile,
+    CurseForgeProjectId, Dependency, DependencyType, FileType, KnownModrinthFile,
     ModLoader, ModrinthProjectId, ModrinthVersionId, ProjectType, State,
     Version, cache_file_hash, cache_file_hash_metadata,
 };
@@ -376,7 +376,18 @@ async fn resolved_content_file_size(
     let file = version
         .files
         .iter()
-        .find(|file| file.primary)
+        .find(|file| file.primary && !matches!(file.file_type, Some(FileType::SourcesJar)))
+        .or_else(|| {
+            version.files.iter().find(|file| {
+                matches!(
+                    file.file_type,
+                    None
+                        | Some(FileType::RequiredResourcePack)
+                        | Some(FileType::OptionalResourcePack)
+                        | Some(FileType::Unknown)
+                )
+            })
+        })
         .or_else(|| version.files.first());
     Ok(file.map_or(1, |file| (file.size as u64).max(1)))
 }
@@ -916,7 +927,18 @@ async fn prepare_version_download(
     let file = version
         .files
         .iter()
-        .find(|file| file.primary)
+        .find(|file| file.primary && !matches!(file.file_type, Some(FileType::SourcesJar)))
+        .or_else(|| {
+            version.files.iter().find(|file| {
+                matches!(
+                    file.file_type,
+                    None
+                        | Some(FileType::RequiredResourcePack)
+                        | Some(FileType::OptionalResourcePack)
+                        | Some(FileType::Unknown)
+                )
+            })
+        })
         .or_else(|| version.files.first())
         .ok_or_else(|| {
             crate::ErrorKind::InputError(
