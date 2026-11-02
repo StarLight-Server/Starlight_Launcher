@@ -13,9 +13,9 @@ use crate::state::instances::{
 };
 use crate::state::{
     CacheBehaviour, CachedEntry, ContentProviderRef, CurseForgeFileId,
-    CurseForgeProjectId, Dependency, DependencyType, FileType, KnownModrinthFile,
-    ModLoader, ModrinthProjectId, ModrinthVersionId, ProjectType, State,
-    Version, cache_file_hash, cache_file_hash_metadata,
+    CurseForgeProjectId, Dependency, DependencyType, FileType,
+    KnownModrinthFile, ModLoader, ModrinthProjectId, ModrinthVersionId,
+    ProjectType, State, Version, cache_file_hash, cache_file_hash_metadata,
 };
 use crate::util::fetch::{
     self, ContentValidation, DownloadRequest, Integrity, ResourceClass,
@@ -376,13 +376,15 @@ async fn resolved_content_file_size(
     let file = version
         .files
         .iter()
-        .find(|file| file.primary && !matches!(file.file_type, Some(FileType::SourcesJar)))
+        .find(|file| {
+            file.primary
+                && !matches!(file.file_type, Some(FileType::SourcesJar))
+        })
         .or_else(|| {
             version.files.iter().find(|file| {
                 matches!(
                     file.file_type,
-                    None
-                        | Some(FileType::RequiredResourcePack)
+                    None | Some(FileType::RequiredResourcePack)
                         | Some(FileType::OptionalResourcePack)
                         | Some(FileType::Unknown)
                 )
@@ -927,13 +929,15 @@ async fn prepare_version_download(
     let file = version
         .files
         .iter()
-        .find(|file| file.primary && !matches!(file.file_type, Some(FileType::SourcesJar)))
+        .find(|file| {
+            file.primary
+                && !matches!(file.file_type, Some(FileType::SourcesJar))
+        })
         .or_else(|| {
             version.files.iter().find(|file| {
                 matches!(
                     file.file_type,
-                    None
-                        | Some(FileType::RequiredResourcePack)
+                    None | Some(FileType::RequiredResourcePack)
                         | Some(FileType::OptionalResourcePack)
                         | Some(FileType::Unknown)
                 )
