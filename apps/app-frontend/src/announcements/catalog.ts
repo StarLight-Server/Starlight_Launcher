@@ -33,6 +33,43 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.4-beta1',
+		version: '1.0.4-beta1',
+		publishedAt: '2026-11-02',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.4-beta1',
+			'zh-CN': 'Starlight Launcher 1.0.4-beta1',
+		},
+		changes: {
+			added: [
+				{
+					'en-US': 'The update check panel adds a Restart and Update button.',
+					'zh-CN': '检查更新面板增加重启并更新按钮。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'Skip the source.jar when downloading mods to avoid downloading the source package.',
+					'zh-CN': '下载 mod 时跳过 source.jar，避免下载源码包。',
+				},
+				{
+					'en-US': 'Instance page tab order follows save order.',
+					'zh-CN': '实例页标签顺序应用保存顺序。',
+				},
+				{
+					'en-US': 'No more false crash reports after stopping the instance.',
+					'zh-CN': '停止实例后不再误报游戏崩溃。',
+				},
+				{
+					'en-US':
+						'Skin Station (Yggdrasil) no longer forces traffic through the Fallen proxy when starting.',
+					'zh-CN': '皮肤站(Yggdrasil)启动时不再强制走Fallen代理。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-1.0.3',
 		version: '1.0.3',
 		publishedAt: '2026-10-29',
