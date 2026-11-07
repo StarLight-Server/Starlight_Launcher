@@ -294,7 +294,7 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
             .transpose()?
             .unwrap_or(ModLoader::Vanilla);
         let game_version = game_version.clone();
-        crate::api::instance::edit(
+        crate::api::instance::edit_for_install(
             &instance_id,
             EditInstance {
                 content_set_patch: Some(AppliedContentSetPatch {
@@ -738,7 +738,7 @@ pub async fn set_instance_information(
         }
         _ => None,
     };
-    crate::api::instance::edit(
+    crate::api::instance::edit_for_install(
         &instance_id,
         EditInstance {
             install_stage: Some(InstanceInstallStage::PackInstalling),
@@ -803,4 +803,56 @@ async fn resolve_pack_loader_version(
         ))
         .into()
     })
+}
+
+#[cfg(all(test, not(feature = "tauri")))]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn new_pack_instance_can_apply_manifest_environment() {
+        crate::event::EventState::init().await.unwrap();
+        let root = tempfile::tempdir().unwrap().keep();
+        let _state = State::init_for_test(root.to_string_lossy().to_string())
+            .await
+            .unwrap();
+        let instance = crate::api::instance::create(
+            "Pack import regression".to_string(),
+            "1.19.4".to_string(),
+            ModLoader::Vanilla,
+            None,
+            None,
+            InstanceLink::Unmanaged,
+            None,
+            None,
+        )
+        .await
+        .unwrap();
+        let id = instance.instance.id;
+        let description = CreatePackDescription {
+            icon: None,
+            override_title: None,
+            project_id: None,
+            version_id: None,
+            instance_id: id.clone(),
+            source_filename: Some("test.mrpack".to_string()),
+        };
+        let dependencies =
+            HashMap::from([(PackDependency::Minecraft, "1.20.1".to_string())]);
+
+        set_instance_information(
+            id.clone(),
+            &description,
+            "Test pack",
+            None,
+            &dependencies,
+            false,
+        )
+        .await
+        .unwrap();
+        let current = crate::api::instance::preview_version_change(&id, None)
+            .await
+            .unwrap();
+        assert_eq!(current.source.game_version, "1.20.1");
+    }
 }

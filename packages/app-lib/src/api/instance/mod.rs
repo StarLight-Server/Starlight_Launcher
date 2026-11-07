@@ -87,11 +87,11 @@ pub use self::home::{
     get_daily_playtime, get_daily_playtime_details, set_pinned,
 };
 pub use self::install::get_optimal_jre_key;
-pub(crate) use self::lifecycle::create;
 pub use self::lifecycle::{
     cache_icon, create_with_direct_link, edit, edit_icon, remove,
     sync_direct_links,
 };
+pub(crate) use self::lifecycle::{create, edit_for_install};
 pub use self::mcarchive::{
     McArchiveContentInstallRequest, McArchiveContentInstallResult,
     import_mcarchive_content, install_mcarchive_content,

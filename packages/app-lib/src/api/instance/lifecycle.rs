@@ -102,7 +102,6 @@ pub async fn edit(
     instance_id: &str,
     patch: EditInstance,
 ) -> crate::Result<InstanceMetadata> {
-    let state = State::get().await?;
     if let Some(environment_patch) =
         patch.content_set_patch.as_ref().filter(|patch| {
             patch.game_version.is_some()
@@ -118,6 +117,16 @@ pub async fn edit(
             return Err(crate::ErrorKind::InputError("Version changes must use the confirmed version-change operation".into()).into());
         }
     }
+    edit_for_install(instance_id, patch).await
+}
+
+/// Apply an environment selected by an install job, which owns its own
+/// lifecycle and confirmation. Ordinary instance edits must go through `edit`.
+pub(crate) async fn edit_for_install(
+    instance_id: &str,
+    patch: EditInstance,
+) -> crate::Result<InstanceMetadata> {
+    let state = State::get().await?;
     super::ensure_backup_eligible_edit(instance_id, &patch).await?;
     crate::state::edit_instance(instance_id, patch, &state.pool).await?;
 
