@@ -122,7 +122,7 @@ defineExpose({ show })
 					min="0"
 					max="360"
 					step="1"
-					class="w-full accent-brand"
+					class="w-full captcha-slider accent-brand"
 					:disabled="loading || submitting"
 				/>
 				<div class="mt-1 flex items-center justify-between text-xs text-secondary">
@@ -154,3 +154,64 @@ defineExpose({ show })
 		</template>
 	</NewModal>
 </template>
+
+<style scoped>
+.captcha-slider {
+	appearance: none;
+	display: block;
+	width: 100%;
+	height: 0.5rem;
+	background: var(--surface-4);
+	border-radius: var(--radius-full);
+	outline: none;
+	opacity: 0.8;
+	transition: opacity 0.15s ease-in-out;
+}
+
+.captcha-slider:hover {
+	opacity: 1;
+}
+
+.captcha-slider::-webkit-slider-thumb {
+	appearance: none;
+	width: 1.125rem;
+	height: 1.125rem;
+	background: var(--color-brand);
+	border-radius: 50%;
+	cursor: grab;
+	border: none;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.captcha-slider::-webkit-slider-thumb:active {
+	cursor: grabbing;
+}
+
+.captcha-slider::-moz-range-thumb {
+	width: 1.125rem;
+	height: 1.125rem;
+	background: var(--color-brand);
+	border-radius: 50%;
+	cursor: grab;
+	border: none;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.captcha-slider::-moz-range-thumb:active {
+	cursor: grabbing;
+}
+
+.captcha-slider::-ms-thumb {
+	width: 1.125rem;
+	height: 1.125rem;
+	background: var(--color-brand);
+	border-radius: 50%;
+	cursor: grab;
+	border: none;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.captcha-slider::-ms-thumb:active {
+	cursor: grabbing;
+}
+</style>
