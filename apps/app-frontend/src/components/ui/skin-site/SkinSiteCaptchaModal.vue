@@ -106,7 +106,7 @@ defineExpose({ show })
 					v-if="image"
 					:src="image"
 					alt=""
-					class="size-full object-contain transition-transform duration-75"
+					class="size-full object-cover transition-transform duration-75"
 					:style="{ transform: `rotate(${previewRotation})` }"
 					draggable="false"
 				/>
