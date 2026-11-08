@@ -33,6 +33,37 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.4-beta2',
+		version: '1.0.4-beta2',
+		publishedAt: '2026-11-08',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.4-beta2',
+			'zh-CN': 'Starlight Launcher 1.0.4-beta2',
+		},
+		changes: {
+			added: [
+				{
+					'en-US': 'Allow modpack installation.',
+					'zh-CN': '允许安装模组包。',
+				},
+			],
+			fixed: [
+				{
+					'en-US': 'Captcha slider thumb is now visible.',
+					'zh-CN': '皮肤站验证码滑块中间圆点现可见。',
+				},
+				{
+					'en-US': 'Captcha image is cropped properly instead of showing the full uncropped image.',
+					'zh-CN': '皮肤站验证码图片使用裁剪显示，不再显示完整未裁剪图片。',
+				},
+				{
+					'en-US': 'Instance launch no longer fails with "getInstancePlayer is not defined".',
+					'zh-CN': '修复实例启动因缺少 getInstancePlayer 导入而失败的问题。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-1.0.4-beta1',
 		version: '1.0.4-beta1',
 		publishedAt: '2026-11-02',
