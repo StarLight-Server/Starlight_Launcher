@@ -82,35 +82,7 @@ export async function chooseInstancePlayer(
 	return picker(instanceId, locked)
 }
 
-export function prepareInstancePlayer(instanceId: string): Promise<void> {
-	if (isOfflineMode()) return Promise.resolve()
-	const current = preparing.get(instanceId)
-	if (current) return current
-	const task = (async () => {
-		const saved = await getInstancePlayer(instanceId)
-		if (saved && !saved.skin_site_user) {
-			const available = await users()
-			if (
-				available.some(
-					(account) =>
-						account.profile.id === saved.id && account.account_type === saved.account_type,
-				)
-			)
-				return
-		}
-		if (saved?.skin_site_user) await waitForSkinSiteSession()
-		if (
-			saved?.skin_site_user &&
-			skinSiteUser.value?.uuid === saved.skin_site_user &&
-			skinSiteStatus.value === 'signed-in'
-		) {
-			await authenticateInstancePlayer(saved)
-			return
-		}
-		await chooseInstancePlayer(instanceId, saved)
-	})().finally(() => {
-		preparing.delete(instanceId)
-	})
-	preparing.set(instanceId, task)
-	return task
+export function prepareInstancePlayer(_instanceId: string): Promise<void> {
+	// 已修改：按照侧边栏（全局）的账号选择为准，不再在实例启动前拦截校验实例特定的玩家。
+	return Promise.resolve()
 }

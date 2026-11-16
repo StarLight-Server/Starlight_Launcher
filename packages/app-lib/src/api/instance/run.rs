@@ -101,18 +101,8 @@ async fn run_with_extra_launch_args_inner(
             MIN_LAUNCH_PREPARATION_TIMEOUT,
             MAX_LAUNCH_PREPARATION_TIMEOUT,
         );
-    let saved_player = context
-        .as_ref()
-        .and_then(|context| context.launch_overrides.player.as_ref());
-    let default_account = if let Some(player) = saved_player {
-        if offline_mode
-            && player.account_type
-                != crate::state::MinecraftAccountType::Offline
-        {
-            return Err(crate::ErrorKind::InputError("当前实例绑定的是在线玩家，请恢复网络后启动，或在实例设置中手动切换玩家".into()).as_error());
-        }
-        Credentials::for_instance_player(player, &state.pool).await?
-    } else if offline_mode {
+    // Force instance launch to use the global active account; ignore instance-specific overrides.
+    let default_account = if offline_mode {
         Credentials::get_offline_credential(&state.pool)
             .await?
             .ok_or_else(|| {
