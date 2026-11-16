@@ -33,6 +33,35 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.4',
+		version: '1.0.4',
+		publishedAt: '2026-11-16',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.4',
+			'zh-CN': 'Starlight Launcher 1.0.4',
+		},
+		changes: {
+			added: [
+				{
+					'en-US': 'Added a "Restart to update" button in the update settings panel when a download is complete.',
+					'zh-CN': '在更新设置面板新增“重启并更新”按钮，当下载完成后显示。',
+				},
+			],
+			changed: [
+				{
+					'en-US': 'Instance launch now strictly follows the globally selected account from the sidebar, ignoring instance-specific player overrides.',
+					'zh-CN': '实例启动现在严格遵循侧边栏全局选中的账号，不再读取实例绑定的特定玩家。',
+				},
+			],
+			fixed: [
+				{
+					'en-US': 'Fixed instance launch failing when the global account does not match the instance-bound player.',
+					'zh-CN': '修复全局账号与实例绑定玩家不匹配时导致的实例启动失败问题。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-1.0.4-beta2',
 		version: '1.0.4-beta2',
 		publishedAt: '2026-11-08',
