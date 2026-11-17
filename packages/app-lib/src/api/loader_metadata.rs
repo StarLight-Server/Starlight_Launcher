@@ -1220,6 +1220,46 @@ fn compare_versions(left: &str, right: &str) -> Ordering {
     }
 }
 
+/// A launcher-meta manifest can be cached when the official manifest was
+/// temporarily unavailable. Prefer the official installer even in that case:
+/// some launcher-meta NeoForge profiles reference extracts that are not hosted.
+pub(crate) fn prefer_official_neoforge_installer(
+    game_version: &str,
+    loader: &LoaderVersion,
+) -> Option<LoaderVersion> {
+    if loader.profile_source != LoaderProfileSource::Json
+        || !loader.url.starts_with(env!("MODRINTH_LAUNCHER_META_URL"))
+        || loader.id.is_empty()
+        || !loader
+            .id
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'-'))
+    {
+        return None;
+    }
+
+    let installer_url = if game_version == "1.20.1" {
+        let full_version = format!("{game_version}-{}", loader.id);
+        format!(
+            "{NEOFORGE_LEGACY_MAVEN_URL}{full_version}/forge-{full_version}-installer.jar"
+        )
+    } else if neoforge_game_version(&loader.id).as_deref() == Some(game_version)
+    {
+        format!(
+            "{NEOFORGE_MAVEN_URL}{0}/neoforge-{0}-installer.jar",
+            loader.id
+        )
+    } else {
+        return None;
+    };
+
+    let mut official = loader.clone();
+    official.url = installer_url;
+    official.profile_source = LoaderProfileSource::Installer;
+    official.fallback_url = Some(loader.url.clone());
+    Some(official)
+}
+
 pub(crate) async fn resolve_loader_profile(
     state: &State,
     game_version: &str,
@@ -2058,6 +2098,41 @@ mod tests {
                 panic!("missing Forge support for {game_version}")
             })
             .loaders
+    }
+
+    #[test]
+    fn launcher_meta_neoforge_profile_prefers_official_installer() {
+        let fallback = LoaderVersion {
+            id: "21.1.233".into(),
+            url: fallback_profile_url("neo", 0, "21.1.233"),
+            stable: true,
+            profile_source: LoaderProfileSource::Json,
+            fallback_url: None,
+        };
+        let resolved =
+            prefer_official_neoforge_installer("1.21.1", &fallback).unwrap();
+        assert_eq!(
+            resolved.url,
+            "https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.233/neoforge-21.1.233-installer.jar"
+        );
+        assert_eq!(resolved.profile_source, LoaderProfileSource::Installer);
+        assert_eq!(
+            resolved.fallback_url.as_deref(),
+            Some(fallback.url.as_str())
+        );
+        assert!(
+            prefer_official_neoforge_installer("1.20.4", &fallback).is_none()
+        );
+        let mut untrusted = fallback.clone();
+        untrusted.url = "https://example.com/profile.json".into();
+        assert!(
+            prefer_official_neoforge_installer("1.21.1", &untrusted).is_none()
+        );
+        let mut invalid = fallback.clone();
+        invalid.id = "../21.1.233".into();
+        assert!(
+            prefer_official_neoforge_installer("1.21.1", &invalid).is_none()
+        );
     }
 
     #[test]

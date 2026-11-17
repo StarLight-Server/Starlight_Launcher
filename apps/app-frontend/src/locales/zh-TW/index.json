@@ -5784,7 +5784,7 @@
     "message": "留個清單"
   },
   "app.onboarding.home-layout.description": {
-    "message": "使用右下角控制項，在 StarLight 皮膚站首頁與專注的實例啟動頁之間切換。"
+    "message": "使用頂端列控制項，在 StarLight 皮膚站首頁與專注的實例啟動頁之間切換。"
   },
   "app.onboarding.home-layout.title": {
     "message": "切換首頁樣式"

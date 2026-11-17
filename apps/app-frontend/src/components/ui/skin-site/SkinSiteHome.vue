@@ -17,6 +17,7 @@ import SkinSiteNavCards from './SkinSiteNavCards.vue'
 import SkinSitePlayerPreview from './SkinSitePlayerPreview.vue'
 import SkinSiteProfileModal from './SkinSiteProfileModal.vue'
 import SkinSiteProfileView from './SkinSiteProfileView.vue'
+import SkinSiteQuickJoin from './SkinSiteQuickJoin.vue'
 import SkinSiteReviewView from './SkinSiteReviewView.vue'
 import WikiView from './WikiView.vue'
 
@@ -112,7 +113,10 @@ function onBugCreated(id: number) {
 			<template v-else>
 				<div class="home-overview">
 					<SkinSitePlayerPreview />
-					<SkinSiteAnnouncements />
+					<div class="flex h-full flex-col justify-between gap-6">
+						<SkinSiteAnnouncements />
+						<SkinSiteQuickJoin />
+					</div>
 				</div>
 
 				<SkinSiteDonationCard />

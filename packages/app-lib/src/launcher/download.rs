@@ -1119,8 +1119,16 @@ pub async fn download_version_info(
         .version_dir(&version_id)
         .join(format!("{version_id}.json"));
 
-    let cache_is_current =
+    let mut cache_is_current =
         loader.is_none() || derived_version_cache_is_current(&path).await;
+    if cache_is_current && mod_loader == ModLoader::NeoForge && path.is_file() {
+        let bytes = io::read(&path).err_into::<crate::Error>().await?;
+        let cached: GameVersionInfo = serde_json::from_slice(&bytes)?;
+        if has_legacy_neoforge_extracts(&cached.libraries) {
+            tracing::info!(version = %version_id, "Refreshing a cached NeoForge profile with obsolete launcher-meta extracts");
+            cache_is_current = false;
+        }
+    }
     let res = if path.exists() && !force.unwrap_or(false) && cache_is_current {
         let mut info: GameVersionInfo = io::read(&path)
             .err_into::<crate::Error>()
@@ -1247,23 +1255,27 @@ pub async fn download_version_info(
                     )
                     .await?;
             }
-            let partial: d::modded::PartialVersionInfo =
-                if mod_loader == ModLoader::OptiFine {
-                    crate::launcher::optifine::build_partial_version_info(
-                        st,
-                        &info,
-                        &version.id,
-                        &loader.id,
-                    )
-                    .await?
-                } else {
-                    crate::api::loader_metadata::resolve_loader_profile(
-                        st,
-                        &version.id,
-                        loader,
-                    )
-                    .await?
-                };
+            let partial: d::modded::PartialVersionInfo = if mod_loader
+                == ModLoader::OptiFine
+            {
+                crate::launcher::optifine::build_partial_version_info(
+                    st,
+                    &info,
+                    &version.id,
+                    &loader.id,
+                )
+                .await?
+            } else {
+                let preferred = (mod_loader == ModLoader::NeoForge)
+                        .then(|| crate::api::loader_metadata::prefer_official_neoforge_installer(&version.id, loader))
+                        .flatten();
+                crate::api::loader_metadata::resolve_loader_profile(
+                    st,
+                    &version.id,
+                    preferred.as_ref().unwrap_or(loader),
+                )
+                .await?
+            };
             info = d::modded::merge_partial_version(partial, info);
         }
 
@@ -1286,6 +1298,17 @@ pub async fn download_version_info(
 
     tracing::debug!("Loaded version info for Minecraft {version_id}");
     Ok(res)
+}
+
+fn has_legacy_neoforge_extracts(libraries: &[Library]) -> bool {
+    libraries.iter().any(|library| {
+        library
+            .name
+            .starts_with("com.modrinth.daedalus:neo-installer-extracts:")
+            || library.name.starts_with(
+                "com.modrinth.daedalus:neoforge-installer-extracts:",
+            )
+    })
 }
 
 pub async fn load_local_version_info(
@@ -2614,6 +2637,21 @@ mod tests {
 
     fn urls(values: &[&str]) -> Option<Vec<String>> {
         Some(values.iter().map(|value| (*value).to_string()).collect())
+    }
+
+    #[test]
+    fn recognizes_obsolete_neoforge_extraction_profiles() {
+        for name in [
+            "com.modrinth.daedalus:neo-installer-extracts:21.1.233:client@lzma",
+            "com.modrinth.daedalus:neoforge-installer-extracts:21.1.233:client@lzma",
+        ] {
+            let library: Library =
+                serde_json::from_value(serde_json::json!({"name": name}))
+                    .unwrap();
+            assert!(has_legacy_neoforge_extracts(&[library]));
+        }
+        let other: Library = serde_json::from_value(serde_json::json!({"name": "com.modrinth.daedalus:forge-installer-extracts:1:client@lzma"})).unwrap();
+        assert!(!has_legacy_neoforge_extracts(&[other]));
     }
 
     #[test]

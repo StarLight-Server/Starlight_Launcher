@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { LayoutTemplateIcon, MinimizeIcon } from '@modrinth/assets'
-import {
-	defineMessages,
-	injectNotificationManager,
-	injectPageContext,
-	useVIntl,
-} from '@modrinth/ui'
+import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { computed, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -35,7 +30,6 @@ const breadcrumbs = useBreadcrumbs()
 const { formatMessage } = useVIntl()
 const { offline } = useNetworkStatus()
 const themeStore = useTheming()
-const pageContext = injectPageContext()
 
 const messages = defineMessages({
 	home: { id: 'app.home.breadcrumb', defaultMessage: 'Home' },
@@ -60,10 +54,6 @@ const playerName = ref<string | null>(null)
 const instancePicker = ref<InstanceType<typeof HomeInstancePickerModal>>()
 const isMinimal = computed(() => themeStore.homeLayout === 'minimal')
 const switchingLayout = ref(false)
-const floatingControlsStyle = computed(() => ({
-	bottom: themeStore.getFeatureFlag('page_path') ? '3.5rem' : '1rem',
-	right: `calc(${pageContext.floatingActionBarOffsets?.right.value ?? '0px'} + 1rem)`,
-}))
 
 const animateSidebarShow = ref(false)
 setTimeout(() => {
@@ -173,11 +163,12 @@ onUnmounted(() => {
 			@create="createInstance"
 		/>
 	</div>
-	<div class="home-floating-controls" :style="floatingControlsStyle">
+	<Teleport v-if="route.path === '/'" to="#home-layout-switch-target">
 		<button
 			v-tooltip="formatMessage(isMinimal ? messages.switchToInformation : messages.switchToMinimal)"
 			data-onboarding-id="home-layout-switch"
 			type="button"
+			data-tauri-drag-region-exclude
 			role="switch"
 			class="home-layout-switch"
 			:class="{ 'is-minimal': isMinimal }"
@@ -194,7 +185,7 @@ onUnmounted(() => {
 				<MinimizeIcon />
 			</span>
 		</button>
-	</div>
+	</Teleport>
 	<Teleport v-if="!isMinimal" to="#sidebar-default-teleport-target">
 		<div
 			class="flex min-w-0 flex-col slide-enter-active"
@@ -220,24 +211,6 @@ onUnmounted(() => {
 	min-height: calc(100dvh - var(--top-bar-height));
 }
 
-.home-floating-controls {
-	position: fixed;
-	z-index: 40;
-	display: flex;
-	height: 2.5rem;
-	align-items: center;
-	gap: 0.125rem;
-	padding: 0.25rem;
-	box-sizing: border-box;
-	border: 1px solid var(--color-divider);
-	border-radius: 9999px;
-	background: var(--color-raised-bg);
-	box-shadow:
-		var(--shadow-button),
-		0 0.25rem 0.75rem rgb(0 0 0 / 20%);
-	isolation: isolate;
-}
-
 .home-layout-switch:focus-visible {
 	outline: none;
 	box-shadow: 0 0 0 4px var(--color-brand-shadow);
@@ -250,7 +223,7 @@ onUnmounted(() => {
 	align-items: center;
 	/* width: 4.25rem; */ /* closes #210 */
 	height: 2rem;
-	margin: 0;
+	margin: 0 0.75rem 0 0;
 	padding: 0;
 	border: 0;
 	border-radius: 9999px;

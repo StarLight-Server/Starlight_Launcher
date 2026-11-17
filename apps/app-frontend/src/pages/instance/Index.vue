@@ -19,6 +19,29 @@
 				@unlinked="fetchInstance"
 			/>
 			<UpdateToPlayModal ref="updateToPlayModal" />
+			<NewModal ref="quickJoinModal" :header="formatMessage(messages.quickJoin)">
+				<p class="m-0 text-secondary">{{ formatMessage(messages.quickJoinConfirm) }}</p>
+				<template #actions>
+					<div class="flex justify-end gap-2">
+						<ButtonStyled type="outlined"
+							><button type="button" @click="quickJoinModal?.hide()">
+								{{ formatMessage(commonMessages.cancelButton) }}
+							</button></ButtonStyled
+						>
+						<ButtonStyled color="brand"
+							><button
+								type="button"
+								@click="
+									quickJoinModal?.hide()
+									startInstance()
+								"
+							>
+								{{ formatMessage(messages.quickJoinContinue) }}
+							</button></ButtonStyled
+						>
+					</div>
+				</template>
+			</NewModal>
 			<ContentPageHeader>
 				<template #icon>
 					<InstanceIcon
@@ -378,6 +401,7 @@ import {
 	ContentPageHeader,
 	defineMessages,
 	injectNotificationManager,
+	NewModal,
 	OverflowMenu,
 	ServerOnlinePlayers,
 	ServerPing,
@@ -391,7 +415,7 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import type { Component as ComponentType } from 'vue'
-import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import InstanceNavTabs from '@/components/instance/InstanceNavTabs.vue'
@@ -452,6 +476,12 @@ const props = defineProps<{
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	quickJoin: { id: 'app.skin-site.quick-join.button', defaultMessage: 'Join the StarLight server' },
+	quickJoinConfirm: {
+		id: 'app.skin-site.quick-join.existing',
+		defaultMessage: 'The StarLight client is about to start. Continue?',
+	},
+	quickJoinContinue: { id: 'app.skin-site.quick-join.continue', defaultMessage: 'Continue' },
 	launchAnother: { id: 'app.instance.launch-another', defaultMessage: 'Launch another window' },
 	stopAll: { id: 'app.instance.stop-all', defaultMessage: 'Stop all windows of this instance' },
 	neverPlayed: { id: 'app.instance.never-played', defaultMessage: 'Never played' },
@@ -524,6 +554,7 @@ const subpagePending = ref(false)
 const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
+const quickJoinModal = ref<InstanceType<typeof NewModal>>()
 let launchElapsedTimer: ReturnType<typeof setInterval> | undefined
 
 useLoadingBarToken(subpagePending)
@@ -806,6 +837,29 @@ const startInstance = async () => {
 		}
 	}
 }
+
+watch(
+	[() => route.query.quickLaunch, () => instance.value?.id, updateToPlayModal],
+	async ([quickLaunch, id, modal]) => {
+		if (quickLaunch !== '1' || id !== props.id || !modal) return
+		const { quickLaunch: _quickLaunch, ...query } = route.query
+		await router.replace({ path: route.path, query, hash: route.hash })
+		await nextTick()
+		if (!playing.value) await startInstance()
+	},
+	{ immediate: true, flush: 'post' },
+)
+
+watch(
+	[() => route.query.quickConfirm, () => instance.value?.id, quickJoinModal],
+	async ([quickConfirm, id, modal]) => {
+		if (quickConfirm !== '1' || id !== props.id || !modal) return
+		const { quickConfirm: _quickConfirm, ...query } = route.query
+		await router.replace({ path: route.path, query, hash: route.hash })
+		modal.show()
+	},
+	{ immediate: true, flush: 'post' },
+)
 
 watch(
 	[loading, () => props.id],

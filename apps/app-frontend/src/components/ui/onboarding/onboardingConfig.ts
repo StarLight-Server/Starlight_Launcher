@@ -77,7 +77,7 @@ export const onboardingMessages = defineMessages({
 	homeLayoutDescription: {
 		id: 'app.onboarding.home-layout.description',
 		defaultMessage:
-			'Use the bottom-right control to switch between the StarLight skin site home and the focused instance launcher.',
+			'Use the top bar control to switch between the StarLight skin site home and the focused instance launcher.',
 	},
 	continueArea: {
 		id: 'app.onboarding.action.continue-area',

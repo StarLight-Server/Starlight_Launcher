@@ -2492,6 +2492,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<Breadcrumbs class="pt-[2px]" />
 			</div>
 			<section data-tauri-drag-region class="flex shrink-0 ml-auto items-center">
+				<div
+					id="home-layout-switch-target"
+					class="flex shrink-0 items-center"
+					data-tauri-drag-region-exclude
+				></div>
 				<div class="flex mr-3">
 					<Suspense>
 						<AppActionBar />

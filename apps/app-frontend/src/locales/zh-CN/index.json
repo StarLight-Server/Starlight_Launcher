@@ -1,4 +1,19 @@
 {
+  "app.skin-site.quick-join.button": {
+    "message": "一键加入 StarLight 服务器"
+  },
+  "app.skin-site.quick-join.existing": {
+    "message": "即将启动 StarLight 客户端，是否继续？"
+  },
+  "app.skin-site.quick-join.install": {
+    "message": "即将自动下载 StarLight 客户端，下载后自动启动，是否继续？"
+  },
+  "app.skin-site.quick-join.continue": {
+    "message": "继续"
+  },
+  "app.skin-site.quick-join.download-only": {
+    "message": "继续但不启动游戏"
+  },
   "app.hosted-packs.progress.pause": {
     "message": "暂停"
   },
@@ -6615,7 +6630,7 @@
     "message": "留个清单"
   },
   "app.onboarding.home-layout.description": {
-    "message": "使用右下角控件在 StarLight 皮肤站主页与专注的实例启动页之间切换。"
+    "message": "使用顶部栏控件在 StarLight 皮肤站主页与专注的实例启动页之间切换。"
   },
   "app.onboarding.home-layout.title": {
     "message": "切换主页样式"

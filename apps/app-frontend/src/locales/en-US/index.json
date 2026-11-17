@@ -1,4 +1,19 @@
 {
+  "app.skin-site.quick-join.button": {
+    "message": "Join the StarLight server"
+  },
+  "app.skin-site.quick-join.existing": {
+    "message": "The StarLight client is about to start. Continue?"
+  },
+  "app.skin-site.quick-join.install": {
+    "message": "The StarLight client will be downloaded and started automatically. Continue?"
+  },
+  "app.skin-site.quick-join.continue": {
+    "message": "Continue"
+  },
+  "app.skin-site.quick-join.download-only": {
+    "message": "Continue without starting the game"
+  },
   "app.account.signed-in-as": {
     "message": "Signed in as"
   },
@@ -6363,7 +6378,7 @@
     "message": "Welcome home"
   },
   "app.onboarding.home-layout.description": {
-    "message": "Use the bottom-right control to switch between the StarLight skin site home and the focused instance launcher."
+    "message": "Use the top bar control to switch between the StarLight skin site home and the focused instance launcher."
   },
   "app.onboarding.home-layout.title": {
     "message": "Switch your home"
