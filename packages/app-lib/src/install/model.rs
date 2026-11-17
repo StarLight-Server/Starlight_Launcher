@@ -2293,6 +2293,7 @@ pub struct InstallJobSnapshot {
     pub details: InstallPhaseDetails,
     pub parallel: Option<InstallParallelProgress>,
     pub display: Option<InstallJobDisplay>,
+    pub resource_names: Vec<String>,
     pub error: Option<InstallErrorView>,
     pub rollback_error: Option<InstallErrorView>,
     pub pause_reason: Option<InstallPauseReason>,
@@ -2305,6 +2306,21 @@ pub struct InstallJobSnapshot {
 }
 
 impl InstallJobState {
+    pub fn resource_names(&self) -> Vec<String> {
+        match &self.request {
+            InstallRequest::InstallContent { display_title, .. }
+            | InstallRequest::InstallCurseForgeContent {
+                display_title, ..
+            }
+            | InstallRequest::InstallCurseForgeWorld {
+                display_title, ..
+            } => {
+                vec![display_title.clone()]
+            }
+            _ => Vec::new(),
+        }
+    }
+
     pub fn source_instance_id(&self) -> Option<String> {
         match &self.request {
             InstallRequest::UpgradeUnmanagedInstance {
