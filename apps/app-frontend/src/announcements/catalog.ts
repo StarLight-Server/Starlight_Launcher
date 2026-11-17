@@ -33,6 +33,39 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.5-beta1',
+		version: '1.0.5-beta1',
+		publishedAt: '2026-11-18',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.5-beta1',
+			'zh-CN': 'Starlight Launcher 1.0.5-beta1',
+		},
+		changes: {
+			added: [
+				{
+					'en-US': 'Added a one-click option to install or launch the StarLight client from the home page.',
+					'zh-CN': '在主页新增一键加入 StarLight 服务器，可下载安装或启动 StarLight 客户端。',
+				},
+			],
+			changed: [
+				{
+					'en-US': 'Moved the home layout switch to the top bar.',
+					'zh-CN': '将主页布局切换按钮移至顶部栏。',
+				},
+			],
+			fixed: [
+				{
+					'en-US': 'Restored the circular captcha image and improved the rotation slider.',
+					'zh-CN': '恢复验证码图片的圆形遮罩，并改进旋转滑块。',
+				},
+				{
+					'en-US': 'Fixed NeoForge installation failing when older metadata references unavailable installer patches.',
+					'zh-CN': '修复旧版元数据引用失效补丁时 NeoForge 安装失败的问题。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-1.0.4',
 		version: '1.0.4',
 		publishedAt: '2026-11-16',
