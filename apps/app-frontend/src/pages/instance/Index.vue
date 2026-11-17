@@ -29,13 +29,7 @@
 							</button></ButtonStyled
 						>
 						<ButtonStyled color="brand"
-							><button
-								type="button"
-								@click="
-									quickJoinModal?.hide()
-									startInstance()
-								"
-							>
+							><button type="button" @click="confirmQuickJoin">
 								{{ formatMessage(messages.quickJoinContinue) }}
 							</button></ButtonStyled
 						>
@@ -836,6 +830,11 @@ const startInstance = async () => {
 			handleSevereError(err, { instanceId: id })
 		}
 	}
+}
+
+function confirmQuickJoin() {
+	quickJoinModal.value?.hide()
+	void startInstance()
 }
 
 watch(
