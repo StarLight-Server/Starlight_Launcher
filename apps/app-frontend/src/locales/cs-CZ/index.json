@@ -1,4 +1,118 @@
 {
+  "app.hosted-error.login.title": {
+    "message": "StarLight sign-in required"
+  },
+  "app.hosted-error.account.title": {
+    "message": "A Minecraft account is required"
+  },
+  "app.hosted-error.access.title": {
+    "message": "The modpack service denied access"
+  },
+  "app.hosted-error.network.title": {
+    "message": "StarLight download failed"
+  },
+  "app.hosted-error.runtime.title": {
+    "message": "Game component installation failed"
+  },
+  "app.hosted-error.storage.title": {
+    "message": "Could not save the client files"
+  },
+  "app.hosted-error.disk-space.title": {
+    "message": "Not enough disk space"
+  },
+  "app.hosted-error.permission.title": {
+    "message": "Cannot access the installation folder"
+  },
+  "app.hosted-error.busy.title": {
+    "message": "The instance or its files are in use"
+  },
+  "app.hosted-error.integrity.title": {
+    "message": "File verification failed"
+  },
+  "app.hosted-error.conflict.title": {
+    "message": "Client files conflict"
+  },
+  "app.hosted-error.configuration.title": {
+    "message": "The server modpack is unavailable"
+  },
+  "app.hosted-error.recovery.title": {
+    "message": "Installation recovery is incomplete"
+  },
+  "app.hosted-error.manual-download.title": {
+    "message": "A mod needs a manual download"
+  },
+  "app.hosted-error.unknown.title": {
+    "message": "StarLight installation could not finish"
+  },
+  "app.hosted-error.login.description": {
+    "message": "Sign in to StarLight again, then retry the download. Signing in will not start the game."
+  },
+  "app.hosted-error.account.description": {
+    "message": "Sign in with a StarLight account that has a player, or add an official Minecraft account from the account panel, then retry."
+  },
+  "app.hosted-error.access.description": {
+    "message": "The server refused the modpack request. This does not necessarily mean your sign-in expired. Copy the details and contact the server administrator."
+  },
+  "app.hosted-error.network.description": {
+    "message": "The download could not finish. Check your connection and retry. If a file is unavailable, send the details to the server administrator."
+  },
+  "app.hosted-error.runtime.description": {
+    "message": "Minecraft, Java, or the mod loader could not be installed. Check the download details for the failed component, then retry after resolving the cause."
+  },
+  "app.hosted-error.storage.description": {
+    "message": "The launcher could not write or replace installation files. Check the folder and file paths in the details, then retry after resolving the cause."
+  },
+  "app.hosted-error.disk-space.description": {
+    "message": "Free up space on the drive containing the installation folder and download cache, then select Retry."
+  },
+  "app.hosted-error.permission.description": {
+    "message": "Check that the installation folder is writable and its files are not being used by another program. Resolve the access problem, then select Retry."
+  },
+  "app.hosted-error.busy.description": {
+    "message": "Close this instance of Minecraft or any program using its files, or wait for the active installation to finish, then select Retry."
+  },
+  "app.hosted-error.integrity.description": {
+    "message": "A downloaded file does not match the expected content. Retry to download it again. If this keeps happening, send the details to the server administrator."
+  },
+  "app.hosted-error.conflict.description": {
+    "message": "Existing files or mods conflict with the server modpack. Check the file names in the details and resolve the conflict before trying again."
+  },
+  "app.hosted-error.configuration.description": {
+    "message": "The published modpack or its game and loader versions are unavailable or invalid. Copy the details and ask the server administrator to check the release."
+  },
+  "app.hosted-error.recovery.description": {
+    "message": "Installation failed and the previous files could not be fully restored. Close the game and wait for any active installation to finish, then retry recovery before launching."
+  },
+  "app.hosted-error.manual-download.description": {
+    "message": "A required mod does not allow automatic downloads. Check the download details and contact the server administrator for the file and installation instructions."
+  },
+  "app.hosted-error.unknown.description": {
+    "message": "The installation stopped unexpectedly. Check the download details or copy the error when requesting help."
+  },
+  "app.hosted-error.details": {
+    "message": "Error details"
+  },
+  "app.hosted-error.copy": {
+    "message": "Copy details"
+  },
+  "app.hosted-error.copied": {
+    "message": "Copied"
+  },
+  "app.hosted-error.copy-failed": {
+    "message": "Could not copy. Select and copy the error details manually."
+  },
+  "app.hosted-error.downloads": {
+    "message": "View downloads"
+  },
+  "app.hosted-error.retry": {
+    "message": "Retry"
+  },
+  "app.hosted-error.sign-in": {
+    "message": "Sign in to StarLight"
+  },
+  "app.hosted-error.signed-in": {
+    "message": "Signed in. You can now retry the download. The game will not start automatically."
+  },
   "app.skin-site.quick-join.button": {
     "message": "Join the StarLight server"
   },
