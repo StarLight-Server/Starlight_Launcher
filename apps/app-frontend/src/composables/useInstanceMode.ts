@@ -3,6 +3,8 @@ import { computed, type MaybeRefOrGetter, toValue } from 'vue'
 
 import { getInstanceMode, type InstanceMode, setInstanceMode } from '@/helpers/hosted-packs'
 
+import { clearHostedInstallFailures, reportHostedInstallFailure } from './hosted-install-errors'
+
 export const instanceModeKey = (instanceId: string) => ['instance-mode', instanceId] as const
 
 export function useInstanceMode(instanceId: MaybeRefOrGetter<string>) {
@@ -16,12 +18,26 @@ export function useInstanceMode(instanceId: MaybeRefOrGetter<string>) {
 
 export function useSetInstanceMode() {
 	const client = useQueryClient()
-	return useMutation({
-		mutationFn: ({ instanceId, mode }: { instanceId: string; mode: InstanceMode }) =>
-			setInstanceMode(instanceId, mode),
+	const mutation = useMutation({
+		mutationFn: async (options: { instanceId: string; mode: InstanceMode }): Promise<void> => {
+			const { instanceId, mode } = options
+			if (mode === 'starlight') clearHostedInstallFailures(instanceId)
+			try {
+				await setInstanceMode(instanceId, mode)
+			} catch (error) {
+				if (mode !== 'starlight') throw error
+				throw reportHostedInstallFailure(error, {
+					instanceId,
+					retry: async () => {
+						await mutation.mutateAsync(options)
+					},
+				})
+			}
+		},
 		onMutate: ({ instanceId }) => client.cancelQueries({ queryKey: instanceModeKey(instanceId) }),
 		onSuccess: (_, { instanceId, mode }) => client.setQueryData(instanceModeKey(instanceId), mode),
 		onError: (_, { instanceId }) =>
 			client.invalidateQueries({ queryKey: instanceModeKey(instanceId) }),
 	})
+	return mutation
 }

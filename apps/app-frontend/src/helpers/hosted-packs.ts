@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 
+import { reportHostedInstallFailure } from '../composables/hosted-install-errors.ts'
 import {
 	requestSkinSiteDownloadToken,
 	requestSkinSitePlayers,
@@ -147,11 +148,20 @@ export const hostedCreate = async (gameDirRoot?: string | null) => {
 }
 export const hostedBinding = (instanceId: string) =>
 	invokeHosted<HostedBinding | null>('plugin:install|hosted_binding', { instanceId })
-export const controlHostedDownload = (action: HostedDownloadControl, instanceId: string) =>
-	runHostedDownloadControl(action, instanceId, {
-		prepareSession: prepareHostedSession,
-		invoke: invokeHosted<void>,
-	})
+export async function controlHostedDownload(action: HostedDownloadControl, instanceId: string) {
+	try {
+		await runHostedDownloadControl(action, instanceId, {
+			prepareSession: prepareHostedSession,
+			invoke: invokeHosted<void>,
+		})
+	} catch (error) {
+		if (action !== 'resume') throw error
+		throw reportHostedInstallFailure(error, {
+			instanceId,
+			retry: () => controlHostedDownload('resume', instanceId),
+		})
+	}
+}
 export const hostedSync = async (instanceId: string) => {
 	await requireHostedGameAccount()
 	startHostedPackAttempt(instanceId)

@@ -10,6 +10,7 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref, watch } from 'vue'
 import type { Router } from 'vue-router'
 
+import { isHostedInstallErrorHandled } from '@/composables/hosted-install-errors'
 import {
 	install_job_dismiss,
 	install_job_repair_cache_and_retry,
@@ -264,11 +265,7 @@ const activeJobStatuses = new Set<InstallJobStatus>([
 	'canceling',
 	'waiting_for_user',
 ])
-const cancelableJobStatuses = new Set<InstallJobStatus>([
-	'queued',
-	'running',
-	'waiting_for_user',
-])
+const cancelableJobStatuses = new Set<InstallJobStatus>(['queued', 'running', 'waiting_for_user'])
 const copyDetailsStallMs = 30_000
 
 interface ProgressSnapshot {
@@ -673,7 +670,9 @@ export async function useInstallJobNotifications(opts: {
 				action: async () => {
 					if (repairingJobIds.value.has(job.job_id)) return
 					if (!requiresCacheRepair) {
-						await opts.manager.retry(job.job_id).catch(opts.handleError)
+						await opts.manager.retry(job.job_id).catch((error) => {
+							if (!isHostedInstallErrorHandled(error)) opts.handleError(error)
+						})
 						await refresh()
 						return
 					}
@@ -752,13 +751,9 @@ export async function useInstallJobNotifications(opts: {
 				wrapText: isFailedJob(job),
 				progressType: finished ? undefined : getProgressType(job),
 				progressCurrent:
-					!finished && hasDeterminateInstallProgress(progress)
-						? progress.current
-						: undefined,
+					!finished && hasDeterminateInstallProgress(progress) ? progress.current : undefined,
 				progressTotal:
-					!finished && hasDeterminateInstallProgress(progress)
-						? progress.total
-						: undefined,
+					!finished && hasDeterminateInstallProgress(progress) ? progress.total : undefined,
 				buttons: getButtons(job),
 				onDismiss: finished
 					? async () => {

@@ -1,4 +1,118 @@
 {
+  "app.hosted-error.login.title": {
+    "message": "需要登录 StarLight"
+  },
+  "app.hosted-error.account.title": {
+    "message": "需要可用的游戏账号"
+  },
+  "app.hosted-error.access.title": {
+    "message": "整合包服务拒绝访问"
+  },
+  "app.hosted-error.network.title": {
+    "message": "StarLight 客户端下载失败"
+  },
+  "app.hosted-error.runtime.title": {
+    "message": "游戏组件安装失败"
+  },
+  "app.hosted-error.storage.title": {
+    "message": "无法保存客户端文件"
+  },
+  "app.hosted-error.disk-space.title": {
+    "message": "磁盘空间不足"
+  },
+  "app.hosted-error.permission.title": {
+    "message": "无法访问安装目录"
+  },
+  "app.hosted-error.busy.title": {
+    "message": "实例或安装文件正在被占用"
+  },
+  "app.hosted-error.integrity.title": {
+    "message": "文件校验失败"
+  },
+  "app.hosted-error.conflict.title": {
+    "message": "客户端文件存在冲突"
+  },
+  "app.hosted-error.configuration.title": {
+    "message": "服务器整合包暂不可用"
+  },
+  "app.hosted-error.recovery.title": {
+    "message": "安装文件尚未恢复完成"
+  },
+  "app.hosted-error.manual-download.title": {
+    "message": "部分模组需要手动下载"
+  },
+  "app.hosted-error.unknown.title": {
+    "message": "StarLight 客户端安装未完成"
+  },
+  "app.hosted-error.login.description": {
+    "message": "请重新登录 StarLight 后重试下载。登录成功后不会自动启动游戏。"
+  },
+  "app.hosted-error.account.description": {
+    "message": "请登录拥有玩家角色的 StarLight 账号，或在账号面板添加正版 Minecraft 账号，然后重试。"
+  },
+  "app.hosted-error.access.description": {
+    "message": "服务器拒绝了整合包请求，这不一定是登录过期。请复制错误详情并联系服务器管理员处理。"
+  },
+  "app.hosted-error.network.description": {
+    "message": "下载未能完成。请检查网络连接后重试；如果文件已失效，请将错误详情发给服务器管理员。"
+  },
+  "app.hosted-error.runtime.description": {
+    "message": "Minecraft、Java 或加载器未能安装完成。请在下载详情中查看失败的组件，处理原因后重试。"
+  },
+  "app.hosted-error.storage.description": {
+    "message": "启动器无法写入或替换安装文件。请查看错误详情中的目录和文件路径，处理原因后重试。"
+  },
+  "app.hosted-error.disk-space.description": {
+    "message": "请清理安装目录和下载缓存所在磁盘的空间，然后点击“重试”。"
+  },
+  "app.hosted-error.permission.description": {
+    "message": "请确认安装目录允许写入，且文件未被其他程序占用。处理访问问题后，点击“重试”。"
+  },
+  "app.hosted-error.busy.description": {
+    "message": "请先关闭该实例的 Minecraft 游戏窗口或占用相关文件的其他程序，或等待正在进行的安装任务结束，然后点击“重试”。"
+  },
+  "app.hosted-error.integrity.description": {
+    "message": "下载文件与预期内容不一致。请重试以重新下载；如果反复失败，请将错误详情发给服务器管理员。"
+  },
+  "app.hosted-error.conflict.description": {
+    "message": "现有文件或模组与服务器整合包发生冲突。请查看错误详情中的文件名称，处理冲突后再重试。"
+  },
+  "app.hosted-error.configuration.description": {
+    "message": "服务器发布的整合包或指定的游戏、加载器版本不可用或配置异常。请复制错误详情，联系服务器管理员检查。"
+  },
+  "app.hosted-error.recovery.description": {
+    "message": "安装失败后，原有文件未能完整恢复。请关闭游戏并等待其他安装任务结束，再重试修复；修复完成前请勿启动该实例。"
+  },
+  "app.hosted-error.manual-download.description": {
+    "message": "部分必需模组不允许自动下载。请查看下载详情，并联系服务器管理员获取文件及安装说明。"
+  },
+  "app.hosted-error.unknown.description": {
+    "message": "安装意外停止。请查看下载详情，或复制错误信息以便反馈问题。"
+  },
+  "app.hosted-error.details": {
+    "message": "错误详情"
+  },
+  "app.hosted-error.copy": {
+    "message": "复制详情"
+  },
+  "app.hosted-error.copied": {
+    "message": "已复制"
+  },
+  "app.hosted-error.copy-failed": {
+    "message": "复制失败，请展开错误详情后手动选中并复制。"
+  },
+  "app.hosted-error.downloads": {
+    "message": "查看下载"
+  },
+  "app.hosted-error.retry": {
+    "message": "重试"
+  },
+  "app.hosted-error.sign-in": {
+    "message": "去登录 StarLight"
+  },
+  "app.hosted-error.signed-in": {
+    "message": "登录成功，可以重试下载。游戏不会自动启动。"
+  },
   "app.skin-site.quick-join.button": {
     "message": "一键加入 StarLight 服务器"
   },

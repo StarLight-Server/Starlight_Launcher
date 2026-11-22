@@ -395,7 +395,7 @@ export function createDownloadManager(handleError: (error: unknown) => void): Do
 
 	async function retryHosted(instanceId: string, sourceJobId?: string) {
 		try {
-			await runHostedSync(instanceId)
+			await runHostedSync(instanceId, () => retryHosted(instanceId, sourceJobId))
 		} catch (error) {
 			markHostedCreationFailed(instanceId, error)
 			throw error

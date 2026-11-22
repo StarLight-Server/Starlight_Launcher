@@ -490,6 +490,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import MissingModpackContentModal from '@/components/ui/modal/MissingModpackContentModal.vue'
+import { isHostedInstallErrorHandled } from '@/composables/hosted-install-errors'
 import { listPendingCurseForgeManualDownloads } from '@/helpers/curseforge'
 import type { CurseForgeManualDownloadItem } from '@/helpers/curseforge-manual'
 import {
@@ -1299,7 +1300,7 @@ async function withBusy(jobId: string, action: () => Promise<void>) {
 	try {
 		await action()
 	} catch (error) {
-		handleError(error)
+		if (!isHostedInstallErrorHandled(error)) handleError(error)
 	} finally {
 		const next = new Set(busy.value)
 		next.delete(jobId)

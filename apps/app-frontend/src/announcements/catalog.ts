@@ -33,6 +33,50 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.5-beta2',
+		version: '1.0.5-beta2',
+		publishedAt: '2026-11-22',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.5-beta2',
+			'zh-CN': 'Starlight Launcher 1.0.5-beta2',
+		},
+		changes: {
+			added: [
+				{
+					'en-US':
+						'StarLight download and installation failures now open a dialog with recovery advice, error details, copy, sign-in and retry actions, even after navigating to another page.',
+					'zh-CN':
+						'StarLight 下载或安装失败时显示错误弹窗，提供处理建议、错误详情、复制、登录及重试入口，切换页面后也能收到提醒。',
+				},
+			],
+			changed: [
+				{
+					'en-US': 'Replaced the one-click StarLight server button icon with a four-point star.',
+					'zh-CN': '将一键加入 StarLight 服务器按钮的图标改为四芒星。',
+				},
+				{
+					'en-US':
+						'Retrying from an error dialog opens Downloads and reuses the original instance or installation folder. Completing a retry does not automatically launch the game.',
+					'zh-CN':
+						'在错误弹窗中重试会打开下载页，并复用原实例或安装目录；重试完成后不会自动启动游戏。',
+				},
+			],
+			fixed: [
+				{
+					'en-US':
+						'Avoid duplicate dialogs for the same failure and suppress error dialogs for user cancellation and ongoing automatic retries.',
+					'zh-CN': '避免同一次失败重复弹窗，主动取消和自动重试过程中不弹出错误窗口。',
+				},
+				{
+					'en-US':
+						'Distinguish expired sign-ins, access denial, storage failures and incomplete recovery, with retry support for failures before an instance has been created.',
+					'zh-CN':
+						'区分登录失效、访问被拒绝、文件存储错误及恢复未完成等原因，实例尚未创建时出错也可重试。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-1.0.5-beta1',
 		version: '1.0.5-beta1',
 		publishedAt: '2026-11-18',

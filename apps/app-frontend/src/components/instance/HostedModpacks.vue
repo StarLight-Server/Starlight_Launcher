@@ -24,7 +24,7 @@
 					<p>{{ formatMessage(messages.description) }}</p>
 				</div>
 				<ButtonStyled
-					><button type="button" :disabled="loading || syncing" @click="load">
+					><button type="button" :disabled="loading || syncing" @click="load(true)">
 						{{ formatMessage(messages.refresh) }}
 					</button></ButtonStyled
 				>
@@ -87,6 +87,7 @@ import { useRouter } from 'vue-router'
 
 import HostedPackProgress from '@/components/instance/HostedPackProgress.vue'
 import InstanceModeSettings from '@/components/instance/InstanceModeSettings.vue'
+import { reportHostedInstallFailure } from '@/composables/hosted-install-errors'
 import { markHostedCreationCompleted } from '@/composables/useHostedCreation'
 import { useHostedSync } from '@/composables/useHostedSync'
 import { useInstanceMode } from '@/composables/useInstanceMode'
@@ -164,7 +165,7 @@ const ready = ref(false)
 const loadError = ref('')
 const error = computed(() => loadError.value || task.error.value)
 let generation = 0
-async function load() {
+async function load(notify = false) {
 	if (modeQuery.data.value !== 'starlight') return
 	const current = ++generation
 	const instanceId = props.instanceId
@@ -178,7 +179,11 @@ async function load() {
 		binding.value = installed
 		ready.value = true
 	} catch (cause) {
-		if (current === generation) loadError.value = String(cause)
+		if (current === generation) {
+			loadError.value = String(cause)
+			// Automatic page refreshes retain their inline error; only explicit actions interrupt.
+			if (notify) reportHostedInstallFailure(cause, { instanceId })
+		}
 	} finally {
 		if (current === generation) loading.value = false
 	}

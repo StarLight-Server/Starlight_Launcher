@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { SparklesIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	commonMessages,
@@ -12,6 +11,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { reportHostedInstallFailure } from '@/composables/hosted-install-errors'
 import { useHostedCreation } from '@/composables/useHostedCreation'
 import { getInstanceMode } from '@/helpers/hosted-packs'
 import { list } from '@/helpers/instance'
@@ -19,7 +19,7 @@ import { list } from '@/helpers/instance'
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const router = useRouter()
-const { install, installing, installError, acknowledge } = useHostedCreation()
+const { install, installing, acknowledge } = useHostedCreation()
 const modal = ref<InstanceType<typeof NewModal>>()
 const instanceId = ref<string>()
 const checking = ref(false)
@@ -76,14 +76,11 @@ async function proceed(launch: boolean) {
 		const pending = install(root || undefined)
 		await router.push('/downloads')
 		const id = await pending
-		if (!id) {
-			if (installError.value) handleError(new Error(installError.value))
-			return
-		}
+		if (!id) return
 		const failure = await openInstance(id, launch)
 		if (!failure) acknowledge(id)
 	} catch (error) {
-		handleError(error)
+		reportHostedInstallFailure(error, { retry: () => proceed(false) })
 	}
 }
 </script>
@@ -91,7 +88,14 @@ async function proceed(launch: boolean) {
 <template>
 	<ButtonStyled color="brand" size="large">
 		<button type="button" class="w-full justify-center" :disabled="checking" @click="openJoin">
-			<SparklesIcon />
+			<svg viewBox="22 22 84 84" fill="none" aria-hidden="true">
+				<path
+					d="M64 27c3.5 25.3 11.7 33.5 37 37-25.3 3.5-33.5 11.7-37 37-3.5-25.3-11.7-33.5-37-37C52.3 60.5 60.5 52.3 64 27Z"
+					stroke="currentColor"
+					stroke-width="5"
+					stroke-linejoin="round"
+				/>
+			</svg>
 			{{ formatMessage(messages.join) }}
 		</button>
 	</ButtonStyled>

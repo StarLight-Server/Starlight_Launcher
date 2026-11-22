@@ -68,6 +68,7 @@ import { hideAllPoppers } from 'floating-vue'
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { type RouteLocationNormalizedLoaded, RouterView, useRoute, useRouter } from 'vue-router'
 
+import HostedInstallErrorModal from '@/components/instance/HostedInstallErrorModal.vue'
 import InstancePlayerModal from '@/components/instance/InstancePlayerModal.vue'
 import TaggedModDownloadsModal from '@/components/instance/TaggedModDownloadsModal.vue'
 import InstanceExportModal from '@/components/lab/recipe-generator/InstanceExportModal.vue'
@@ -2660,6 +2661,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</div>
 	</NewModal>
 	<ErrorModal ref="errorModal" />
+	<HostedInstallErrorModal />
 	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
 	<ContentInstallModal
 		ref="modInstallModal"
