@@ -295,6 +295,7 @@ import {
 } from '@/helpers/auth'
 import { process_listener } from '@/helpers/events'
 import { authenticateInstancePlayer } from '@/helpers/instance-player'
+import { minecraftLoginMessages } from '@/helpers/minecraft-login-messages'
 import { getPlayerHeadUrl } from '@/helpers/rendering/batch-skin-renderer.ts'
 import type { Skin } from '@/helpers/skins'
 import { get_available_skins } from '@/helpers/skins'
@@ -724,9 +725,9 @@ async function login() {
 	loginDisabled.value = true
 	try {
 		const account = await loginToMinecraft({
-			trouble: formatMessage(messages.loginTrouble),
-			browserLogin: formatMessage(messages.loginBrowser),
-			deviceCode: formatMessage(messages.loginDeviceCode),
+			trouble: formatMessage(minecraftLoginMessages.trouble),
+			browserLogin: formatMessage(minecraftLoginMessages.browserLogin),
+			deviceCode: formatMessage(minecraftLoginMessages.deviceCode),
 		})
 		if (account) await onMicrosoftLogin(account)
 	} catch (error) {
@@ -928,18 +929,6 @@ const messages = defineMessages({
 	minecraftAccount: {
 		id: 'minecraft-account.label',
 		defaultMessage: 'Minecraft account',
-	},
-	loginTrouble: {
-		id: 'minecraft-login.trouble',
-		defaultMessage: 'Having trouble?',
-	},
-	loginBrowser: {
-		id: 'minecraft-login.browser',
-		defaultMessage: 'Use browser login',
-	},
-	loginDeviceCode: {
-		id: 'minecraft-login.device-code',
-		defaultMessage: 'Use device code',
 	},
 })
 </script>

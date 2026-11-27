@@ -25,6 +25,7 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { AxolotlBrandConfig } from '@/config'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { install_existing_instance } from '@/helpers/install'
+import { minecraftLoginMessages } from '@/helpers/minecraft-login-messages'
 import { cancel_directory_change } from '@/helpers/settings.ts'
 import { exportErrorLogs } from '@/helpers/utils'
 import { handleSevereError } from '@/store/error.js'
@@ -234,7 +235,11 @@ const loadingMinecraft = ref(false)
 async function loginMinecraft() {
 	try {
 		loadingMinecraft.value = true
-		const loggedIn = await login_flow()
+		const loggedIn = await login_flow({
+			trouble: formatMessage(minecraftLoginMessages.trouble),
+			browserLogin: formatMessage(minecraftLoginMessages.browserLogin),
+			deviceCode: formatMessage(minecraftLoginMessages.deviceCode),
+		})
 
 		if (loggedIn) {
 			await set_default_user(loggedIn.profile.id).catch(handleError)

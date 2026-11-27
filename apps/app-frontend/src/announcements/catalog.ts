@@ -33,6 +33,24 @@ export const ANNOUNCEMENT_CHANGE_TYPES: readonly AnnouncementChangeType[] = [
 
 export const launcherAnnouncements: readonly LauncherAnnouncement[] = [
 	{
+		id: 'launcher-1.0.5-beta3',
+		version: '1.0.5-beta3',
+		publishedAt: '2026-11-27',
+		title: {
+			'en-US': 'Starlight Launcher 1.0.5-beta3',
+			'zh-CN': 'Starlight Launcher 1.0.5-beta3',
+		},
+		changes: {
+			fixed: [
+				{
+					'en-US':
+						'Fixed an error when signing in again from Minecraft authentication error dialogs.',
+					'zh-CN': '修复从 Minecraft 登录错误弹窗重新登录时出现的参数错误。',
+				},
+			],
+		},
+	},
+	{
 		id: 'launcher-1.0.5-beta2',
 		version: '1.0.5-beta2',
 		publishedAt: '2026-11-22',
